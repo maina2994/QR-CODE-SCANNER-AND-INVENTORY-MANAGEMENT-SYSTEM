@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - FoodMart</title>
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #f6f6f6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            animation: fadeIn 1s ease;
+        }
+
+        /* LEFT */
+        .left {
+            flex: 1;
+            background: white;
+            padding: 60px;
+        }
+
+        .left h1 {
+            font-size: 32px;
+        }
+
+        .input-box {
+            margin-bottom: 20px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+        }
+
+        textarea {
+            height: 120px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: black;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        /* RIGHT */
+        .right {
+            flex: 1;
+            background: #000;
+            color: white;
+            padding: 60px;
+        }
+
+        .card {
+            background: #111;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* SOCIALS */
+        .socials a {
+            margin-right: 10px;
+            background: #111;
+            padding: 12px;
+            border-radius: 50%;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .socials a:hover {
+            background: #ff5a00;
+        }
+
+        /* MAP */
+        .map {
+            margin-top: 20px;
+        }
+
+        iframe {
+            border-radius: 12px;
+        }
+
+        /* WHATSAPP FLOAT */
+        .whatsapp {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            font-size: 22px;
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .whatsapp:hover {
+            background: #1ebe5d;
+        }
+
+        /* ANIMATION */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+
+        .error {
+            color: red;
+            font-size: 13px;
+            display: none;
+        }
+
+        .success {
+            color: green;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- LEFT -->
+        <div class="left">
+            <h1>Contact FoodMart</h1>
+
+            <div class="input-box">
+                <input type="text" id="name" placeholder="Your name">
+                <div class="error" id="nameError">Required</div>
+            </div>
+
+            <div class="input-box">
+                <input type="email" id="email" placeholder="Your email">
+                <div class="error" id="emailError">Valid email required</div>
+            </div>
+
+            <div class="input-box">
+                <textarea id="message" placeholder="Your message"></textarea>
+                <div class="error" id="messageError">Required</div>
+            </div>
+
+            <button onclick="sendMessage()">Send Message</button>
+
+            <div class="success" id="successMsg">✅ Message sent!</div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right">
+            <h2>Reach Us</h2>
+
+            <div class="card">
+                <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
+            </div>
+
+            <div class="card">
+                <p><i class="fas fa-phone"></i> +254 712 345 678</p>
+            </div>
+
+            <div class="card">
+                <p><i class="fas fa-envelope"></i> foodmart@gmail.com</p>
+            </div>
+
+            <!-- SOCIALS -->
+            <div class="socials">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://wa.me/254712345678"><i class="fab fa-whatsapp"></i></a>
+            </div>
+
+            <!-- MAP -->
+            <div class="map">
+                <iframe src="https://maps.google.com/maps?q=Nairobi%20Kenya&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                    width="100%" height="200">
+                </iframe>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- WHATSAPP FLOAT BUTTON -->
+    <a href="https://wa.me/254712345678" class="whatsapp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+        function sendMessage() {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const message = document.getElementById("message").value.trim();
+
+            let valid = true;
+
+            document.getElementById("nameError").style.display = "none";
+            document.getElementById("emailError").style.display = "none";
+            document.getElementById("messageError").style.display = "none";
+
+            if (!name) {
+                document.getElementById("nameError").style.display = "block";
+                valid = false;
+            }
+
+            if (!email || !email.includes("@")) {
+                document.getElementById("emailError").style.display = "block";
+                valid = false;
+            }
+
+            if (!message) {
+                document.getElementById("messageError").style.display = "block";
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            document.getElementById("successMsg").style.display = "block";
+
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("message").value = "";
+        }
+    </script>
+
+</body>
+
+</html>

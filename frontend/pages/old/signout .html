@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Out</title>
+
+    <style>
+        /* BODY AND BACKGROUND */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #d0e8ff;
+            /* Light blue background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* CONTAINER */
+        .container {
+            background: white;
+            width: 400px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        /* HEADER */
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        /* BUTTON */
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #ff5a00;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #e04e00;
+        }
+
+        p {
+            margin-top: 15px;
+        }
+
+        a {
+            color: #3399ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Sign Out</h2>
+        <p>Are you sure you want to sign out?</p>
+
+        <button onclick="signOut()">Yes, Sign Out</button>
+        <p><a href="hotel.html">Cancel</a></p>
+    </div>
+
+    <script>
+        function signOut() {
+            // Clear user data (localStorage/sessionStorage)
+            localStorage.clear();
+            alert("You have been signed out!");
+            // Redirect to login page
+            window.location.href = "login.html";
+        }
+    </script>
+
+</body>
+
+</html>

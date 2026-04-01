@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+
+    <style>
+        /* BODY AND BACKGROUND */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #d0e8ff;
+            /* Light blue background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* CONTAINER */
+        .container {
+            background: white;
+            width: 400px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* HEADER */
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* FORM ELEMENTS */
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #3399ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2673cc;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        a {
+            color: #3399ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>⚙️ Settings</h2>
+
+        <!-- Change Username -->
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter new username">
+
+        <!-- Change Email -->
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter new email">
+
+        <!-- Change Password -->
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter new password">
+
+        <!-- Notifications Settings -->
+        <label for="notifications">Notifications</label>
+        <select id="notifications">
+            <option value="all">All Notifications</option>
+            <option value="orders">Orders Only</option>
+            <option value="payments">Payments Only</option>
+            <option value="none">None</option>
+        </select>
+
+        <button onclick="saveSettings()">Save Settings</button>
+        <p><a href="hotel.html">Back to Menu</a></p>
+    </div>
+
+    <script>
+        // Save settings locally (demo)
+        function saveSettings() {
+            const settings = {
+                username: document.getElementById("username").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+                notifications: document.getElementById("notifications").value
+            };
+
+            localStorage.setItem("userSettings", JSON.stringify(settings));
+            alert("Settings saved!");
+        }
+    </script>
+
+</body>
+
+</html>

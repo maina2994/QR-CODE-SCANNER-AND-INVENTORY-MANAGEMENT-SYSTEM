@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>M-Pesa Payment</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f5f5f5;
+        }
+
+        header {
+            background: green;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: darkgreen;
+        }
+
+        .total {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <header>
+        <h2>💳 M-Pesa Payment</h2>
+    </header>
+
+    <div class="container">
+
+        <h3 class="total" id="totalAmount">Total: KES 0</h3>
+
+        <input type="text" id="phone" placeholder="Enter M-Pesa Number (07XXXXXXXX)">
+
+        <button onclick="payNow()">Pay Now</button>
+
+        <p class="status" id="status"></p>
+
+    </div>
+
+    <script>
+
+        // Load cart
+        let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+        let total = 0
+
+        cart.forEach(item => {
+            total += item.price * item.qty
+        })
+
+        // Display total
+        document.getElementById("totalAmount").innerText = "Total: KES " + total
+
+        // Payment function
+        function payNow() {
+
+            let phone = document.getElementById("phone").value
+            let status = document.getElementById("status")
+
+            if (phone === "") {
+                status.innerText = "Enter phone number"
+                status.style.color = "red"
+                return
+            }
+
+            if (phone.length < 10) {
+                status.innerText = "Invalid phone number"
+                status.style.color = "red"
+                return
+            }
+
+            status.innerText = "Processing payment..."
+            status.style.color = "orange"
+
+            // Simulate M-Pesa delay
+            setTimeout(() => {
+
+                status.innerText = "Payment successful ✅"
+                status.style.color = "green"
+
+                // Clear cart
+                localStorage.removeItem("cart")
+
+                // Save fake order ID
+                let orderId = "ORD" + Math.floor(Math.random() * 100000)
+                localStorage.setItem("orderId", orderId)
+
+                // Redirect to tracking
+                setTimeout(() => {
+                    window.location.href = "tracking.html"
+                }, 2000)
+
+            }, 3000)
+        }
+
+        function completePayment() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            // Save paid orders for billing page
+            localStorage.setItem("lastPaid", JSON.stringify(cart));
+
+            // Add notifications
+            let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+            cart.forEach(item => {
+                notifications.push({ message: `Payment Received: ${item.name}`, icon: "💰" });
+            });
+            localStorage.setItem("notifications", JSON.stringify(notifications));
+
+            // Clear cart
+            localStorage.removeItem("cart");
+
+            alert("Payment Successful!");
+
+            // Redirect to bill page
+            window.location.href = "bill.html";
+        }
+    </script>
+
+</body>
+
+</html>

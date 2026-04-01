@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #0e6253;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #0e6253;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn-clear {
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .status-paid {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h2>Admin Dashboard</h2>
+    </header>
+
+    <div class="container">
+        <h3>All Orders</h3>
+        <h3>⚠️ Stock Alerts</h3>
+        <div id="stock-alerts"></div>
+        <table id="orders-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Orders will be populated here -->
+            </tbody>
+        </table>
+
+        <button class="btn-clear" onclick="clearOrders()">Clear All Orders</button>
+    </div>
+
+    <script>
+        function loadOrders() {
+            let allOrders = JSON.parse(localStorage.getItem("allOrders")) || [];
+
+            console.log("ORDERS:", allOrders); // 🔥 DEBUG
+
+            let tbody = document.querySelector("#orders-table tbody");
+            tbody.innerHTML = "";
+
+            if (!allOrders || allOrders.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6'>No orders yet.</td></tr>";
+                return;
+            }
+
+            allOrders.reverse().forEach((order, index) => {
+
+                let orderTotal = 0;
+                let itemsList = "";
+
+                order.items.forEach(item => {
+                    let total = item.price * item.quantity;
+                    orderTotal += total;
+
+                    itemsList += `${item.name} (x${item.quantity})<br>`;
+                });
+
+                let row = document.createElement("tr");
+
+                row.innerHTML = `
+            <td>#${index + 1}</td>
+            <td>${order.phone}</td>
+            <td>${order.date}</td>
+            <td>${itemsList}</td>
+            <td>Ksh ${orderTotal}</td>
+            <td class="status-paid">Paid</td>
+        `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        // 🔥 LOAD DATA WHEN PAGE OPENS
+        window.onload = loadOrders;
+
+        function clearOrders() {
+            localStorage.removeItem("allOrders");
+            loadOrders();
+            alert("All orders cleared!");
+            function loadStockAlerts() {
+                let stock = JSON.parse(localStorage.getItem("stock")) || {};
+                let alertBox = document.getElementById("stock-alerts");
+
+                alertBox.innerHTML = "";
+
+                let hasAlert = false;
+
+                for (let item in stock) {
+                    if (stock[item] <= 3) { // 🔥 LOW STOCK LEVEL
+                        hasAlert = true;
+
+                        alertBox.innerHTML += `
+                <p style="color:red; font-weight:bold;">
+                    ⚠️ ${item} is low on stock (${stock[item]} left)
+                </p>
+            `;
+                    }
+                }
+
+                if (!hasAlert) {
+                    alertBox.innerHTML = "<p style='color:green;'>All stock levels are OK ✅</p>";
+                }
+            }
+        }
+        window.onload = function () {
+            loadOrders();
+            loadStockAlerts();
+        };
+    </script>
+</body>
+
+</html>

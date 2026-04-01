@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+
+    <style>
+        /* BODY BACKGROUND */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff5a00, #ff9966);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* FORM CONTAINER */
+        .register-container {
+            background: white;
+            padding: 30px;
+            width: 350px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        /* INPUT FIELDS */
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        /* BUTTON */
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ff5a00;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #e04e00;
+        }
+
+        /* LINK */
+        a {
+            text-decoration: none;
+            color: #ff5a00;
+            font-weight: bold;
+        }
+
+        p {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<script>
+    function validateForm() {
+
+        let password = document.getElementById("password").value
+        let confirmPassword = document.getElementById("confirmPassword").value
+        let error = document.getElementById("error")
+
+        if (password !== confirmPassword) {
+            error.innerText = "❌ Passwords do not match"
+            return false
+        }
+
+        if (password.length < 6) {
+            error.innerText = "❌ Password must be at least 6 characters"
+            return false
+        }
+
+        error.innerText = ""
+
+        alert("✅ Registration successful!")
+
+        return true
+    }
+
+</script>
+
+<body>
+
+    <div class="register-container">
+        <h2>Create Account</h2>
+
+        <form onsubmit="return validateForm()">
+            <input type="text" id="name" placeholder="Full Name" required>
+            <input type="email" id="email" placeholder="Email Address" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+
+            <p id="error" style="color:red; font-size:14px;"></p>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p>Already have an account? <a href="login.html">Login</a></p>
+    </div>
+
+</body>
+
+</html>

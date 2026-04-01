@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Meals</title>
+    <style>
+        :root {
+            --primaryColor: #0e6253;
+            --secondaryColor: #ffc107;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+        }
+
+        .navbar {
+            background: var(--primaryColor);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            color: var(--secondaryColor);
+        }
+
+        .nav-links a {
+            color: white;
+            margin-left: 15px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondaryColor);
+        }
+
+        .header {
+            text-align: center;
+            padding: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--secondaryColor);
+        }
+
+        .category {
+            margin: 20px;
+        }
+
+        .category h3 {
+            color: var(--primaryColor);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .card h4 {
+            margin: 10px 0 5px;
+        }
+
+        .card p {
+            margin: 0;
+        }
+
+        .card button {
+            margin-top: 8px;
+            padding: 8px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            background: var(--primaryColor);
+            color: white;
+            cursor: pointer;
+        }
+
+        .card button:hover {
+            background: #1e7e34;
+        }
+
+        /* ================= FOOTER ================= */
+        .footer {
+            background: var(--primaryColor);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 30px;
+        }
+
+        .footer span {
+            color: var(--secondaryColor);
+            font-weight: bold;
+        }
+
+        .qty-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .qty-control button {
+            background: var(--primaryColor);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .qty-control span {
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            background: var(--primaryColor);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 30px;
+        }
+
+        .footer span {
+            color: var(--secondaryColor);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const searchTerm = params.get('search')?.toLowerCase() || '';
+    const category = params.get('category')?.toLowerCase() || '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const meals = document.querySelectorAll('.detail-card');
+
+        meals.forEach(meal => {
+            const name = meal.querySelector('h4').innerText.toLowerCase();
+
+            // Filter by search term
+            if (searchTerm && !name.includes(searchTerm)) {
+                meal.style.display = 'none';
+            }
+
+            // Filter by category (if category logic is implemented)
+            // Example: if(meal.dataset.category !== category && category !== 'all') { meal.style.display = 'none'; }
+        });
+
+        // Optional: Show what user searched
+        if (searchTerm) {
+            const display = document.createElement('p');
+            display.innerText = `Search results for: "${searchTerm}"`;
+            document.body.prepend(display);
+        }
+    });
+</script>
+
+<body>
+
+    <div class="navbar">
+        <h2>FoodMart</h2>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="cart.html">Cart</a>
+            <a href="notification.html">Notifications</a>
+            <a href="contacts.html">Contact</a>
+            <a href="bill.html">Bills</a>
+        </div>
+    </div>
+
+
+    <div class="header">🍽️ All Meals</div>
+
+    <!-- ================= BURGERS ================= -->
+    <div class="category" data-category="burger"></div>
+    <h3>🍔 Burgers</h3>
+    <div class="grid">
+        <div class="card">
+            <img src="chicken burger.jpg" alt="Chicken Burger">
+            <h4>Chicken Burger</h4>
+            <p>Kshs.650</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Chicken Burger', 650)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="beef burger.jpg" alt="Beef Burger">
+            <h4>Beef Burger</h4>
+            <p>Kshs.300</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Beef Burger', 300)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="grilled chicken burger.jpg" alt="Grilled Chicken Burger">
+            <h4>Grilled Chicken Burger</h4>
+            <p>Kshs.400</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Grilled Chicken Burger', 400)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="smushburger.jpg" alt="Smush Burger">
+            <h4>Smush Burger</h4>
+            <p>Kshs.500</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Smush Burger', 500)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="cheese burger.jpg" alt="Cheese Burger">
+            <h4>Cheese Burger</h4>
+            <p>Kshs.450</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Cheese Burger', 450)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="cheddar chicken Burger.jpg" alt="Cheddar Chicken Burger">
+            <h4>Cheddar Chicken Burger</h4>
+            <p>Kshs.550</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Cheddar Chicken Burger', 550)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="cheese stuffed burger.jpg" alt="Cheese Stuffed Burger">
+            <h4>Cheese Stuffed Burger</h4>
+            <p>Kshs.450</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Cheese Stuffed Burger', 450)">Add to Cart</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- ================= PIZZA ================= -->
+    <div class="category" data-category="pizza"></div>
+    <h3>🍕 Pizza</h3>
+    <div class="grid">
+        <div class="card">
+            <img src="ppz.jpg" alt="Pepperoni Pizza">
+            <h4>Pepperoni Pizza</h4>
+            <p>Kshs.500</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Pepperoni Pizza', 500)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="cp.jpg" alt="Chicken Pizza">
+            <h4>Chicken Pizza</h4>
+            <p>Kshs.600</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Chicken Pizza', 600)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="chp.jpg" alt="Cheese Pizza">
+            <h4>Cheese Pizza</h4>
+            <p>Kshs.650</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Cheese Pizza', 650)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="bbqp.jpg" alt="BBQ Pizza">
+            <h4>BBQ Pizza</h4>
+            <p>Kshs.700</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'BBQ Pizza', 700)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="sup.jpg" alt="Supreme Pizza">
+            <h4>Supreme Pizza</h4>
+            <p>Kshs.750</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Supreme Pizza', 750)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="vp.jpg" alt="Veggie Pizza">
+            <h4>Veggie Pizza</h4>
+            <p>Kshs.700</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Veggie Pizza', 700)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="chop.jpg" alt="Chocolate Pizza">
+            <h4>Chocolate Pizza</h4>
+            <p>Kshs.600</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Chocolate Pizza', 600)">Add to Cart</button>
+        </div>
+    </div>
+    </div>
+    <!-- ================= COFFEE ================= -->
+    <div class="category" data-category="coffee"></div>
+    <h3>☕ Coffee</h3>
+    <div class="grid">
+        <div class="card">
+            <img src="blackc.jpg" alt="Black Coffee">
+            <h4>Black Coffee</h4>
+            <p>Kshs.150</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Black Coffee', 150)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="mochac.jpg" alt="Mocha Coffee">
+            <h4>Mocha Coffee</h4>
+            <p>Kshs.120</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Mocha Coffee', 120)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="coffeeamericano.jpg" alt="Americano Coffee">
+            <h4>Americano Coffee</h4>
+            <p>Kshs.200</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Americano Coffee', 200)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="cappuccinnocoffee.jpg" alt="Cappuccino Coffee">
+            <h4>Cappuccino Coffee</h4>
+            <p>Kshs.350</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Cappuccino Coffee', 350)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="exprresocoffee.jpg" alt="Expresso Coffee">
+            <h4>Expresso Coffee</h4>
+            <p>Kshs.400</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Expresso Coffee', 400)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="icedlattecoffee.jpg" alt="Iced Latte Coffee">
+            <h4>Iced Latte Coffee</h4>
+            <p>Kshs.420</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Iced Latte Coffee', 420)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="machic.jpg" alt="Macchiato Coffee">
+            <h4>Macchiato Coffee</h4>
+            <p>Kshs.500</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Macchiato Coffee', 500)">Add to Cart</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- ================= ICE CREAM ================= -->
+    <div class="category" data-category="ice cream"></div>
+    <h3>🍨 Ice Cream</h3>
+    <div class="grid">
+        <div class="card">
+            <img src="vai.jpg" alt="Vanilla Ice Cream">
+            <h4>Vanilla Ice Cream</h4>
+            <p>Kshs.80</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Vanilla Ice Cream', 80)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="strawberry.jpg" alt="Strawberry Ice Cream">
+            <h4>Strawberry Ice Cream</h4>
+            <p>Kshs.120</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Strawberry Ice Cream', 120)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="choi.jpg" alt="Chocolate Ice Cream">
+            <h4>Chocolate Ice Cream</h4>
+            <p>Kshs.150</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Chocolate Ice Cream', 150)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="sui.jpg" alt="Sundae Ice Cream">
+            <h4>Sundae Ice Cream</h4>
+            <p>Kshs.200</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Sundae Ice Cream', 200)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="greei.jpg" alt="Green Ice Cream">
+            <h4>Green Ice Cream</h4>
+            <p>Kshs.100</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Green Ice Cream', 100)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="cai.jpg" alt="Caramel Ice Cream">
+            <h4>Caramel Ice Cream</h4>
+            <p>Kshs.250</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Caramel Ice Cream', 250)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="msi.jpg" alt="Milkshake Ice Cream">
+            <h4>Milkshake Ice Cream</h4>
+            <p>Kshs.250</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Milkshake Ice Cream', 250)">Add to Cart</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- ================= AFRICAN DISHES ================= -->
+    <div class="category" data-category="African dishes"></div>
+    <h3>🍛 African Dishes</h3>
+    <div class="grid">
+        <div class="card">
+            <img src="ugb.jpg" alt="Ugali & Beef Stew">
+            <h4>Ugali & Beef Stew</h4>
+            <p>Kshs.250</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Ugali & Beef Stew', 250)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="ugs.jpg" alt="Ugali & Sukuma Wiki">
+            <h4>Ugali & Sukuma Wiki</h4>
+            <p>Kshs.150</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Ugali & Sukuma Wiki', 150)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="pilau.jpg" alt="Pilau">
+            <h4>Pilau</h4>
+            <p>Kshs.300</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Pilau', 300)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="chapatib.jpg" alt="Chapati & Beans">
+            <h4>Chapati & Beans</h4>
+            <p>Kshs.200</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Chapati & Beans', 200)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="nyc.jpg" alt="Nyama Choma">
+            <h4>Nyama Choma</h4>
+            <p>Kshs.600</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Nyama Choma', 600)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="githeri.jpg" alt="Githeri">
+            <h4>Githeri</h4>
+            <p>Kshs.150</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Githeri', 150)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="matoke.jpg" alt="Matoke">
+            <h4>Matoke</h4>
+            <p>Kshs.250</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Matoke', 250)">Add to Cart</button>
+        </div>
+    </div>
+    </div>
+    <!-- ================= DRINKS ================= -->
+    <div class="category" data-category="drinks"></div>
+    <h3>🥤 Drinks</h3>
+    <div class="grid">
+        <div class="card">
+            <img src="soda.jpg" alt="Soda">
+            <h4>Soda</h4>
+            <p>Kshs.60</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Soda', 60)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="juice.jpg" alt="Fresh Juice">
+            <h4>Fresh Juice</h4>
+            <p>Kshs.120</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Fresh Juice', 120)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="milkshake.jpg" alt="Milkshake">
+            <h4>Milkshake</h4>
+            <p>Kshs.300</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Milkshake', 300)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="water.jpg" alt="Bottled Water">
+            <h4>Bottled Water</h4>
+            <p>Kshs.50</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Bottled Water', 50)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="smoothie.jpg" alt="Smoothie">
+            <h4>Smoothie</h4>
+            <p>Kshs.250</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Smoothie', 250)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="energy drink.jpg" alt="Energy Drink">
+            <h4>Energy Drink</h4>
+            <p>Kshs.150</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Energy Drink', 150)">Add to Cart</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- ================= DESSERTS ================= -->
+    <div class="category" data-category="desserts"></div>
+    <h3>🍰 Desserts</h3>
+    <div class="grid">
+        <div class="card">
+            <img src="cake.jpg" alt="Chocolate Cake">
+            <h4>Chocolate Cake</h4>
+            <p>Kshs.200</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Chocolate Cake', 200)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="icecream.jpg" alt="Ice Cream">
+            <h4>Ice Cream</h4>
+            <p>Kshs.100</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Ice Cream', 100)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="donuts.jpg" alt="Donuts">
+            <h4>Donuts</h4>
+            <p>Kshs.150</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Donuts', 150)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="cookies.jpg" alt="Cookies">
+            <h4>Cookies</h4>
+            <p>Kshs.120</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Cookies', 120)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="brownie.jpg" alt="Brownie">
+            <h4>Brownie</h4>
+            <p>Kshs.180</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Brownie', 180)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="pancake.jpg" alt="Pancakes">
+            <h4>Pancakes</h4>
+            <p>Kshs.250</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Pancakes', 250)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="waffles.jpg" alt="Waffles">
+            <h4>Waffles</h4>
+            <p>Kshs.300</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Waffles', 300)">Add to Cart</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- ================= SEAFOOD ================= -->
+    <div class="category" data-category="seafood"></div>
+    <h3>🦐 Seafood</h3>
+    <div class="grid">
+        <div class="card">
+            <img src="tilapia.jpg" alt="Tilapia">
+            <h4>Tilapia</h4>
+            <p>Kshs.500</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Tilapia', 500)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="kingfish.jpg" alt="Kingfish">
+            <h4>Kingfish</h4>
+            <p>Kshs.900</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Kingfish', 900)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="snapper.jpg" alt="Snapper">
+            <h4>Snapper</h4>
+            <p>Kshs.800</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Snapper', 800)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="prawns.jpg" alt="Prawns">
+            <h4>Prawns</h4>
+            <p>Kshs.700</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Prawns', 700)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="crab.jpg" alt="Crab">
+            <h4>Crab</h4>
+            <p>Kshs.1200</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Crab', 1200)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="calamari.jpg" alt="Calamari">
+            <h4>Calamari</h4>
+            <p>Kshs.600</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Calamari', 600)">Add to Cart</button>
+        </div>
+        <div class="card">
+            <img src="lobster.jpg" alt="Lobster">
+            <h4>Lobster</h4>
+            <p>Kshs.2500</p>
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+            <button onclick="addToCartWithQty(this, 'Lobster', 2500)">Add to Cart</button>
+        </div>
+    </div>
+    </div>
+    <!-- ================= SALADS ================= -->
+    <div class="category" data-category="salads"></div>
+    <h3>🥗 Salads</h3>
+    <div class="grid">
+
+        <div class="card">
+            <img src="caesar salad.jpg" alt="Caesar Salad">
+            <h4>Caesar Salad</h4>
+            <p>Kshs.300</p>
+
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+
+            <button onclick="addToCartWithQty(this, 'Caesar Salad', 300)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="greek salad.jpg" alt="Greek Salad">
+            <h4>Greek Salad</h4>
+            <p>Kshs.350</p>
+
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+
+            <button onclick="addToCartWithQty(this, 'Greek Salad', 350)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="fruit salad.jpg" alt="Fruit Salad">
+            <h4>Fruit Salad</h4>
+            <p>Kshs.200</p>
+
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+
+            <button onclick="addToCartWithQty(this, 'Fruit Salad', 200)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="chicken salad.jpg" alt="Chicken Salad">
+            <h4>Chicken Salad</h4>
+            <p>Kshs.400</p>
+
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+
+            <button onclick="addToCartWithQty(this, 'Chicken Salad', 400)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="avocado salad.jpg" alt="Avocado Salad">
+            <h4>Avocado Salad</h4>
+            <p>Kshs.250</p>
+
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+
+            <button onclick="addToCartWithQty(this, 'Avocado Salad', 250)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="coleslaw.jpg" alt="Coleslaw">
+            <h4>Coleslaw</h4>
+            <p>Kshs.180</p>
+
+            <div class="qty-control">
+                <button onclick="decreaseQty(this)">-</button>
+                <span class="qty">1</span>
+                <button onclick="increaseQty(this)">+</button>
+            </div>
+
+            <button onclick="addToCartWithQty(this, 'Coleslaw', 180)">Add to Cart</button>
+        </div>
+
+    </div>
+    </div>
+    <!-- 🔻 FOOTER -->
+    <div class="footer">
+        <p>© 2026 <span>FoodMart</span> | All Rights Reserved</p>
+    </div>
+
+    <!-- ================= QUANTITY & CART JAVASCRIPT ================= -->
+    <script>
+
+        let tableNumber = new URLSearchParams(window.location.search).get("table");
+
+        if (!tableNumber) {
+            tableNumber = "Unknown Table";
+        }
+
+        console.log("Table:", tableNumber);
+        function addToCartWithQty(button, name, price) {
+            let card = button.closest(".card");
+            let qty = parseInt(card.querySelector(".qty").innerText);
+
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            let existingItem = cart.find(item => item.name === name);
+
+            if (existingItem) {
+                existingItem.quantity += qty;
+            } else {
+                cart.push({
+                    name: name,
+                    price: price,
+                    quantity: qty,
+                    table: tableNumber
+                });
+            }
+
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            console.log("UPDATED CART:", cart);
+            alert(name + " added to cart 🛒");
+        }
+
+        function increaseQty(btn) {
+            let qtySpan = btn.parentElement.querySelector(".qty");
+            qtySpan.innerText = parseInt(qtySpan.innerText) + 1;
+        }
+
+        function decreaseQty(btn) {
+            let qtySpan = btn.parentElement.querySelector(".qty");
+            let current = parseInt(qtySpan.innerText);
+
+            if (current > 1) {
+                qtySpan.innerText = current - 1;
+            }
+        }
+
+        function filterCategory(category) {
+            let sections = document.querySelectorAll(".category");
+
+            sections.forEach(section => {
+                if (category === "all") {
+                    section.style.display = "block";
+                } else {
+                    section.style.display =
+                        section.getAttribute("data-category") === category
+                            ? "block"
+                            : "none";
+                }
+            });
+        }
+
+    </script>

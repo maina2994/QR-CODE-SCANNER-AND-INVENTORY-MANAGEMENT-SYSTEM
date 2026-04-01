@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Meals</title>
+
+    <style>
+        /* COLORS */
+        :root {
+            --primaryColor: #0e6253;
+            --secondaryColor: #ffc107;
+        }
+
+        /* BODY */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+        }
+
+        /* ================= NAVBAR ================= */
+        .navbar {
+            background: var(--primaryColor);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            color: var(--secondaryColor);
+        }
+
+        .nav-links a {
+            color: white;
+            margin-left: 15px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondaryColor);
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--secondaryColor);
+        }
+
+        /* CATEGORY */
+        .category {
+            margin: 20px;
+        }
+
+        .category h3 {
+            color: var(--primaryColor);
+        }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        /* CARD */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .card h4 {
+            margin: 10px 0 5px;
+        }
+
+        .card p {
+            margin: 0;
+        }
+
+        /* BUTTON */
+        .card button {
+            margin-top: 8px;
+            padding: 8px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            background: var(--primaryColor);
+            color: white;
+            cursor: pointer;
+        }
+
+        .card button:hover {
+            background: #1e7e34;
+        }
+
+        /* ================= FOOTER ================= */
+        .footer {
+            background: var(--primaryColor);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 30px;
+        }
+
+        .footer span {
+            color: var(--secondaryColor);
+            font-weight: bold;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .cart-item button {
+            margin: 3px;
+            padding: 5px 10px;
+            border: none;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-item button:hover {
+            background: #1e7e34;
+        }
+    </style>
+</head>
+<script>
+    function loadCart() {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        let container = document.getElementById("cart-items");
+        let total = 0;
+
+        container.innerHTML = "";
+
+        cart.forEach((item, index) => {
+            total += item.price * item.quantity;
+
+            container.innerHTML += `
+        <div class="cart-item">
+            <span>${item.name} - Ksh ${item.price}</span>
+
+            <div>
+                <button onclick="decrease(${index})">-</button>
+                <span>${item.quantity}</span>
+                <button onclick="increase(${index})">+</button>
+            </div>
+
+            <button onclick="removeItem(${index})">Remove</button>
+        </div>
+        `;
+        });
+
+        document.getElementById("total").innerText = "Total: Ksh " + total;
+    }
+
+    function increase(index) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        cart[index].quantity++;
+        localStorage.setItem("cart", JSON.stringify(cart));
+        loadCart();
+    }
+
+    function decrease(index) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        if (cart[index].quantity > 1) {
+            cart[index].quantity--;
+        }
+        localStorage.setItem("cart", JSON.stringify(cart));
+        loadCart();
+    }
+
+    function removeItem(index) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        cart.splice(index, 1);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        loadCart();
+    }
+
+    loadCart();
+</script>
+
+<body>
+
+    <!-- 🔝 NAVBAR -->
+    <div class="navbar">
+        <h2>FoodMart</h2>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="cart.html">Cart</a>
+            <a href="notification.html">Notifications</a>
+            <a href="contacts.html">Contact</a>
+        </div>
+    </div>
+
+    <div class="header">🍽️ All Meals</div>
+
+    <!-- BURGERS -->
+    <div class="category">
+        <h3>🍔 Burgers</h3>
+        <div class="grid">
+            <div class="card">
+                <img src="chicken burger.jpg">
+                <h4>chicken burger</h4>
+                <p>
+                    <Kshs class="650"></Kshs>
+                </p>
+                <button onclick="addToCart('chicken burger',650)">Add</button>
+            </div>
+            <div class="card">
+                <img src="beef burger.jpg">
+                <h4>Beef Burger</h4>
+                <p>
+                <p>Kshs.300</p>
+                </p>
+                <button onclick="addToCart('Beef Burger',300)">Add</button>
+            </div>
+            <div class="card">
+                <img src="grilled chicken burger.jpg">
+                <h4>grilled chicken burger</h4>
+                <p>Kshs.</p>
+                <button onclick="addToCart('grilled chicken Burger',400)">Add</button>
+            </div>
+            <div class="card">
+                <img src="smushburger.jpg">
+                <h4>smush burger</h4>
+                <p>
+                <p>Kshs.500</p>
+                </p>
+                <button onclick="addToCart('smush burger',500)">Add</button>
+            </div>
+            <div class="card">
+                <img src="cheese burger.jpg">
+                <h4>cheese Burger</h4>
+                <p>
+                <p>Kshs.450</p>
+                </p>
+                <button onclick="addToCart('cheese burger',250)">Add</button>
+            </div>
+            <div class="card">
+                <img src="cheddar chicken Burger.jpg">
+                <h4>cheddar chicken Burger</h4>
+                <p>Kshs.550</p>
+                <button onclick="addToCart('cheddar chicken Burger',350)">Add</button>
+            </div>
+            <div class="card">
+                <img src="cheese stuffed burger.jpg">
+                <h4>cheese stuffed Burger</h4>
+                <p>
+                <p>Kshs.450</p>
+                </p>
+                <button onclick="addToCart('cheese stuffed bugger',450)">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIZZA -->
+    <div class="category">
+        <h3>🍕 Pizza</h3>
+        <div class="grid">
+            <div class="card">
+                <img src="ppz.jpg">
+                <h4>Pepporoni Pizza</h4>
+                <p>Kshs.500</p>
+                <button onclick="addToCart('Pepporoni Pizza',500)">Add</button>
+            </div>
+            <div class="card">
+                <img src="cp.jpg">
+                <h4>Chicken pizza</h4>
+                <p>Kshs.600</p>
+                <button onclick="addToCart('chicken pizza,'600)">Add</button>
+            </div>
+            <div class="card">
+                <img src="chp.jpg">
+                <h4>cheese pizza</h4>
+                <p>
+                <p>Kshs.650</p>
+                </p>
+                <button onclick="addToCart('cheese piza',650)">Add</button>
+            </div>
+            <div class="card">
+                <img src="bbqp.jpg">
+                <h4>BBq pizza</h4>
+                <p>
+                <p>Kshs.700</p>
+                </p>
+                <button onclick="addToCart('BBQ',800)">Add</button>
+            </div>
+            <div class="card">
+                <img src="sup.jpg">
+                <h4>supreme pizza</h4>
+                <p>
+                <p>Kshs.750</p>
+                </p>
+                <button onclick="addToCart('supreme pizza',750)">Add</button>
+            </div>
+            <div class="card">
+                <img src="vp.jpg">
+                <h4>veggie pizza</h4>
+                <p>
+                <p>Kshs.700</p>
+                </p>
+                <button onclick="addToCart('veggie pizza',700)">Add</button>
+            </div>
+            <div class="card">
+                <img src="chop.jpg">
+                <h4>chocolate pizza</h4>
+                <p>
+                <p>Kshs.600</p>
+                </p>
+                <button onclick="addToCart('chocolate',600)">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COFFEE -->
+    <div class="category">
+        <h3>☕ Coffee</h3>
+        <div class="grid">
+            <div class="card">
+                <img src="blackc.jpg">
+                <h4>Black Coffee</h4>
+                <p>
+                <p>Kshs.150</p>
+                </p>
+                <button onclick="addToCart('Black Coffee',150)">Add</button>
+            </div>
+            <div class="card">
+                <img src="mochac.jpg">
+                <h4>mocha coffee</h4>
+                <p>Kshs.120</p>
+                <button onclick="addToCart('mocha coffee',120)">Add</button>
+            </div>
+            <div class="card">
+                <img src="coffeeamericano.jpg">
+                <h4>americano coffee</h4>
+                <p>
+                <p>Kshs.200</p>
+                </p>
+                <button onclick="addToCart('americano coffee',200)">Add</button>
+            </div>
+            <div class="card">
+                <img src="cappuccinnocoffee.jpg">
+                <h4>cappuccino coffee</h4>
+                <p>
+                <p>Kshs.350</p>
+                </p>
+                <button onclick="addToCart('cappuccino coffee',350)">Add</button>
+            </div>
+            <div class="card">
+                <img src="exprresocoffee.jpg">
+                <h4>exprreso coffee</h4>
+                <p>
+                <p>Kshs.4000</p>
+                </p>
+                <button onclick="addToCart('expresso coffee',400)">Add</button>
+            </div>
+            <div class="card">
+                <img src="icedlattecoffee.jpg">
+                <h4>iced latte coffee</h4>
+                <p>
+                <p>Kshs.420</p>
+                </p>
+                <button onclick="addToCart('iced latte coffee',420)">Add</button>
+            </div>
+            <div class="card">
+                <img src="machic.jpg">
+                <h4>machiato coffee</h4>
+                <p>
+                <p>Kshs.500</p>
+                </p>
+                <button onclick="addToCart('machiato coffe',500)">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ICE CREAM -->
+    <div class="category">
+        <h3>🍨 Ice Cream</h3>
+        <div class="grid">
+            <div class="card">
+                <img src="vai.jpg">
+                <h4>Vanilla Ice Cream</h4>
+                <p>Kshs.80</p>
+                <button onclick="addToCart('Vanilla Ice Cream',80)">Add</button>
+            </div>
+            <div class="card">
+                <img src="strawberry.jpg">
+                <h4>strawberry ice cream</h4>
+                <p>Kshs.120</p>
+                <button onclick="addToCart('strawberry ice cream',120)">Add</button>
+            </div>
+            <div class="card">
+                <img src="choi.jpg">
+                <h4>chocolate ice cream</h4>
+                <p>
+                <p>Kshs.150</p>
+                </p>
+                <button onclick="addToCart('chocolate ice cream',150)">Add</button>
+            </div>
+            <div class="card">
+                <img src="sui.jpg">
+                <h4>sundae ice cream</h4>
+                <p>
+                <p>Kshs.200</p>
+                </p>
+                <button onclick="addToCart('sunadae ice cream',200)">Add</button>
+            </div>
+            <div class="card">
+                <img src="greei.jpg">
+                <h4>green ice cream</h4>
+                <p>
+                <p>Kshs.100</p>
+                </p>
+                <button onclick="addToCart('greean ice cream',100)">Add</button>
+            </div>
+            <div class="card">
+                <img src="cai.jpg">
+                <h4>caramel ice cream</h4>
+                <p>
+                <p>Kshs.350</p>
+                <button onclick="addToCart('caramel ice cream',250)">Add</button>
+            </div>
+            <div class="card">
+                <img src="msi.jpg">
+                <h4>milkshake ice cream</h4>
+                <p>
+                <p>Kshs.250</p>
+                </p>
+                <button onclick="addToCart('milkshake ice cream',120)">Add</button>
+            </div>
+        </div>
+    </div>
+    <!-- 🍛 AFRICAN DISHES -->
+    <div class="category">
+        <h3><ion-icon name="leaf-outline"></ion-icon> African Dishes</h3>
+        <div class="grid">
+
+            <div class="card">
+                <img src="ugb.jpg">
+                <h4>Ugali & Beef Stew</h4>
+                <p>Kshs.250</p>
+                <button onclick="addToCart('Ugali & Beef Stew',250)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="ugs.jpg">
+                <h4>Ugali & Sukuma Wiki</h4>
+                <p>
+                <p>Kshs.250</p>
+                </p>
+                <button onclick="addToCart('Ugali & Sukuma Wiki',150)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="pilau.jpg">
+                <h4>Pilau</h4>
+                <p>Kshs.300</p>
+                <button onclick="addToCart('Pilau',300)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="chapatib.jpg">
+                <h4>Chapati & Beans</h4>
+                <p>Kshs.200</p>
+                <button onclick="addToCart('Chapati & Beans',200)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="nyc.jpg">
+                <h4>Nyama Choma</h4>
+                <p>Kshs.600</p>
+                <button onclick="addToCart('Nyama Choma',600)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="githeri.jpg">
+                <h4>Githeri</h4>
+                <p>Kshs.150</p>
+                <button onclick="addToCart('Githeri',150)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="matoke.jpg">
+                <h4>Matoke</h4>
+                <p>Kshs.250</p>
+                <button onclick="addToCart('Matoke',250)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- 🥤 DRINKS -->
+    <div class="category">
+        <h3><ion-icon name="wine-outline"></ion-icon> Drinks</h3>
+        <div class="grid">
+
+            <div class="card">
+                <img src="soda.jpg">
+                <h4>Soda</h4>
+                <p>Kshs.60</p>
+                <button onclick="addToCart('Soda',60)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="juice.jpg">
+                <h4>Fresh Juice</h4>
+                <p>Kshs.120</p>
+                <button onclick="addToCart('Fresh Juice',120)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="milkshake.jpg">
+                <h4>Milkshake</h4>
+                <p>Kshs.300</p>
+                <button onclick="addToCart('Milkshake',300)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="water.jpg">
+                <h4>Bottled Water</h4>
+                <p>Kshs.50</p>
+                <button onclick="addToCart('Bottled Water',50)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="smoothie.jpg">
+                <h4>Smoothie</h4>
+                <p>Kshs.250</p>
+                <button onclick="addToCart('Smoothie',250)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="energy drink.jpg">
+                <h4>Energy Drink</h4>
+                <p>Kshs.150</p>
+                <button onclick="addToCart('Energy Drink',150)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+            <div class="card">
+                <img src="blackwine.jpg">
+                <h4>black wine</h4>
+                <p>Kshs.150</p>
+                <button onclick="addToCart('black wine',1500)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- 🍰 DESSERTS -->
+    <div class="category">
+        <h3><ion-icon name="ice-cream-outline"></ion-icon> Desserts</h3>
+        <div class="grid">
+
+            <div class="card">
+                <img src="cake.jpg">
+                <h4>Chocolate Cake</h4>
+                <p>Kshs.200</p>
+                <button onclick="addToCart('Chocolate Cake',200)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="icecream.jpg">
+                <h4>Ice Cream</h4>
+                <p>Kshs.100</p>
+                <button onclick="addToCart('Ice Cream',100)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="donuts.jpg">
+                <h4>Donuts</h4>
+                <p>Kshs.150</p>
+                <button onclick="addToCart('Donuts',150)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="cookies.jpg">
+                <h4>Cookies</h4>
+                <p>Kshs.120</p>
+                <button onclick="addToCart('Cookies',120)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="brownie.jpg">
+                <h4>Brownie</h4>
+                <p>Kshs.180</p>
+                <button onclick="addToCart('Brownie',180)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+
+            <div class="card">
+                <img src="pancake.jpg">
+                <h4>Pancakes</h4>
+                <p>Kshs.250</p>
+                <button onclick="addToCart('Pancakes',250)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+            <div class="card">
+                <span class="food-badge">NEW</span>
+                <img src="waffles.jpg" alt="Waffles">
+                <h4>Waffles</h4>
+                <p>Kshs.300</p>
+                <button onclick="addToCart('Waffles',300)">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- SEAFOOD CATEGORY -->
+    <div class="category">
+        <h3>🦐 Seafood</h3>
+        <div class="grid">
+            <div class="card">
+                <img src="tilapia.jpg" alt="Tilapia">
+                <h4>Tilapia</h4>
+                <p>Kshs.500</p>
+                <button onclick="addToCart('Tilapia',500)">Add</button>
+            </div>
+            <div class="card">
+                <img src="kingfish.jpg" alt="Kingfish">
+                <h4>Kingfish</h4>
+                <p>Kshs.900</p>
+                <button onclick="addToCart('Kingfish',900)">Add</button>
+            </div>
+            <div class="card">
+                <img src="snapper.jpg" alt="Snapper">
+                <h4>Snapper</h4>
+                <p>Kshs.800</p>
+                <button onclick="addToCart('Snapper',800)">Add</button>
+            </div>
+            <div class="card">
+                <img src="prawns.jpg" alt="Prawns">
+                <h4>Prawns</h4>
+                <p>Kshs.700</p>
+                <button onclick="addToCart('Prawns',700)">Add</button>
+            </div>
+            <div class="card">
+                <img src="crab.jpg" alt="Crab">
+                <h4>Crab</h4>
+                <p>Kshs.1200</p>
+                <button onclick="addToCart('Crab',1200)">Add</button>
+            </div>
+            <div class="card">
+                <img src="calamari.jpg" alt="Calamari">
+                <h4>Calamari</h4>
+                <p>Kshs.600</p>
+                <button onclick="addToCart('Calamari',600)">Add</button>
+            </div>
+            <div class="card">
+                <img src="lobster.jpg" alt="Lobster">
+                <h4>Lobster</h4>
+                <p>Kshs.2500</p>
+                <button onclick="addToCart('Lobster',2500)">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔻 FOOTER -->
+    <div class="footer">
+        <p>© 2026 <span>FoodMart</span> | All Rights Reserved</p>
+    </div>
+
+    <script>
+        function addToCart(name, price) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            // check if item already exists
+            let existing = cart.find(item => item.name === name);
+
+            if (existing) {
+                existing.quantity += 1; // increase quantity
+            } else {
+                cart.push({ name, price, quantity: 1 });
+            }
+
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            alert(name + " added to cart!");
+        }
+    </script>
+
+</body>
+
+</html>

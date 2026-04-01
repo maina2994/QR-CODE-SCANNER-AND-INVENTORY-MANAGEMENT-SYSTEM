@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #d0e8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            width: 400px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .notification {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: #f0f8ff;
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            border-left: 5px solid #3399ff;
+        }
+
+        /* 🔥 ORDER STATUS CARD */
+        .order-card {
+            background: #fff7e6;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid orange;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #3399ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        p.back {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        p.back a {
+            color: #3399ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>🔔 Notifications</h2>
+
+        <!-- 🟡 ORDER STATUS -->
+        <div id="order-status"></div>
+
+        <!-- 🔔 NORMAL NOTIFICATIONS -->
+        <div id="notifications-list"></div>
+
+        <button onclick="clearNotifications()">Clear Notifications</button>
+
+        <p class="back"><a href="all-meals.html">Back to Menu</a></p>
+    </div>
+
+    <script>
+        const table = localStorage.getItem("tableNumber");
+
+        /* 🍔 LOAD CUSTOMER ORDER STATUS */
+        function loadCustomerOrder() {
+            let orders = JSON.parse(localStorage.getItem("allOrders")) || [];
+            let container = document.getElementById("order-status");
+
+            container.innerHTML = "";
+
+            if (!table) {
+                container.innerHTML = "<p>No table detected</p>";
+                return;
+            }
+
+            let myOrders = orders.filter(order => order.table == table);
+
+            if (myOrders.length === 0) {
+                container.innerHTML = "<p>No orders yet</p>";
+                return;
+            }
+
+            let latest = myOrders[myOrders.length - 1];
+
+            let itemsHTML = "";
+
+            if (latest.items) {
+                latest.items.forEach(item => {
+                    itemsHTML += `<p>${item.name} x${item.quantity}</p>`;
+                });
+            }
+
+            let color = "orange";
+
+            if (latest.status === "cooking") color = "blue";
+            if (latest.status === "ready") color = "green";
+
+            container.innerHTML = `
+                <div class="order-card">
+                    <h3>🍽 Table ${latest.table}</h3>
+                    ${itemsHTML}
+                    <p>Status: 
+                        <span class="status" style="color:${color}">
+                            ${latest.status || "pending"}
+                        </span>
+                    </p>
+                </div>
+            `;
+        }
+
+        /* 🔔 LOAD NORMAL NOTIFICATIONS */
+        function loadNotifications() {
+            let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+
+            let container = document.getElementById("notifications-list");
+            container.innerHTML = "";
+
+            if (notifications.length === 0) {
+                container.innerHTML = "<p>No notifications yet.</p>";
+                return;
+            }
+
+            [...notifications].reverse().forEach(note => {
+                container.innerHTML += `
+                <div class="notification">
+                    <p>${note.message}<br><small>${note.time || ""}</small></p>
+                    <span>🔔</span>
+                </div>
+                `;
+            });
+        }
+
+        function clearNotifications() {
+            localStorage.removeItem("notifications");
+            loadNotifications();
+        }
+
+        /* 🔄 AUTO UPDATE ORDER STATUS */
+        setInterval(loadCustomerOrder, 2000);
+
+        /* 🔄 REAL-TIME NOTIFICATION LISTENER */
+        window.addEventListener("storage", function (event) {
+            if (event.key === "notifications") {
+                loadNotifications();
+            }
+            if (event.key === "allOrders") {
+                loadCustomerOrder(); // 🔥 update status live
+            }
+        });
+
+        /* 🚀 LOAD EVERYTHING */
+        window.onload = function () {
+            loadNotifications();
+            loadCustomerOrder();
+        };
+    </script>
+</body>
+
+</html>

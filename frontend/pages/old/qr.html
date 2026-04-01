@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Codes for Tables</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body class="bg-gray-100 font-sans p-6">
+
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2 text-center">📱 Table QR Codes</h1>
+        <p class="text-gray-500 text-center mb-6">Generate QR codes for all restaurant tables</p>
+
+        <!-- Controls -->
+        <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <input id="tableCount" type="number" placeholder="Enter number of tables"
+                class="px-4 py-2 border rounded-lg w-full sm:w-auto" />
+
+            <button onclick="generateAllQR()" class="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800">
+                Generate All QR Codes
+            </button>
+
+            <button onclick="window.print()" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
+                Print
+            </button>
+        </div>
+
+        <!-- QR Grid -->
+        <div id="qrContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+    </div>
+
+    <script>
+        function generateAllQR() {
+            const count = document.getElementById('tableCount').value;
+
+            if (!count || count <= 0) {
+                alert('Enter valid number of tables');
+                return;
+            }
+
+            const container = document.getElementById('qrContainer');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= count; i++) {
+                const div = document.createElement('div');
+                div.className = 'bg-white p-4 rounded-xl shadow text-center';
+
+                const title = document.createElement('h2');
+                title.className = 'font-bold mb-2';
+                title.innerText = `Table ${i}`;
+
+                const qrDiv = document.createElement('div');
+                qrDiv.className = 'flex justify-center mb-2';
+
+                const url = `https://shiny-sawine-5df1c4.netlify.app/home.html?table=${i}`;
+
+                new QRCode(qrDiv, {
+                    text: url,
+                    width: 120,
+                    height: 120
+                });
+
+                const label = document.createElement('p');
+                label.className = 'text-xs text-gray-500 break-all';
+                label.innerText = url;
+
+                div.appendChild(title);
+                div.appendChild(qrDiv);
+                div.appendChild(label);
+
+                container.appendChild(div);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
