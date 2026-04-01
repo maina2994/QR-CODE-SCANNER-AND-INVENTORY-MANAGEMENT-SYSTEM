@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Restaurant Menu{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        nav {
+            background-color: #0a2342;
+            padding: 0;
+            margin: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        nav li {
+            margin: 0;
+        }
+
+        nav a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 0.8rem 1.2rem;
+            transition: background-color 0.2s ease;
+        }
+
+        nav a:hover {
+            background-color: #1f8a70;
+        }
+
+        nav .nav-separator {
+            color: #444;
+            padding: 0.8rem 0;
+        }
+
+        .nav-container {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-left {
+            display: flex;
+            gap: 0;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 0;
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+            }
+
+            .nav-container {
+                flex-direction: column;
+            }
+
+            nav a {
+                width: 100%;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-left">
+                <ul>
+                    <li><a href="/">🏠 Menu</a></li>
+                    <li><a href="/cart/">🛒 Cart</a></li>
+                    <li><a href="/qr-generate/">📱 Generate QR</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <ul>
+                    <li><a href="/login/">👤 Login</a></li>
+                    <li><a href="/admin/">⚙️ Admin</a></li>
+                    <li><a href="/staff/">👨‍💼 Staff</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <h1>{% block header %}Restaurant Menu{% endblock %}</h1>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; background-color: #f4f4f4; margin-top: 2rem; color: #666;">
+        <p>&copy; 2026 QR Code Restaurant System. All rights reserved.</p>
+    </footer>
+</body>
+</html>

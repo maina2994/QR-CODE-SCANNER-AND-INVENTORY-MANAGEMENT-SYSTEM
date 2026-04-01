@@ -1,0 +1,40 @@
+{% extends 'menu/base.html' %}
+{% load static %}
+
+{% block title %}Generate QR Code{% endblock %}
+{% block header %}Generate QR Code for Table{% endblock %}
+
+{% block content %}
+<div style="max-width:600px; margin:2rem auto;">
+    <form method="POST">
+        {% csrf_token %}
+        <div style="margin-bottom:1.5rem;">
+            <label style="display:block; margin-bottom:0.5rem; font-weight:bold;">Table Number:</label>
+            <input type="number" name="table_id" min="1" max="50" required style="width:100%; padding:0.8rem; border:1px solid #ddd; border-radius:4px; font-size:1rem;" placeholder="Enter table number" />
+        </div>
+        <button type="submit" style="width:100%; padding:0.8rem; background-color:#1f8a70; color:white; border:none; border-radius:4px; cursor:pointer; font-size:1rem;">Generate QR Code</button>
+    </form>
+
+    {% if qr_image %}
+    <div style="margin-top:2rem; text-align:center;">
+        <h3>QR Code for Table {{ table_id }}</h3>
+        <img src="data:image/png;base64,{{ qr_image }}" alt="QR Code" style="border:2px solid #ddd; padding:1rem; max-width:300px;" />
+        <p style="margin-top:1rem; color:#666;">Customers can scan this code to access the menu</p>
+        <p style="margin-top:0.5rem;">
+            <a href="{{ qr_url }}" style="color:#1f8a70; text-decoration:none;">Menu Link: {{ qr_url }}</a>
+        </p>
+        <button onclick="window.print()" style="margin-top:1rem; padding:0.6rem 1.2rem; background-color:#0a2342; color:white; border:none; border-radius:4px; cursor:pointer;">Print QR Code</button>
+    </div>
+    {% endif %}
+
+    <div style="margin-top:2rem; padding:1.5rem; background-color:#f9f9f9; border-radius:4px;">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Enter the table number</li>
+            <li>Click "Generate QR Code"</li>
+            <li>Print or display the QR code at the table</li>
+            <li>Customers scan the code with their phone to access the menu</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

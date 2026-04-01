@@ -1,0 +1,40 @@
+{% extends 'menu/base.html' %}
+{% load static %}
+
+{% block title %}Restaurant Menu{% endblock %}
+{% block header %}Restaurant Menu{% endblock %}
+
+{% block content %}
+<div id="menu-container">
+    {% for item in menu_items %}
+    <div class="menu-item">
+        <img src="{% static 'images/' %}{{ item.image_url|slice:'8:' }}" alt="{{ item.name }}" onerror="this.src='{% static 'images/food-placeholder.jpg' %}'" />
+        <h3>{{ item.name }}</h3>
+        <p>${{ item.price }}</p>
+        <small>{% if item.availability %}In stock{% else %}Sold out{% endif %}</small>
+        <div class="item-footer">
+            <button {% if not item.availability %}disabled{% endif %} onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price }})">
+                {% if item.availability %}Add to Cart{% else %}Unavailable{% endif %}
+            </button>
+        </div>
+    </div>
+    {% empty %}
+    <p>No menu items available at the moment.</p>
+    {% endfor %}
+</div>
+
+<script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function addToCart(id, name, price) {
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.quantity++;
+        } else {
+            cart.push({ id, name, price, quantity: 1 });
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert(`${name} added to cart!`);
+    }
+</script>
+{% endblock %}

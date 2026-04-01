@@ -1,0 +1,22 @@
+{% extends 'menu/base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+{% block header %}Login{% endblock %}
+
+{% block content %}
+<div style="max-width:400px; margin:2rem auto;">
+    <form method="POST">
+        {% csrf_token %}
+        <div style="margin-bottom:1rem;">
+            <label>Email:</label>
+            <input type="email" name="email" required style="width:100%; padding:0.5rem; border:1px solid #ddd; border-radius:4px;" />
+        </div>
+        <div style="margin-bottom:1rem;">
+            <label>Password:</label>
+            <input type="password" name="password" required style="width:100%; padding:0.5rem; border:1px solid #ddd; border-radius:4px;" />
+        </div>
+        <button type="submit" style="width:100%;">Login</button>
+    </form>
+</div>
+{% endblock %}

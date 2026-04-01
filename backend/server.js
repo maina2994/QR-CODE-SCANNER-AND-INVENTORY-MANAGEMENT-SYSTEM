@@ -7,6 +7,7 @@ const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const qrcode = require('qrcode');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -25,7 +26,7 @@ app.use(express.static('../frontend/public'));
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '', // Change as needed
+    password: 'sa22shasasha.', // Change as needed
     database: 'restaurant_db'
 });
 
@@ -46,6 +47,10 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Routes
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/pages/menu.html'));
+});
 
 app.get('/menu', (req, res) => {
     const tableId = req.query.table_id;
