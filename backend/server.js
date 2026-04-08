@@ -26,7 +26,7 @@ app.use(express.static('../frontend/public'));
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'sa22shasasha.', // Change as needed
+    password: 'Root1234!', // Change as needed
     database: 'restaurant_db'
 });
 

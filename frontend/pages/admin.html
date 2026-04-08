@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body>
     <header>
-        <h1>Admin Dashboard</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Admin Dashboard</h1>
+            <div>
+                <button onclick="window.location.href='menu.html'" style="margin-right: 10px;">Menu</button>
+                <button onclick="window.location.href='login.html'" style="background-color: #c0392b;">Logout</button>
+            </div>
+        </div>
     </header>
     <main>
         <nav>
@@ -18,6 +24,6 @@
         </nav>
         <div id="content"></div>
     </main>
-    <script src="../public/js/admin.js"></script>
+    <script src="/public/js/admin.js"></script>
 </body>
 </html>

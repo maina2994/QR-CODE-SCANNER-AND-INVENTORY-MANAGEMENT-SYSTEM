@@ -5,10 +5,8 @@ USE restaurant_db;
 -- Insert users
 
 INSERT INTO users (name, email, password, role) VALUES
-
-('Admin User', 'admin@restaurant.com', '$2a$10$examplehashedpassword', 'admin'),
-
-('Staff User', 'staff@restaurant.com', '$2a$10$examplehashedpassword', 'staff');
+('Admin User', 'admin@restaurant.com', '$2a$10$Co7nxiWhpelFxfljmZcAuuiF3WzcU6bRkV.biI2kgaxkB.U4ggd1a', 'admin'),
+('Staff User', 'staff@restaurant.com', '$2a$10$Co7nxiWhpelFxfljmZcAuuiF3WzcU6bRkV.biI2kgaxkB.U4ggd1a', 'staff');
 
 -- Insert tables
 

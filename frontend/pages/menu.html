@@ -3,17 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <title>Menu - Restaurant</title>
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <style>
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .cart-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cart-count {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .menu-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #1f8a70;
+            background: white;
+            color: #1f8a70;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background-color: #1f8a70;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background-color: #1f8a70;
+            color: white;
+        }
+
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-item.unavailable {
+            opacity: 0.6;
+        }
+
+        .stock-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .stock-label.in-stock {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .stock-label.out-of-stock {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .quantity-control button {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            font-size: 1.1rem;
+        }
+
+        .quantity-display {
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .no-menu {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Restaurant Menu</h1>
+        <div class="menu-header">
+            <h1>🍽️ Restaurant Menu</h1>
+            <div class="cart-info">
+                <span><strong>Table ID:</strong> <span id="table-id">Quick Buy</span></span>
+                <button onclick="window.location.href='cart.html'" style="margin-right: 10px;">
+                    View Cart <span class="cart-count" id="cart-count">0</span>
+                </button>
+                <button onclick="window.location.href='login.html'" style="background-color: #c0392b;">Logout</button>
+            </div>
+        </div>
     </header>
     <main>
+        <div class="menu-filters" id="filters"></div>
+        
+        <div id="menu-loading" style="text-align: center; padding: 2rem;">
+            <p>Loading menu items...</p>
+        </div>
+        
         <div id="menu-container"></div>
-        <button id="view-cart">View Cart</button>
+        
+        <div id="api-debug" style="background: #f0f0f0; padding: 1rem; margin: 1rem 0; border-radius: 5px; display: none;">
+            <small><strong>Debug Info:</strong> <span id="debug-text"></span></small>
+        </div>
+        
+        <br>
+        <button id="view-cart" onclick="window.location.href='cart.html'" style="padding: 1rem 2rem; font-size: 1rem;">
+            🛒 View Cart (<span id="cart-total">0</span> items)
+        </button>
     </main>
-    <script src="/js/menu.js"></script>
+    <script src="/public/js/menu.js"></script>
 </body>
 </html>

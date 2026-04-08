@@ -4,16 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Confirmation</title>
-    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body>
     <header>
-        <h1>Order Confirmed</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Order Confirmed</h1>
+            <button onclick="window.location.href='login.html'" style="background-color: #c0392b;">Logout</button>
+        </div>
     </header>
     <main>
         <p>Your order has been placed. Order ID: <span id="order-id"></span></p>
+        <br>
         <button id="view-order">View Order Details</button>
+        <button onclick="window.location.href='menu.html'" style="margin-left: 10px;">Continue Shopping</button>
+        <button onclick="window.location.href='order-details.html'" style="margin-left: 10px;">View Details</button>
     </main>
-    <script src="../public/js/confirmation.js"></script>
+    <script src="/public/js/confirmation.js"></script>
 </body>
 </html>

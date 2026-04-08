@@ -4,16 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Dashboard</title>
-    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body>
     <header>
-        <h1>Staff Dashboard</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Staff Dashboard</h1>
+            <div>
+                <button onclick="window.location.href='menu.html'" style="margin-right: 10px;">Menu</button>
+                <button onclick="window.location.href='login.html'" style="background-color: #c0392b;">Logout</button>
+            </div>
+        </div>
     </header>
     <main>
         <div id="orders-list"></div>
+        <br>
+        <button onclick="window.location.href='login.html'" style="background-color: #c0392b; width: 100%;">Logout</button>
     </main>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="../public/js/staff.js"></script>
+    <script src="/public/js/staff.js"></script>
 </body>
 </html>

@@ -4,17 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart</title>
-    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body>
     <header>
-        <h1>Your Cart</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Your Cart</h1>
+            <div>
+                <button onclick="window.location.href='menu.html'" style="margin-right: 10px;">Back to Menu</button>
+                <button onclick="window.location.href='login.html'" style="background-color: #c0392b;">Logout</button>
+            </div>
+        </div>
     </header>
     <main>
         <div id="cart-items"></div>
+        <br>
         <button id="place-order">Place Order</button>
-        <button id="back-to-menu">Back to Menu</button>
+        <button id="back-to-menu" onclick="window.location.href='menu.html'" style="margin-left: 10px;">Back to Menu</button>
     </main>
-    <script src="../public/js/cart.js"></script>
+    <script src="/public/js/cart.js"></script>
 </body>
 </html>
