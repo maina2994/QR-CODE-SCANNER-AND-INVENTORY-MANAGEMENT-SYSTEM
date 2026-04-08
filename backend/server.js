@@ -24,10 +24,10 @@ app.use(express.static('../frontend/public'));
 
 // Database connection
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Root1234!', // Change as needed
-    database: 'restaurant_db'
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'Root1234!', // Change as needed
+    database: process.env.DB_NAME || 'restaurant_db'
 });
 
 db.connect((err) => {
