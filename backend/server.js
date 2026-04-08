@@ -35,7 +35,13 @@ db.connect((err, client, release) => {
         process.exit(1);
     }
     console.log('Connected to PostgreSQL');
-    release();
+    // Create tables if they don't exist
+    const schema = require('fs').readFileSync('./database/schema-postgres.sql', 'utf8');
+    client.query(schema, (err) => {
+        if (err) console.error('Schema error:', err.message);
+        else console.log('Tables ready!');
+        release();
+    });
 });
 
 // Auth middleware
