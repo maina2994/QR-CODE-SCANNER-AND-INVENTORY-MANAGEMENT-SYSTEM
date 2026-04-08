@@ -32,7 +32,7 @@ const db = new Pool({
 db.connect((err, client, release) => {
     if (err) {
         console.error('PostgreSQL connection error:', err.message);
-        process.exit(1);
+        console.error('Continuing without DB...');
     }
     console.log('Connected to PostgreSQL');
     // Create tables if they don't exist
