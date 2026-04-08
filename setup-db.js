@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const db = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: true
 });
 
 const sql = fs.readFileSync('./database/schema-postgres.sql', 'utf8');
