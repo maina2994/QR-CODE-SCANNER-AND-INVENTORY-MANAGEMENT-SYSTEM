@@ -4,7 +4,7 @@
   "description": "QR Code-Based Self-Ordering and Inventory Management System",
   "main": "backend/server.js",
   "scripts": {
-    "start": "node backend/server.js",
+    "start": "node backend/server.js",\n    "setup-db": "node setup-db.js",
     "dev": "nodemon backend/server.js"
   },
   "dependencies": {
