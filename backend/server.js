@@ -104,6 +104,18 @@ app.post('/order', async (req, res) => {
         res.status(500).json({ message: 'Database error', error: err.message });
     }
 });
+// Temporary seed route - remove after seeding
+app.get('/seed-data', async (req, res) => {
+    try {
+        await db.query(`INSERT INTO tables (table_number) VALUES (1),(2),(3),(4),(5) ON CONFLICT DO NOTHING`);
+        await db.query(`INSERT INTO ingredients (name,quantity_in_stock,unit) VALUES ('Tomato',100,'kg'),('Cheese',50,'kg'),('Flour',200,'kg'),('Chicken',30,'kg'),('Rice',150,'kg') ON CONFLICT DO NOTHING`);
+        await db.query(`INSERT INTO menu_items (name,price,image_url,availability) VALUES ('Margherita Pizza',12.99,'/images/pizza.jpg',true),('Cheese Stuffed Burger',11.50,'/images/burger.jpg',true),('Grilled Chicken Burger',10.75,'/images/grilled chicken burger.jpg',true),('Caesar Salad',7.99,'/images/caesar salad.jpg',true),('Fried Rice',8.99,'/images/friedchips.jpg',true),('Fish and Chips',13.00,'/images/fish.jpg',true),('Pancakes',6.50,'/images/pancakes.jpg',true),('Ice Cream Sundae',5.50,'/images/icecream.jpg',true) ON CONFLICT DO NOTHING`);
+        await db.query(`INSERT INTO users (name,email,password,role) VALUES ('Admin User','admin@restaurant.com','$2a$10$Co7nxiWhpelFxfljmZcAuuiF3WzcU6bRkV.biI2kgaxkB.U4ggd1a','admin'),('Staff User','staff@restaurant.com','$2a$10$Co7nxiWhpelFxfljmZcAuuiF3WzcU6bRkV.biI2kgaxkB.U4ggd1a','staff') ON CONFLICT DO NOTHING`);
+        res.json({ message: 'Seed data inserted successfully!' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 app.get('/order/:id', async (req, res) => {
     const orderId = parseInt(req.params.id);
