@@ -3,7 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const mysql = require('mysql2');
+const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const qrcode = require('qrcode');
@@ -12,170 +12,126 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+    cors: { origin: '*', methods: ['GET', 'POST'] }
 });
+
+const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret';
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('../frontend/public'));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
 
-// Database connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'sa22shasasha.', // Change as needed
-    database: 'restaurant_db'
+const db = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
 });
 
-db.connect((err) => {
-    if (err) throw err;
-    console.log('Connected to MySQL');
+db.connect((err, client, release) => {
+    if (err) {
+        console.error('PostgreSQL connection error:', err.message);
+        console.error('Continuing without DB...');
+        return;
+    }
+    console.log('Connected to PostgreSQL');
+    const schema = require('fs').readFileSync('./database/schema-postgres.sql', 'utf8');
+    client.query(schema, (err) => {
+        if (err) console.error('Schema error:', err.message);
+        else console.log('Tables ready!');
+        release();
+    });
 });
 
-// Middleware for auth
 const authenticateToken = (req, res, next) => {
-    const token = req.header('Authorization')?.split(' ')[1];
+    const authHeader = req.header('Authorization');
+    const token = authHeader && authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'Access denied' });
-    jwt.verify(token, 'secretkey', (err, user) => {
+    jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) return res.status(403).json({ message: 'Invalid token' });
         req.user = user;
         next();
     });
 };
 
-// Routes
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/pages/menu.html'));
 });
 
-app.get('/menu', (req, res) => {
-    const tableId = req.query.table_id;
-    db.query('SELECT * FROM menu_items WHERE availability = TRUE', (err, results) => {
-        if (err) return res.status(500).json(err);
-        res.json({ menu: results, tableId });
-    });
+app.get('/menu', async (req, res) => {
+    const tableId = req.query.table_id || null;
+    try {
+        const result = await db.query('SELECT * FROM menu_items WHERE availability = TRUE');
+        res.json({ menu: result.rows, tableId });
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
 });
 
-app.post('/order', (req, res) => {
+app.post('/order', async (req, res) => {
     const { tableId, items } = req.body;
-    // Calculate total
-    let total = 0;
-    items.forEach(item => total += item.price * item.quantity);
-    // Insert order
-    db.query('INSERT INTO orders (table_id, total_amount) VALUES (?, ?)', [tableId, total], (err, result) => {
-        if (err) return res.status(500).json(err);
-        const orderId = result.insertId;
-        // Insert order items
-        const values = items.map(item => [orderId, item.id, item.quantity, item.price]);
-        db.query('INSERT INTO order_items (order_id, menu_item_id, quantity, price) VALUES ?', [values], (err) => {
-            if (err) return res.status(500).json(err);
-            // Deduct inventory
-            items.forEach(item => {
-                db.query('SELECT * FROM menu_item_ingredients WHERE menu_item_id = ?', [item.id], (err, ingredients) => {
-                    ingredients.forEach(ing => {
-                        db.query('UPDATE ingredients SET quantity_in_stock = quantity_in_stock - ? WHERE id = ?', [ing.quantity_required * item.quantity, ing.ingredient_id]);
-                    });
-                });
-            });
-            // Emit to staff
-            io.emit('newOrder', { orderId, tableId, items, total });
-            res.json({ orderId });
-        });
-    });
+    if (!tableId || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: 'tableId and non-empty items array are required' });
+    }
+    let total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    try {
+        const orderResult = await db.query(
+            'INSERT INTO orders (table_id, total_amount) VALUES ($1, $2) RETURNING id',
+            [tableId, total]
+        );
+        const orderId = orderResult.rows[0].id;
+        for (const item of items) {
+            await db.query(
+                'INSERT INTO order_items (order_id, menu_item_id, quantity, price) VALUES ($1, $2, $3, $4)',
+                [orderId, item.id, item.quantity, item.price]
+            );
+            const ingredients = await db.query(
+                'SELECT * FROM menu_item_ingredients WHERE menu_item_id = $1', [item.id]
+            );
+            for (const ing of ingredients.rows) {
+                await db.query(
+                    'UPDATE ingredients SET quantity_in_stock = quantity_in_stock - $1 WHERE id = $2',
+                    [ing.quantity_required * item.quantity, ing.ingredient_id]
+                );
+            }
+        }
+        io.emit('newOrder', { orderId, tableId, items, total });
+        res.json({ orderId });
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
 });
 
-app.get('/order/:id', (req, res) => {
-    const orderId = req.params.id;
-    db.query('SELECT * FROM orders WHERE id = ?', [orderId], (err, order) => {
-        if (err) return res.status(500).json(err);
-        db.query('SELECT oi.*, mi.name FROM order_items oi JOIN menu_items mi ON oi.menu_item_id = mi.id WHERE oi.order_id = ?', [orderId], (err, items) => {
-            if (err) return res.status(500).json(err);
-            res.json({ order: order[0], items });
-        });
-    });
+app.get('/order/:id', async (req, res) => {
+    const orderId = parseInt(req.params.id);
+    if (isNaN(orderId)) return res.status(400).json({ message: 'Invalid order ID' });
+    try {
+        const order = await db.query('SELECT * FROM orders WHERE id = $1', [orderId]);
+        if (order.rows.length === 0) return res.status(404).json({ message: 'Order not found' });
+        const items = await db.query(
+            'SELECT oi.*, mi.name FROM order_items oi JOIN menu_items mi ON oi.menu_item_id = mi.id WHERE oi.order_id = $1',
+            [orderId]
+        );
+        res.json({ order: order.rows[0], items: items.rows });
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
 });
 
-// Admin routes
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    db.query('SELECT * FROM users WHERE email = ?', [email], (err, users) => {
-        if (err) return res.status(500).json(err);
-        if (users.length === 0) return res.status(400).json({ message: 'User not found' });
-        const user = users[0];
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-            if (err) return res.status(500).json(err);
-            if (!isMatch) return res.status(400).json({ message: 'Invalid password' });
-            const token = jwt.sign({ id: user.id, role: user.role }, 'secretkey');
-            res.json({ token, role: user.role });
-        });
-    });
+    if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
+    try {
+        const users = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (users.rows.length === 0) return res.status(400).json({ message: 'Invalid credentials' });
+        const user = users.rows[0];
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '8h' });
+        res.json({ token, role: user.role });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
 });
-
-app.get('/orders', authenticateToken, (req, res) => {
-    db.query('SELECT o.*, t.table_number FROM orders o LEFT JOIN tables t ON o.table_id = t.id ORDER BY o.created_at DESC', (err, results) => {
-        if (err) return res.status(500).json(err);
-        res.json(results);
-    });
-});
-
-app.put('/orders/:id/status', authenticateToken, (req, res) => {
-    const { status } = req.body;
-    db.query('UPDATE orders SET status = ? WHERE id = ?', [status, req.params.id], (err) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Status updated' });
-    });
-});
-
-app.get('/menu-admin', authenticateToken, (req, res) => {
-    db.query('SELECT * FROM menu_items', (err, results) => {
-        if (err) return res.status(500).json(err);
-        res.json(results);
-    });
-});
-
-app.post('/menu', authenticateToken, (req, res) => {
-    const { name, price, image_url } = req.body;
-    db.query('INSERT INTO menu_items (name, price, image_url) VALUES (?, ?, ?)', [name, price, image_url], (err) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Menu item added' });
-    });
-});
-
-app.put('/menu/:id', authenticateToken, (req, res) => {
-    const { name, price, image_url, availability } = req.body;
-    db.query('UPDATE menu_items SET name = ?, price = ?, image_url = ?, availability = ? WHERE id = ?', [name, price, image_url, availability, req.params.id], (err) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Menu item updated' });
-    });
-});
-
-app.delete('/menu/:id', authenticateToken, (req, res) => {
-    db.query('DELETE FROM menu_items WHERE id = ?', [req.params.id], (err) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Menu item deleted' });
-    });
-});
-
-app.get('/inventory', authenticateToken, (req, res) => {
-    db.query('SELECT * FROM ingredients', (err, results) => {
-        if (err) return res.status(500).json(err);
-        res.json(results);
-    });
-});
-
-app.put('/inventory/:id', authenticateToken, (req, res) => {
-    const { quantity_in_stock } = req.body;
-    db.query('UPDATE ingredients SET quantity_in_stock = ? WHERE id = ?', [quantity_in_stock, req.params.id], (err) => {
-        if (err) return res.status(500).json(err);
-        res.json({ message: 'Inventory updated' });
-    });
-});
-
-// Generate QR codes
 
 app.post('/signup', async (req, res) => {
     const { name, email, password, role } = req.body;
@@ -193,23 +149,112 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-app.get('/generate-qr/:tableId', (req, res) => {
-    const tableId = req.params.tableId;
-    const url = `http://localhost:3000/menu?table_id=${tableId}`;
-    qrcode.toDataURL(url, (err, qr) => {
-        if (err) return res.status(500).json(err);
-        db.query('UPDATE tables SET qr_code_url = ? WHERE id = ?', [qr, tableId]);
+app.get('/orders', authenticateToken, async (req, res) => {
+    try {
+        const result = await db.query(
+            'SELECT o.*, t.table_number FROM orders o LEFT JOIN tables t ON o.table_id = t.id ORDER BY o.created_at DESC'
+        );
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
+});
+
+app.put('/orders/:id/status', authenticateToken, async (req, res) => {
+    const { status } = req.body;
+    const allowed = ['pending', 'preparing', 'ready', 'completed'];
+    if (!allowed.includes(status)) return res.status(400).json({ message: 'Invalid status value' });
+    try {
+        await db.query('UPDATE orders SET status = $1 WHERE id = $2', [status, req.params.id]);
+        io.emit('orderStatusUpdate', { orderId: req.params.id, status });
+        res.json({ message: 'Status updated' });
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
+});
+
+app.get('/menu-admin', authenticateToken, async (req, res) => {
+    try {
+        const result = await db.query('SELECT * FROM menu_items');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
+});
+
+app.post('/menu', authenticateToken, async (req, res) => {
+    const { name, price, image_url } = req.body;
+    if (!name || price == null) return res.status(400).json({ message: 'name and price are required' });
+    try {
+        await db.query('INSERT INTO menu_items (name, price, image_url) VALUES ($1, $2, $3)', [name, price, image_url || null]);
+        res.json({ message: 'Menu item added' });
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
+});
+
+app.put('/menu/:id', authenticateToken, async (req, res) => {
+    const { name, price, image_url, availability } = req.body;
+    try {
+        await db.query(
+            'UPDATE menu_items SET name = $1, price = $2, image_url = $3, availability = $4 WHERE id = $5',
+            [name, price, image_url, availability, req.params.id]
+        );
+        res.json({ message: 'Menu item updated' });
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
+});
+
+app.delete('/menu/:id', authenticateToken, async (req, res) => {
+    try {
+        await db.query('DELETE FROM menu_items WHERE id = $1', [req.params.id]);
+        res.json({ message: 'Menu item deleted' });
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
+});
+
+app.get('/inventory', authenticateToken, async (req, res) => {
+    try {
+        const result = await db.query('SELECT * FROM ingredients');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
+});
+
+app.put('/inventory/:id', authenticateToken, async (req, res) => {
+    const { quantity_in_stock } = req.body;
+    if (quantity_in_stock == null || quantity_in_stock < 0) {
+        return res.status(400).json({ message: 'quantity_in_stock must be a non-negative number' });
+    }
+    try {
+        await db.query('UPDATE ingredients SET quantity_in_stock = $1 WHERE id = $2', [quantity_in_stock, req.params.id]);
+        res.json({ message: 'Inventory updated' });
+    } catch (err) {
+        res.status(500).json({ message: 'Database error', error: err.message });
+    }
+});
+
+app.get('/generate-qr/:tableId', async (req, res) => {
+    const tableId = parseInt(req.params.tableId);
+    if (isNaN(tableId)) return res.status(400).json({ message: 'Invalid table ID' });
+    const url = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/menu?table_id=${tableId}`;
+    try {
+        const qr = await qrcode.toDataURL(url);
+        await db.query('UPDATE tables SET qr_code_url = $1 WHERE id = $2', [qr, tableId]);
         res.json({ qr });
-    });
+    } catch (err) {
+        res.status(500).json({ message: 'QR generation error', error: err.message });
+    }
 });
 
 io.on('connection', (socket) => {
-    console.log('Client connected');
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
-    });
+    console.log('Client connected:', socket.id);
+    socket.on('disconnect', () => console.log('Client disconnected:', socket.id));
 });
 
-server.listen(3000, () => {
-    console.log('Server running on port 3000');
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
