@@ -6,7 +6,8 @@ import io
 import base64
 from urllib.parse import urlencode
 
-API_BASE_URL = 'http://localhost:3000'
+from django.conf import settings
+API_BASE_URL = getattr(settings, 'NODE_API_URL', 'http://localhost:3000')
 
 def get_menu(request):
     """Fetch menu items from Express API"""
