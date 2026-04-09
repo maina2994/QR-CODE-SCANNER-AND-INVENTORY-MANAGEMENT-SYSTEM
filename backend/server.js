@@ -30,18 +30,22 @@ const db = new Pool({
 db.connect((err, client, release) => {
     if (err) {
         console.error('PostgreSQL connection error:', err.message);
-        console.error('Continuing without DB...');
         return;
     }
     console.log('Connected to PostgreSQL');
-    const schema = require('fs').readFileSync('./database/schema-postgres.sql', 'utf8');
-    client.query(schema, (err) => {
-        if (err) console.error('Schema error:', err.message);
-        else console.log('Tables ready!');
+    try {
+        const fs = require('fs');
+        const schema = fs.readFileSync('./database/schema-postgres.sql', 'utf8');
+        client.query(schema, (err) => {
+            if (err) console.error('Schema error:', err.message);
+            else console.log('Tables ready!');
+            release();
+        });
+    } catch(e) {
+        console.error('Schema file error:', e.message);
         release();
-    });
+    }
 });
-
 const authenticateToken = (req, res, next) => {
     const authHeader = req.header('Authorization');
     const token = authHeader && authHeader.split(' ')[1];
