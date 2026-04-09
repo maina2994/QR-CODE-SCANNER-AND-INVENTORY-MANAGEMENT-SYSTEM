@@ -1,131 +1,48 @@
 {% extends 'menu/base.html' %}
-{% block title %}Your Order — Saveur{% endblock %}
+{% block title %}Your Cart — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-.cart-page{max-width:900px;margin:0 auto;padding:3rem 2rem}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;color:var(--text);margin-bottom:0.5rem}
-.page-subtitle{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2.5rem}
-.cart-layout{display:grid;grid-template-columns:1fr 380px;gap:2rem;align-items:start}
-.cart-items-section h3{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)}
-.cart-item{display:flex;align-items:center;gap:1.25rem;padding:1.25rem 0;border-bottom:1px solid var(--border)}
-.cart-item-info{flex:1}
-.cart-item-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;margin-bottom:0.2rem}
-.cart-item-price{font-size:0.8rem;color:var(--text-muted)}
+.cart-page{max-width:700px;margin:0 auto;padding:2rem}
+.cart-page h1{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);margin-bottom:2rem}
+.cart-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 0;border-bottom:1px solid var(--border)}
+.cart-item-name{font-weight:500;margin-bottom:0.25rem}
+.cart-item-price{color:var(--text-muted);font-size:0.85rem}
 .qty-control{display:flex;align-items:center;gap:0.75rem}
-.qty-btn{width:28px;height:28px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.qty-btn{width:30px;height:30px;border-radius:50%;background:var(--dark3);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
 .qty-btn:hover{border-color:var(--border-hover);color:var(--gold)}
-.qty-num{font-size:0.9rem;font-weight:500;min-width:20px;text-align:center}
-.item-total{font-size:0.95rem;font-weight:500;min-width:80px;text-align:right}
-.remove-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;padding:4px;transition:color 0.2s}
+.qty-num{font-weight:500;min-width:20px;text-align:center}
+.item-total{color:var(--gold);font-weight:600;min-width:60px;text-align:right}
+.remove-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;padding:0.25rem;transition:color 0.2s}
 .remove-btn:hover{color:#f87171}
-.order-summary{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;position:sticky;top:90px}
-.order-summary::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
-.summary-title{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.5rem}
-.summary-row{display:flex;justify-content:space-between;font-size:0.85rem;padding:0.5rem 0;color:var(--text-muted)}
-.summary-total{display:flex;justify-content:space-between;padding:1rem 0 0;margin-top:0.5rem;border-top:1px solid var(--border);font-size:1rem;font-weight:500;color:var(--text)}
-.summary-total .amount{color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1.3rem}
-.summary-kes{font-size:0.75rem;color:var(--text-dim);text-align:right;margin-top:0.2rem;margin-bottom:1.5rem}
-.payment-section{margin-top:1.5rem}
-.payment-title{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
-.payment-options{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem}
-.payment-option{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.2s}
-.payment-option:hover,.payment-option.selected{border-color:var(--border-hover);background:var(--gold-pale)}
-.payment-option input[type=radio]{accent-color:var(--gold);width:16px;height:16px}
-.payment-option-label{font-size:0.85rem;font-weight:500}
-.payment-option-sub{font-size:0.72rem;color:var(--text-muted)}
-.mpesa-section{display:none;margin-bottom:1rem}
-.mpesa-section.show{display:block}
-.empty-cart{text-align:center;padding:5rem 2rem;grid-column:1/-1}
-.empty-cart-icon{font-size:3rem;margin-bottom:1rem;opacity:0.3}
-.empty-cart h2{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--text-dim);margin-bottom:0.5rem}
+.cart-summary{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-top:2rem}
+.summary-row{display:flex;justify-content:space-between;padding:0.5rem 0;font-size:0.9rem;color:var(--text-muted)}
+.summary-total{display:flex;justify-content:space-between;padding-top:1rem;margin-top:0.5rem;border-top:1px solid var(--border);font-size:1.1rem;font-weight:600;color:var(--text)}
+.summary-total span:last-child{color:var(--gold)}
+.empty-cart{text-align:center;padding:4rem 0;color:var(--text-muted)}
+.empty-cart h2{font-family:'Playfair Display',serif;color:var(--text-dim);margin-bottom:0.75rem}
 </style>
 {% endblock %}
 {% block content %}
 <div class="cart-page">
-  <div class="ornament" style="justify-content:flex-start;margin-bottom:0.5rem">
-    <div class="ornament-line" style="width:30px"></div>
-    <div class="ornament-diamond" style="width:4px;height:4px"></div>
+  <h1>Your Order</h1>
+  <div id="cart-items"></div>
+  <div id="cart-summary" style="display:none">
+    <div class="cart-summary">
+      <div class="summary-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+      <div class="summary-row"><span>Table</span><span id="table-display">—</span></div>
+      <div class="summary-total"><span>Total</span><span id="total">$0.00</span></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;padding:1rem;margin-top:1rem;font-size:1rem" onclick="placeOrder()">
+      Place Order
+    </button>
+    <a href="/" class="btn btn-dark" style="width:100%;justify-content:center;padding:0.85rem;margin-top:0.75rem">
+      Add More Items
+    </a>
   </div>
-  <h1 class="page-title">Your Order</h1>
-  <p class="page-subtitle">Review and confirm your selection</p>
-
   <div id="empty-cart" class="empty-cart" style="display:none">
-    <div class="empty-cart-icon">◇</div>
-    <h2>Your order is empty</h2>
-    <p style="color:var(--text-muted);margin-bottom:2rem;font-size:0.9rem">Browse our menu and add some items to get started</p>
-    <a href="/" class="btn btn-gold">Explore Menu</a>
-  </div>
-
-  <div class="cart-layout" id="cart-layout">
-    <div class="cart-items-section">
-      <h3>Selected Items</h3>
-      <div id="cart-items"></div>
-    </div>
-    <div class="order-summary">
-      <div class="summary-title">Order Summary</div>
-      <div id="summary-rows"></div>
-      <div class="summary-total">
-        <span>Total</span>
-        <span class="amount" id="total-usd">$0.00</span>
-      </div>
-      <div class="summary-kes" id="total-kes"></div>
-
-      <div class="payment-section">
-        <div class="payment-title">Payment Method</div>
-        <div class="payment-options">
-          <label class="payment-option selected" id="opt-mpesa">
-            <input type="radio" name="payment" value="mpesa" checked onchange="selectPayment(this)">
-            <div>
-              <div class="payment-option-label">M-Pesa</div>
-              <div class="payment-option-sub">Lipa na M-Pesa</div>
-            </div>
-          </label>
-          <label class="payment-option" id="opt-card">
-            <input type="radio" name="payment" value="card" onchange="selectPayment(this)">
-            <div>
-              <div class="payment-option-label">Credit / Debit Card</div>
-              <div class="payment-option-sub">Visa, Mastercard</div>
-            </div>
-          </label>
-          <label class="payment-option" id="opt-cash">
-            <input type="radio" name="payment" value="cash" onchange="selectPayment(this)">
-            <div>
-              <div class="payment-option-label">Cash on Delivery</div>
-              <div class="payment-option-sub">Pay when served</div>
-            </div>
-          </label>
-        </div>
-
-        <div class="mpesa-section show" id="mpesa-section">
-          <div class="form-group">
-            <label>M-Pesa Phone Number</label>
-            <input type="tel" id="mpesa-phone" placeholder="07XXXXXXXX" maxlength="12" />
-          </div>
-        </div>
-
-        <div class="mpesa-section" id="card-section">
-          <div class="form-group">
-            <label>Card Number</label>
-            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)" />
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
-            <div class="form-group">
-              <label>Expiry</label>
-              <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" />
-            </div>
-            <div class="form-group">
-              <label>CVV</label>
-              <input type="text" id="card-cvv" placeholder="123" maxlength="3" />
-            </div>
-          </div>
-        </div>
-
-        <button class="btn btn-gold btn-full btn-lg" id="place-btn" onclick="placeOrder()" style="margin-top:0.5rem">
-          Place Order
-        </button>
-        <a href="/" class="btn btn-ghost btn-full" style="margin-top:0.75rem;font-size:0.75rem">Continue Shopping</a>
-      </div>
-    </div>
+    <h2>Your cart is empty</h2>
+    <p>Browse our menu and add some items</p>
+    <a href="/" class="btn btn-gold" style="margin-top:1.5rem">View Menu</a>
   </div>
 </div>
 {% endblock %}
@@ -134,105 +51,82 @@
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 const tableId = localStorage.getItem('tableId') || '{{ table_id }}';
 const API = 'https://qr-backend-app.onrender.com';
-let selectedPayment = 'mpesa';
-
-function selectPayment(el) {
-  selectedPayment = el.value;
-  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-  el.closest('.payment-option').classList.add('selected');
-  document.getElementById('mpesa-section').className = 'mpesa-section' + (selectedPayment==='mpesa'?' show':'');
-  document.getElementById('card-section').className = 'mpesa-section' + (selectedPayment==='card'?' show':'');
-}
-
-function formatCard(el) {
-  let v = el.value.replace(/\D/g,'').substring(0,16);
-  el.value = v.replace(/(.{4})/g,'$1 ').trim();
-}
 
 function render() {
+  const container = document.getElementById('cart-items');
+  const summary = document.getElementById('cart-summary');
+  const empty = document.getElementById('empty-cart');
+  updateCartCount();
+
   if(!cart.length) {
-    document.getElementById('cart-layout').style.display = 'none';
-    document.getElementById('empty-cart').style.display = 'block';
+    container.innerHTML = '';
+    summary.style.display = 'none';
+    empty.style.display = 'block';
     return;
   }
-  document.getElementById('cart-layout').style.display = 'grid';
-  document.getElementById('empty-cart').style.display = 'none';
+  empty.style.display = 'none';
+  summary.style.display = 'block';
 
-  document.getElementById('cart-items').innerHTML = cart.map((item,idx) => `
+  container.innerHTML = cart.map((item, idx) => `
     <div class="cart-item">
-      <div class="cart-item-info">
+      <div>
         <div class="cart-item-name">${item.name}</div>
         <div class="cart-item-price">$${parseFloat(item.price).toFixed(2)} each</div>
       </div>
-      <div class="qty-control">
-        <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
-        <span class="qty-num">${item.quantity}</span>
-        <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(${idx}, -1)">−</button>
+          <span class="qty-num">${item.quantity}</span>
+          <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+        </div>
+        <div class="item-total">$${(item.price * item.quantity).toFixed(2)}</div>
+        <button class="remove-btn" onclick="removeItem(${idx})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
       </div>
-      <div class="item-total">$${(item.price*item.quantity).toFixed(2)}</div>
-      <button class="remove-btn" onclick="removeItem(${idx})">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-      </button>
     </div>
   `).join('');
 
-  const subtotal = cart.reduce((s,i)=>s+i.price*i.quantity,0);
-  const kes = Math.round(subtotal * 130);
-  document.getElementById('summary-rows').innerHTML = `
-    <div class="summary-row"><span>Items (${cart.length})</span><span>$${subtotal.toFixed(2)}</span></div>
-    <div class="summary-row"><span>Table</span><span>${tableId ? 'Table '+tableId : '—'}</span></div>
-    <div class="summary-row"><span>Service</span><span>Included</span></div>
-  `;
-  document.getElementById('total-usd').textContent = '$'+subtotal.toFixed(2);
-  document.getElementById('total-kes').textContent = 'KES '+kes.toLocaleString();
-  updateCartCount();
+  const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  document.getElementById('subtotal').textContent = '$' + total.toFixed(2);
+  document.getElementById('total').textContent = '$' + total.toFixed(2);
+  document.getElementById('table-display').textContent = tableId ? 'Table ' + tableId : 'No table selected';
 }
 
-function changeQty(idx,d) {
-  cart[idx].quantity+=d;
-  if(cart[idx].quantity<=0) cart.splice(idx,1);
-  localStorage.setItem('cart',JSON.stringify(cart));
+function changeQty(idx, delta) {
+  cart[idx].quantity += delta;
+  if(cart[idx].quantity <= 0) cart.splice(idx, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
   render();
 }
+
 function removeItem(idx) {
-  cart.splice(idx,1);
-  localStorage.setItem('cart',JSON.stringify(cart));
+  cart.splice(idx, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
   render();
 }
 
 async function placeOrder() {
-  if(!tableId) { showToast('Please scan a table QR code first'); return; }
-  if(!cart.length) return;
-
-  if(selectedPayment==='mpesa') {
-    const phone = document.getElementById('mpesa-phone').value.trim();
-    if(!phone || phone.length < 10) { showToast('Please enter a valid M-Pesa number'); return; }
-  }
-
-  const btn = document.getElementById('place-btn');
-  btn.textContent = 'Processing...';
-  btn.disabled = true;
-
+  if(!tableId) { alert('No table selected. Please scan a QR code.'); return; }
   try {
     const res = await fetch(`${API}/order`, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({tableId, items:cart, paymentMethod:selectedPayment})
+      body: JSON.stringify({tableId, items: cart})
     });
     const data = await res.json();
     if(res.ok) {
       localStorage.removeItem('cart');
       localStorage.removeItem('tableId');
-      window.location.href = '/confirmation/?order_id='+data.orderId;
+      window.location.href = '/confirmation/?order_id=' + data.orderId;
     } else {
-      showToast(data.message||'Failed to place order');
-      btn.textContent='Place Order'; btn.disabled=false;
+      alert('Failed to place order: ' + (data.message || 'Unknown error'));
     }
   } catch(e) {
-    showToast('Connection error. Please try again.');
-    btn.textContent='Place Order'; btn.disabled=false;
+    alert('Connection error. Please try again.');
   }
 }
+
 render();
 </script>
 {% endblock %}
