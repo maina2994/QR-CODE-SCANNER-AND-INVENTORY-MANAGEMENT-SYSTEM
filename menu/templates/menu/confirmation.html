@@ -1,13 +1,42 @@
 {% extends 'menu/base.html' %}
-{% load static %}
-
-{% block title %}Order Confirmation{% endblock %}
-{% block header %}Order Confirmation{% endblock %}
-
+{% block title %}Order Confirmed — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+.confirmation-page{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:2rem}
+.confirmation-card{max-width:500px;width:100%;text-align:center}
+.checkmark{width:80px;height:80px;border-radius:50%;background:rgba(74,222,128,0.1);border:2px solid #4ade80;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}
+.confirmation-card h1{font-family:'Playfair Display',serif;font-size:2rem;color:var(--text);margin-bottom:0.75rem}
+.confirmation-card p{color:var(--text-muted);margin-bottom:2rem;line-height:1.6}
+.order-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(201,168,76,0.1);border:1px solid var(--border-hover);border-radius:var(--radius-lg);padding:0.75rem 1.5rem;margin-bottom:2rem;font-size:1.1rem;color:var(--gold);font-weight:600}
+</style>
+{% endblock %}
 {% block content %}
-<div style="text-align:center; margin:2rem 0;">
-    <h2>✓ Thank you for your order!</h2>
-    <p>Your order has been placed successfully.</p>
-    <p>Order details will be sent to your table shortly.</p>
+<div class="confirmation-page">
+  <div class="confirmation-card">
+    <div class="checkmark">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h1>Order Placed!</h1>
+    <p>Your order has been received and is being prepared. We'll have it ready for you shortly.</p>
+    <div class="order-badge" id="order-badge">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Order Confirmed
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.75rem">
+      <a href="/" class="btn btn-gold" style="justify-content:center;padding:0.85rem">Back to Menu</a>
+    </div>
+  </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const params = new URLSearchParams(window.location.search);
+const orderId = params.get('order_id');
+if(orderId) {
+  document.getElementById('order-badge').innerHTML = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Order #${orderId}
+  `;
+}
+</script>
 {% endblock %}

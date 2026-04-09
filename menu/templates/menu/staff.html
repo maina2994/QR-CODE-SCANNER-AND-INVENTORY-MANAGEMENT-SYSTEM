@@ -1,15 +1,217 @@
 {% extends 'menu/base.html' %}
-{% load static %}
-
-{% block title %}Staff Dashboard{% endblock %}
-{% block header %}Staff Dashboard{% endblock %}
-
+{% block title %}Staff Dashboard — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+.dashboard{max-width:1200px;margin:0 auto;padding:2rem}
+.dashboard-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.dashboard-header h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem}
+.stat-card .stat-label{font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem}
+.stat-card .stat-value{font-size:1.8rem;font-weight:600;color:var(--text)}
+.stat-card .stat-value.gold{color:var(--gold)}
+.orders-section{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.section-title{font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.order-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;transition:border-color 0.2s}
+.order-card.new{border-color:var(--gold);animation:neworder 0.5s ease}
+@keyframes neworder{0%{transform:scale(1.02)}100%{transform:scale(1)}}
+.order-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
+.order-id{font-weight:600;font-size:0.95rem}
+.order-table{color:var(--text-muted);font-size:0.85rem}
+.order-items{font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem;line-height:1.6}
+.order-footer{display:flex;align-items:center;justify-content:space-between}
+.order-total{color:var(--gold);font-weight:600}
+.status-select{background:var(--dark3);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:0.3rem 0.6rem;font-size:0.8rem;cursor:pointer}
+.inventory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-top:2rem}
+.inventory-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem}
+.inventory-name{font-weight:500;margin-bottom:0.5rem}
+.inventory-bar{height:6px;border-radius:3px;background:var(--dark3);margin:0.5rem 0;overflow:hidden}
+.inventory-fill{height:100%;border-radius:3px;background:var(--gold);transition:width 0.3s}
+.inventory-fill.low{background:#f87171}
+.inventory-fill.medium{background:#fbbf24}
+.inventory-qty{font-size:0.8rem;color:var(--text-muted)}
+.notification{position:fixed;top:80px;right:1.5rem;background:var(--dark2);border:1px solid var(--gold);border-radius:var(--radius-lg);padding:1rem 1.25rem;max-width:300px;transform:translateX(350px);transition:transform 0.3s;z-index:999}
+.notification.show{transform:translateX(0)}
+.notification-title{font-weight:600;color:var(--gold);margin-bottom:0.25rem;font-size:0.9rem}
+.notification-body{font-size:0.85rem;color:var(--text-muted)}
+.no-orders{text-align:center;padding:2rem;color:var(--text-dim);font-size:0.9rem}
+</style>
+{% endblock %}
+{% block nav_extra %}
+<span id="connection-status" class="badge badge-green">Live</span>
+<button class="btn btn-outline" style="padding:0.4rem 1rem;font-size:0.85rem" onclick="logout()">Logout</button>
+{% endblock %}
 {% block content %}
-<h2>Order Management</h2>
-<p>Staff features coming soon...</p>
-<ul>
-    <li>View incoming orders</li>
-    <li>Update order status</li>
-    <li>Manage delivery</li>
-</ul>
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Staff Dashboard</h1>
+    <div style="font-size:0.85rem;color:var(--text-muted)" id="current-time"></div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">New Orders</div>
+      <div class="stat-value gold" id="stat-new">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Preparing</div>
+      <div class="stat-value" id="stat-preparing">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ready</div>
+      <div class="stat-value" id="stat-ready">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed Today</div>
+      <div class="stat-value" id="stat-completed">0</div>
+    </div>
+  </div>
+
+  <div class="orders-section">
+    <div>
+      <div class="section-title">
+        <div class="live-dot"></div>
+        Live Orders
+      </div>
+      <div id="orders-container">
+        <div class="no-orders">No active orders</div>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">Inventory Levels</div>
+      <div class="inventory-grid" id="inventory-container" style="grid-template-columns:1fr"></div>
+    </div>
+  </div>
+</div>
+
+<div class="notification" id="notification">
+  <div class="notification-title" id="notif-title">New Order!</div>
+  <div class="notification-body" id="notif-body"></div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+const token = localStorage.getItem('token');
+if(!token) window.location.href = '/login/';
+
+const API = 'https://qr-backend-app.onrender.com';
+let orders = [];
+
+function logout() { localStorage.removeItem('token'); window.location.href = '/login/'; }
+
+function updateTime() {
+  document.getElementById('current-time').textContent = new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateTime, 1000); updateTime();
+
+async function fetchOrders() {
+  try {
+    const res = await fetch(`${API}/orders`, {headers:{'Authorization':`Bearer ${token}`}});
+    if(res.status === 401 || res.status === 403) { logout(); return; }
+    orders = await res.json();
+    renderOrders();
+    updateStats();
+  } catch(e) { console.error(e); }
+}
+
+async function fetchInventory() {
+  try {
+    const res = await fetch(`${API}/inventory`, {headers:{'Authorization':`Bearer ${token}`}});
+    const data = await res.json();
+    renderInventory(data);
+  } catch(e) { console.error(e); }
+}
+
+function renderOrders() {
+  const container = document.getElementById('orders-container');
+  const active = orders.filter(o => o.status !== 'completed');
+  if(!active.length) { container.innerHTML = '<div class="no-orders">No active orders</div>'; return; }
+  container.innerHTML = active.map(o => `
+    <div class="order-card" id="order-${o.id}">
+      <div class="order-header">
+        <div>
+          <div class="order-id">Order #${o.id}</div>
+          <div class="order-table">Table ${o.table_number || o.table_id}</div>
+        </div>
+        <span class="badge ${statusBadge(o.status)}">${o.status}</span>
+      </div>
+      <div class="order-footer">
+        <div class="order-total">$${parseFloat(o.total_amount).toFixed(2)}</div>
+        <select class="status-select" onchange="updateStatus(${o.id}, this.value)">
+          <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
+          <option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option>
+          <option value="ready" ${o.status==='ready'?'selected':''}>Ready</option>
+          <option value="completed" ${o.status==='completed'?'selected':''}>Completed</option>
+        </select>
+      </div>
+    </div>
+  `).join('');
+}
+
+function statusBadge(s) {
+  return {pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',completed:'badge-gold'}[s]||'badge-gold';
+}
+
+function updateStats() {
+  document.getElementById('stat-new').textContent = orders.filter(o=>o.status==='pending').length;
+  document.getElementById('stat-preparing').textContent = orders.filter(o=>o.status==='preparing').length;
+  document.getElementById('stat-ready').textContent = orders.filter(o=>o.status==='ready').length;
+  document.getElementById('stat-completed').textContent = orders.filter(o=>o.status==='completed').length;
+}
+
+function renderInventory(items) {
+  const c = document.getElementById('inventory-container');
+  c.innerHTML = items.map(i => {
+    const pct = Math.min(100, (i.quantity_in_stock / 200) * 100);
+    const cls = pct < 20 ? 'low' : pct < 50 ? 'medium' : '';
+    return `<div class="inventory-card">
+      <div class="inventory-name">${i.name}</div>
+      <div class="inventory-bar"><div class="inventory-fill ${cls}" style="width:${pct}%"></div></div>
+      <div class="inventory-qty">${i.quantity_in_stock} ${i.unit} remaining</div>
+    </div>`;
+  }).join('');
+}
+
+async function updateStatus(orderId, status) {
+  try {
+    await fetch(`${API}/orders/${orderId}/status`, {
+      method:'PUT',
+      headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+      body: JSON.stringify({status})
+    });
+    fetchOrders();
+  } catch(e) { console.error(e); }
+}
+
+function showNotification(title, body) {
+  document.getElementById('notif-title').textContent = title;
+  document.getElementById('notif-body').textContent = body;
+  const n = document.getElementById('notification');
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 4000);
+}
+
+const socket = io(API, {transports:['websocket','polling']});
+socket.on('connect', () => {
+  document.getElementById('connection-status').textContent = 'Live';
+  document.getElementById('connection-status').className = 'badge badge-green';
+});
+socket.on('disconnect', () => {
+  document.getElementById('connection-status').textContent = 'Offline';
+  document.getElementById('connection-status').className = 'badge badge-red';
+});
+socket.on('newOrder', (data) => {
+  showNotification('New Order!', `Table ${data.tableId} — $${parseFloat(data.total).toFixed(2)}`);
+  fetchOrders();
+});
+socket.on('orderStatusUpdate', () => fetchOrders());
+
+fetchOrders();
+fetchInventory();
+setInterval(fetchOrders, 30000);
+setInterval(fetchInventory, 60000);
+</script>
 {% endblock %}

@@ -1,112 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Restaurant Menu{% endblock %}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <style>
-        nav {
-            background-color: #0a2342;
-            padding: 0;
-            margin: 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-        nav li {
-            margin: 0;
-        }
-
-        nav a {
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            padding: 0.8rem 1.2rem;
-            transition: background-color 0.2s ease;
-        }
-
-        nav a:hover {
-            background-color: #1f8a70;
-        }
-
-        nav .nav-separator {
-            color: #444;
-            padding: 0.8rem 0;
-        }
-
-        .nav-container {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-left {
-            display: flex;
-            gap: 0;
-        }
-
-        .nav-right {
-            display: flex;
-            gap: 0;
-        }
-
-        @media (max-width: 768px) {
-            nav ul {
-                flex-direction: column;
-            }
-
-            .nav-container {
-                flex-direction: column;
-            }
-
-            nav a {
-                width: 100%;
-            }
-        }
-    </style>
-    {% block extra_css %}{% endblock %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Saveur Restaurant{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;--gold-light:#E8C97A;--gold-dark:#A07830;
+  --black:#0A0A0A;--dark:#111111;--dark2:#1A1A1A;--dark3:#242424;
+  --text:#F5F0E8;--text-muted:#9A9080;--text-dim:#6A6058;
+  --border:rgba(201,168,76,0.2);--border-hover:rgba(201,168,76,0.5);
+  --radius:8px;--radius-lg:16px;
+}
+body{background:var(--black);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+nav{background:var(--dark);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;gap:1.5rem;align-items:center}
+.nav-links a{color:var(--text-muted);text-decoration:none;font-size:0.9rem;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:var(--gold)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:0.6rem 1.4rem;border-radius:var(--radius);font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s;text-decoration:none;border:none}
+.btn-gold{background:var(--gold);color:var(--black)}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--border-hover)}
+.btn-outline:hover{background:rgba(201,168,76,0.1)}
+.btn-dark{background:var(--dark3);color:var(--text);border:1px solid var(--border)}
+.btn-dark:hover{border-color:var(--border-hover)}
+.card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem}
+.gold-text{color:var(--gold)}
+.badge{display:inline-flex;align-items:center;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.75rem;font-weight:500}
+.badge-gold{background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid var(--border)}
+.badge-green{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3)}
+.badge-red{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
+.badge-blue{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)}
+.badge-yellow{background:rgba(234,179,8,0.15);color:#fbbf24;border:1px solid rgba(234,179,8,0.3)}
+.divider{height:1px;background:var(--border);margin:1.5rem 0}
+input,select,textarea{background:var(--dark3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:0.75rem 1rem;font-size:0.95rem;font-family:'Inter',sans-serif;width:100%;transition:border-color 0.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+label{font-size:0.85rem;color:var(--text-muted);font-weight:500;margin-bottom:0.4rem;display:block}
+.form-group{margin-bottom:1.25rem}
+.alert{padding:0.9rem 1.2rem;border-radius:var(--radius);font-size:0.9rem;margin-bottom:1rem}
+.alert-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171}
+.alert-success{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80}
+</style>
+{% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav>
-        <div class="nav-container">
-            <div class="nav-left">
-                <ul>
-                    <li><a href="/">🏠 Menu</a></li>
-                    <li><a href="/cart/">🛒 Cart</a></li>
-                    <li><a href="/qr-generate/">📱 Generate QR</a></li>
-                </ul>
-            </div>
-            <div class="nav-right">
-                <ul>
-                    <li><a href="/login/">👤 Login</a></li>
-                    <li><a href="/admin/">⚙️ Admin</a></li>
-                    <li><a href="/staff/">👨‍💼 Staff</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <header>
-        <h1>{% block header %}Restaurant Menu{% endblock %}</h1>
-    </header>
-
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer style="text-align: center; padding: 2rem; background-color: #f4f4f4; margin-top: 2rem; color: #666;">
-        <p>&copy; 2026 QR Code Restaurant System. All rights reserved.</p>
-    </footer>
+<nav>
+  <a href="/" class="nav-brand">SAVEUR</a>
+  <div class="nav-links">
+    <a href="/">Menu</a>
+    <a href="/cart/">Cart <span id="cart-count" style="background:var(--gold);color:var(--black);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600">0</span></a>
+    {% block nav_extra %}{% endblock %}
+  </div>
+</nav>
+{% block content %}{% endblock %}
+<script>
+function updateCartCount(){const c=JSON.parse(localStorage.getItem('cart')||'[]');const t=c.reduce((s,i)=>s+i.quantity,0);document.getElementById('cart-count').textContent=t}
+updateCartCount();
+</script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

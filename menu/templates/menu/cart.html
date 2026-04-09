@@ -1,61 +1,132 @@
 {% extends 'menu/base.html' %}
-{% load static %}
-
-{% block title %}Shopping Cart{% endblock %}
-{% block header %}Shopping Cart{% endblock %}
-
+{% block title %}Your Cart — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+.cart-page{max-width:700px;margin:0 auto;padding:2rem}
+.cart-page h1{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);margin-bottom:2rem}
+.cart-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 0;border-bottom:1px solid var(--border)}
+.cart-item-name{font-weight:500;margin-bottom:0.25rem}
+.cart-item-price{color:var(--text-muted);font-size:0.85rem}
+.qty-control{display:flex;align-items:center;gap:0.75rem}
+.qty-btn{width:30px;height:30px;border-radius:50%;background:var(--dark3);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.qty-btn:hover{border-color:var(--border-hover);color:var(--gold)}
+.qty-num{font-weight:500;min-width:20px;text-align:center}
+.item-total{color:var(--gold);font-weight:600;min-width:60px;text-align:right}
+.remove-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;padding:0.25rem;transition:color 0.2s}
+.remove-btn:hover{color:#f87171}
+.cart-summary{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-top:2rem}
+.summary-row{display:flex;justify-content:space-between;padding:0.5rem 0;font-size:0.9rem;color:var(--text-muted)}
+.summary-total{display:flex;justify-content:space-between;padding-top:1rem;margin-top:0.5rem;border-top:1px solid var(--border);font-size:1.1rem;font-weight:600;color:var(--text)}
+.summary-total span:last-child{color:var(--gold)}
+.empty-cart{text-align:center;padding:4rem 0;color:var(--text-muted)}
+.empty-cart h2{font-family:'Playfair Display',serif;color:var(--text-dim);margin-bottom:0.75rem}
+</style>
+{% endblock %}
 {% block content %}
-<div id="cart-container">
-    <p>Loading cart...</p>
+<div class="cart-page">
+  <h1>Your Order</h1>
+  <div id="cart-items"></div>
+  <div id="cart-summary" style="display:none">
+    <div class="cart-summary">
+      <div class="summary-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+      <div class="summary-row"><span>Table</span><span id="table-display">—</span></div>
+      <div class="summary-total"><span>Total</span><span id="total">$0.00</span></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;padding:1rem;margin-top:1rem;font-size:1rem" onclick="placeOrder()">
+      Place Order
+    </button>
+    <a href="/" class="btn btn-dark" style="width:100%;justify-content:center;padding:0.85rem;margin-top:0.75rem">
+      Add More Items
+    </a>
+  </div>
+  <div id="empty-cart" class="empty-cart" style="display:none">
+    <h2>Your cart is empty</h2>
+    <p>Browse our menu and add some items</p>
+    <a href="/" class="btn btn-gold" style="margin-top:1.5rem">View Menu</a>
+  </div>
 </div>
-
+{% endblock %}
+{% block extra_js %}
 <script>
-    function displayCart() {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const container = document.getElementById('cart-container');
-        
-        if (cart.length === 0) {
-            container.innerHTML = '<p>Your cart is empty.</p>';
-            return;
-        }
+let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+const tableId = localStorage.getItem('tableId') || '{{ table_id }}';
+const API = 'https://qr-backend-app.onrender.com';
 
-        let html = '<table style="width:100%; border-collapse:collapse;"><tr style="background-color:#f0f0f0;"><th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th><th>Action</th></tr>';
-        let total = 0;
+function render() {
+  const container = document.getElementById('cart-items');
+  const summary = document.getElementById('cart-summary');
+  const empty = document.getElementById('empty-cart');
+  updateCartCount();
 
-        cart.forEach((item, index) => {
-            const subtotal = item.price * item.quantity;
-            total += subtotal;
-            html += `<tr style="border-bottom:1px solid #ddd;">
-                <td style="padding:0.5rem;">${item.name}</td>
-                <td style="padding:0.5rem;">$${parseFloat(item.price).toFixed(2)}</td>
-                <td style="padding:0.5rem;">${item.quantity}</td>
-                <td style="padding:0.5rem;">$${subtotal.toFixed(2)}</td>
-                <td style="padding:0.5rem;"><button onclick="removeItem(${index})">Remove</button></td>
-            </tr>`;
-        });
+  if(!cart.length) {
+    container.innerHTML = '';
+    summary.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  summary.style.display = 'block';
 
-        html += `</table><hr/><h3>Total: $${total.toFixed(2)}</h3><div style="margin-top:1rem;">
-            <button onclick="checkout()" style="background-color:#1f8a70; color:white; padding:0.8rem 1.5rem; border:none; border-radius:8px; cursor:pointer; font-size:1rem;">Checkout</button>
-        </div>`;
-        container.innerHTML = html;
+  container.innerHTML = cart.map((item, idx) => `
+    <div class="cart-item">
+      <div>
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">$${parseFloat(item.price).toFixed(2)} each</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(${idx}, -1)">−</button>
+          <span class="qty-num">${item.quantity}</span>
+          <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+        </div>
+        <div class="item-total">$${(item.price * item.quantity).toFixed(2)}</div>
+        <button class="remove-btn" onclick="removeItem(${idx})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  document.getElementById('subtotal').textContent = '$' + total.toFixed(2);
+  document.getElementById('total').textContent = '$' + total.toFixed(2);
+  document.getElementById('table-display').textContent = tableId ? 'Table ' + tableId : 'No table selected';
+}
+
+function changeQty(idx, delta) {
+  cart[idx].quantity += delta;
+  if(cart[idx].quantity <= 0) cart.splice(idx, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  render();
+}
+
+function removeItem(idx) {
+  cart.splice(idx, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  render();
+}
+
+async function placeOrder() {
+  if(!tableId) { alert('No table selected. Please scan a QR code.'); return; }
+  try {
+    const res = await fetch(`${API}/order`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({tableId, items: cart})
+    });
+    const data = await res.json();
+    if(res.ok) {
+      localStorage.removeItem('cart');
+      localStorage.removeItem('tableId');
+      window.location.href = '/confirmation/?order_id=' + data.orderId;
+    } else {
+      alert('Failed to place order: ' + (data.message || 'Unknown error'));
     }
+  } catch(e) {
+    alert('Connection error. Please try again.');
+  }
+}
 
-    function removeItem(index) {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cart.splice(index, 1);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        displayCart();
-    }
-
-    function checkout() {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        if (cart.length === 0) {
-            alert('Cart is empty!');
-            return;
-        }
-        window.location.href = '/confirmation/';
-    }
-
-    displayCart();
+render();
 </script>
 {% endblock %}
