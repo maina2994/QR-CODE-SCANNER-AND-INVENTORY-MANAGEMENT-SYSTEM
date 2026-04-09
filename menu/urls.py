@@ -11,7 +11,7 @@ urlpatterns = [
     path('qr-generate/', views.qr_generate_view, name='qr-generate'),
     path('order/<int:order_id>/', views.order_details_view, name='order-details'),
     path('confirmation/', views.confirmation_view, name='confirmation'),
-    # API proxy
+    path('track-order/', views.track_order_view, name='track-order'),
     path('api/login/', views.api_login, name='api-login'),
     path('api/signup/', views.api_signup, name='api-signup'),
 ]

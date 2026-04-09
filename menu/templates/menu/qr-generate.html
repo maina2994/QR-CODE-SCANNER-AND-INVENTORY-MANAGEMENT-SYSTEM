@@ -1,40 +1,69 @@
 {% extends 'menu/base.html' %}
 {% load static %}
-
-{% block title %}Generate QR Code{% endblock %}
-{% block header %}Generate QR Code for Table{% endblock %}
-
+{% block title %}Table QR Codes — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+.qr-page{max-width:700px;margin:0 auto;padding:3rem 2rem}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;margin-bottom:0.25rem}
+.page-sub{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2.5rem}
+.qr-form{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:2rem;position:relative;overflow:hidden}
+.qr-form::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.qr-result{background:var(--dark2);border:1px solid var(--border-hover);border-radius:var(--radius-lg);padding:2rem;text-align:center;position:relative;overflow:hidden}
+.qr-result::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.qr-img-wrap{display:inline-block;padding:1.25rem;background:white;border-radius:var(--radius-lg);margin:1.5rem 0}
+.qr-img-wrap img{display:block;width:200px;height:200px}
+.qr-url{font-size:0.78rem;color:var(--text-muted);margin-bottom:1.5rem;word-break:break-all;background:var(--dark3);padding:0.75rem;border-radius:var(--radius);border:1px solid var(--border)}
+.qr-actions{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
+.instructions{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem}
+.inst-title{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
+.inst-step{display:flex;align-items:flex-start;gap:1rem;padding:0.75rem 0;border-bottom:1px solid var(--border)}
+.inst-step:last-child{border-bottom:none}
+.inst-num{width:24px;height:24px;border-radius:50%;background:var(--gold-pale);border:1px solid var(--border-hover);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:600;flex-shrink:0}
+.inst-text{font-size:0.85rem;color:var(--text-muted);line-height:1.5}
+</style>
+{% endblock %}
 {% block content %}
-<div style="max-width:600px; margin:2rem auto;">
+<div class="qr-page">
+  <div class="ornament" style="justify-content:flex-start;margin-bottom:0.5rem">
+    <div class="ornament-line" style="width:30px"></div>
+    <div class="ornament-diamond" style="width:4px;height:4px"></div>
+  </div>
+  <h1 class="page-title">Table QR Codes</h1>
+  <p class="page-sub">Generate codes for customer self-ordering</p>
+
+  <div class="qr-form">
     <form method="POST">
-        {% csrf_token %}
-        <div style="margin-bottom:1.5rem;">
-            <label style="display:block; margin-bottom:0.5rem; font-weight:bold;">Table Number:</label>
-            <input type="number" name="table_id" min="1" max="50" required style="width:100%; padding:0.8rem; border:1px solid #ddd; border-radius:4px; font-size:1rem;" placeholder="Enter table number" />
-        </div>
-        <button type="submit" style="width:100%; padding:0.8rem; background-color:#1f8a70; color:white; border:none; border-radius:4px; cursor:pointer; font-size:1rem;">Generate QR Code</button>
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Table Number</label>
+        <input type="number" name="table_id" min="1" max="50" required placeholder="Enter table number (1–50)" value="{{ table_id|default:'' }}" />
+      </div>
+      <button type="submit" class="btn btn-gold btn-full" style="padding:0.9rem">Generate QR Code</button>
     </form>
+  </div>
 
-    {% if qr_image %}
-    <div style="margin-top:2rem; text-align:center;">
-        <h3>QR Code for Table {{ table_id }}</h3>
-        <img src="data:image/png;base64,{{ qr_image }}" alt="QR Code" style="border:2px solid #ddd; padding:1rem; max-width:300px;" />
-        <p style="margin-top:1rem; color:#666;">Customers can scan this code to access the menu</p>
-        <p style="margin-top:0.5rem;">
-            <a href="{{ qr_url }}" style="color:#1f8a70; text-decoration:none;">Menu Link: {{ qr_url }}</a>
-        </p>
-        <button onclick="window.print()" style="margin-top:1rem; padding:0.6rem 1.2rem; background-color:#0a2342; color:white; border:none; border-radius:4px; cursor:pointer;">Print QR Code</button>
+  {% if qr_image %}
+  <div class="qr-result">
+    <div style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem">Table {{ table_id }}</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--text)">QR Code Generated</div>
+    <div class="qr-img-wrap">
+      <img src="data:image/png;base64,{{ qr_image }}" alt="QR Code for Table {{ table_id }}" />
     </div>
-    {% endif %}
+    <div class="qr-url">{{ qr_url }}</div>
+    <div class="qr-actions">
+      <button class="btn btn-gold" onclick="window.print()">Print QR Code</button>
+      <a href="{{ qr_url }}" target="_blank" class="btn btn-outline">Test Link</a>
+    </div>
+  </div>
+  {% endif %}
 
-    <div style="margin-top:2rem; padding:1.5rem; background-color:#f9f9f9; border-radius:4px;">
-        <h3>Instructions:</h3>
-        <ol>
-            <li>Enter the table number</li>
-            <li>Click "Generate QR Code"</li>
-            <li>Print or display the QR code at the table</li>
-            <li>Customers scan the code with their phone to access the menu</li>
-        </ol>
-    </div>
+  <div class="instructions" style="margin-top:2rem">
+    <div class="inst-title">How It Works</div>
+    <div class="inst-step"><div class="inst-num">1</div><div class="inst-text">Enter the table number above and click Generate</div></div>
+    <div class="inst-step"><div class="inst-num">2</div><div class="inst-text">Print the QR code and place it on the table</div></div>
+    <div class="inst-step"><div class="inst-num">3</div><div class="inst-text">Guests scan the code with their phone camera</div></div>
+    <div class="inst-step"><div class="inst-num">4</div><div class="inst-text">They browse the menu and place orders directly</div></div>
+    <div class="inst-step"><div class="inst-num">5</div><div class="inst-text">Orders appear instantly on the staff dashboard</div></div>
+  </div>
 </div>
 {% endblock %}

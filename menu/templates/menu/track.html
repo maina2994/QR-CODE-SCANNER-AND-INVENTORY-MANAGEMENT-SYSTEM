@@ -1,0 +1,192 @@
+{% extends 'menu/base.html' %}
+{% block title %}Track Order — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+.track-page{max-width:640px;margin:0 auto;padding:3rem 2rem}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;color:var(--text);margin-bottom:0.25rem}
+.page-subtitle{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2.5rem}
+.order-header-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem;position:relative;overflow:hidden}
+.order-header-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.order-header-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.order-meta{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.3rem}
+.order-meta-val{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--text)}
+.progress-track{margin-bottom:2.5rem}
+.progress-title{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.5rem}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;align-items:flex-start;gap:1.5rem;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;left:19px;top:44px;width:2px;height:48px;background:var(--border);transition:background 0.5s}
+.step.done:not(:last-child)::after,.step.active:not(:last-child)::after{background:linear-gradient(180deg,var(--gold),var(--border))}
+.step.done:not(:last-child)::after{background:var(--gold)}
+.step-dot{width:40px;height:40px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--dark2);z-index:1;transition:all 0.4s}
+.step.done .step-dot{background:var(--gold);border-color:var(--gold);color:var(--black)}
+.step.active .step-dot{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,0.15)}
+.step.pending .step-dot{color:var(--text-dim)}
+.step-body{padding:0.6rem 0 3rem}
+.step-name{font-weight:500;font-size:0.9rem;margin-bottom:0.2rem}
+.step.active .step-name{color:var(--gold)}
+.step.done .step-name{color:var(--text-muted)}
+.step.pending .step-name{color:var(--text-dim)}
+.step-desc{font-size:0.78rem;color:var(--text-dim);line-height:1.5}
+.step.active .step-desc{color:var(--text-muted)}
+.pulse-ring{animation:pulse-ring 1.5s infinite}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 4px rgba(201,168,76,0.15)}50%{box-shadow:0 0 0 8px rgba(201,168,76,0.05)}}
+.items-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem}
+.items-card-title{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)}
+.order-item{display:flex;justify-content:space-between;font-size:0.875rem;padding:0.5rem 0;border-bottom:1px solid var(--border)}
+.order-item:last-of-type{border-bottom:none}
+.order-item-name{color:var(--text-muted)}
+.order-total-row{display:flex;justify-content:space-between;padding-top:0.75rem;margin-top:0.25rem;border-top:1px solid var(--border);font-weight:500}
+.order-total-row .amount{color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1.1rem}
+.refresh-row{display:flex;align-items:center;justify-content:space-between;font-size:0.78rem;color:var(--text-dim)}
+.refresh-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.78rem;display:flex;align-items:center;gap:0.4rem;transition:color 0.2s;font-family:'Inter',sans-serif}
+.refresh-btn:hover{color:var(--gold)}
+.auto-refresh{color:var(--text-dim)}
+</style>
+{% endblock %}
+{% block content %}
+<div class="track-page">
+  <div class="ornament" style="justify-content:flex-start;margin-bottom:0.5rem">
+    <div class="ornament-line" style="width:30px"></div>
+    <div class="ornament-diamond" style="width:4px;height:4px"></div>
+  </div>
+  <h1 class="page-title">Track Your Order</h1>
+  <p class="page-subtitle">Live status updates</p>
+
+  <div id="loading" style="text-align:center;padding:4rem">
+    <div class="spinner"></div>
+    <div style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted)">Fetching your order...</div>
+  </div>
+
+  <div id="content" style="display:none">
+    <div class="order-header-card">
+      <div class="order-header-grid" id="order-meta"></div>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-title">Order Progress</div>
+      <div class="steps">
+        <div class="step pending" id="step-pending">
+          <div class="step-dot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="step-body">
+            <div class="step-name">Order Received</div>
+            <div class="step-desc">Your order has been placed and confirmed</div>
+          </div>
+        </div>
+        <div class="step pending" id="step-preparing">
+          <div class="step-dot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          </div>
+          <div class="step-body">
+            <div class="step-name">Preparing Your Meal</div>
+            <div class="step-desc">Our chef is crafting your order with care</div>
+          </div>
+        </div>
+        <div class="step pending" id="step-ready">
+          <div class="step-dot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="step-body">
+            <div class="step-name">Ready to Serve</div>
+            <div class="step-desc">Your order is ready and will be served shortly</div>
+          </div>
+        </div>
+        <div class="step pending" id="step-completed">
+          <div class="step-dot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="step-body" style="padding-bottom:0">
+            <div class="step-name">Completed</div>
+            <div class="step-desc">Enjoy your meal! Thank you for dining with us</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="items-card">
+      <div class="items-card-title">Your Items</div>
+      <div id="items-list"></div>
+    </div>
+
+    <div class="refresh-row">
+      <span class="auto-refresh" id="auto-refresh-text">Auto-refreshing every 15s</span>
+      <button class="refresh-btn" onclick="loadOrder()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh now
+      </button>
+    </div>
+  </div>
+
+  <div id="error" style="display:none;text-align:center;padding:4rem 2rem">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text-dim);margin-bottom:0.5rem">Order not found</div>
+    <p style="color:var(--text-muted);margin-bottom:2rem;font-size:0.875rem">Please check your order number and try again</p>
+    <a href="/" class="btn btn-gold">Back to Menu</a>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+const API = 'https://qr-backend-app.onrender.com';
+const params = new URLSearchParams(window.location.search);
+const orderId = params.get('order_id');
+const statusOrder = ['pending','preparing','ready','completed'];
+let refreshTimer;
+
+function updateSteps(status) {
+  const idx = statusOrder.indexOf(status);
+  statusOrder.forEach((s,i) => {
+    const el = document.getElementById('step-'+s);
+    if(i < idx) el.className = 'step done';
+    else if(i === idx) {
+      el.className = 'step active';
+      if(status !== 'completed') el.querySelector('.step-dot').classList.add('pulse-ring');
+    }
+    else el.className = 'step pending';
+  });
+}
+
+async function loadOrder() {
+  if(!orderId) { show('error'); return; }
+  try {
+    const res = await fetch(`${API}/order/${orderId}`);
+    if(!res.ok) throw new Error();
+    const {order, items} = await res.json();
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+
+    const kes = Math.round(parseFloat(order.total_amount) * 130);
+    document.getElementById('order-meta').innerHTML = `
+      <div><div class="order-meta">Order</div><div class="order-meta-val">#${order.id}</div></div>
+      <div><div class="order-meta">Table</div><div class="order-meta-val">${order.table_id}</div></div>
+      <div><div class="order-meta">Status</div><div class="order-meta-val"><span class="badge ${badge(order.status)}">${order.status}</span></div></div>
+      <div><div class="order-meta">Total</div><div class="order-meta-val">$${parseFloat(order.total_amount).toFixed(2)}</div></div>
+    `;
+    updateSteps(order.status);
+    document.getElementById('items-list').innerHTML =
+      items.map(i=>`<div class="order-item"><span class="order-item-name">${i.name} ×${i.quantity}</span><span>$${(i.price*i.quantity).toFixed(2)}</span></div>`).join('') +
+      `<div class="order-total-row"><span>Total</span><span class="amount">$${parseFloat(order.total_amount).toFixed(2)} <small style="font-size:0.7em;color:var(--text-dim)">/ KES ${kes.toLocaleString()}</small></span></div>`;
+
+    if(order.status === 'completed') {
+      clearInterval(refreshTimer);
+      document.getElementById('auto-refresh-text').textContent = 'Order completed';
+    }
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'block';
+  }
+}
+
+function badge(s) {
+  return {pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',completed:'badge-gold'}[s]||'badge-gold';
+}
+
+const socket = io(API, {transports:['websocket','polling']});
+socket.on('orderStatusUpdate', d => { if(String(d.orderId)===String(orderId)) loadOrder(); });
+
+loadOrder();
+refreshTimer = setInterval(loadOrder, 15000);
+</script>
+{% endblock %}

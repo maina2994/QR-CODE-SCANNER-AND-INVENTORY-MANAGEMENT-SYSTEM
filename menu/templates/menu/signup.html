@@ -1,144 +1,124 @@
 {% extends 'menu/base.html' %}
-{% block title %}Sign Up — Saveur{% endblock %}
+{% block title %}Staff Registration — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-.auth-page{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:2rem}
-.auth-card{width:100%;max-width:440px;background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem}
-.auth-logo{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);text-align:center;margin-bottom:0.5rem}
-.auth-subtitle{text-align:center;color:var(--text-muted);font-size:0.9rem;margin-bottom:2rem}
-.input-icon{position:relative}
-.input-icon input,.input-icon select{padding-left:2.8rem}
-.input-icon svg{position:absolute;left:0.9rem;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none}
-.auth-link{text-align:center;font-size:0.9rem;color:var(--text-muted);margin-top:1.5rem}
-.auth-link a{color:var(--gold);text-decoration:none}
-.domain-hint{font-size:0.78rem;color:var(--text-dim);margin-top:0.3rem}
-.domain-hint.valid{color:#4ade80}
-.domain-hint.invalid{color:#f87171}
-.password-strength{height:4px;border-radius:2px;margin-top:0.5rem;transition:all 0.3s}
+.auth-page{min-height:calc(100vh - 72px);display:flex;align-items:center;justify-content:center;padding:2rem;position:relative}
+.auth-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(201,168,76,0.04) 0%,transparent 60%)}
+.auth-card{width:100%;max-width:440px;background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:2.5rem;position:relative;overflow:hidden}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.auth-eyebrow{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:0.75rem}
+.auth-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;text-align:center;margin-bottom:0.5rem}
+.auth-sub{font-size:0.78rem;color:var(--text-muted);text-align:center;margin-bottom:2rem}
+.input-wrap{position:relative}
+.input-wrap input,.input-wrap select{padding-left:2.75rem}
+.input-wrap .icon{position:absolute;left:0.9rem;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none}
+.strength-bar{height:3px;border-radius:2px;margin-top:0.5rem;transition:all 0.3s;background:var(--border);overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;transition:all 0.3s;width:0}
+.email-hint{font-size:0.72rem;margin-top:0.3rem}
+.email-hint.ok{color:var(--success-light)}
+.email-hint.bad{color:#f87171}
+.email-hint.neutral{color:var(--text-dim)}
 </style>
 {% endblock %}
 {% block content %}
 <div class="auth-page">
+  <div class="auth-bg"></div>
   <div class="auth-card">
-    <div class="auth-logo">SAVEUR</div>
-    <div class="auth-subtitle">Create Staff Account</div>
+    <div class="auth-eyebrow">Join The Team</div>
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-sub">Register your staff account</p>
 
-    <div id="error-msg" class="alert alert-error" style="display:none"></div>
-    <div id="success-msg" class="alert alert-success" style="display:none"></div>
+    <div id="msg-error" class="alert alert-error" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="err-text"></span>
+    </div>
+    <div id="msg-success" class="alert alert-success" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      Account created! Redirecting to login...
+    </div>
 
     <div class="form-group">
       <label>Full Name</label>
-      <div class="input-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <div class="input-wrap">
+        <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <input type="text" id="name" placeholder="Your full name" />
       </div>
     </div>
-
     <div class="form-group">
       <label>Email Address</label>
-      <div class="input-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+      <div class="input-wrap">
+        <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
         <input type="email" id="email" placeholder="name@restaurant.com" oninput="checkEmail(this.value)" />
       </div>
-      <div class="domain-hint" id="email-hint">Must use @restaurant.com email</div>
+      <div class="email-hint neutral" id="email-hint">Must use @restaurant.com email</div>
     </div>
-
     <div class="form-group">
       <label>Role</label>
-      <div class="input-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <select id="role" style="padding-left:2.8rem">
+      <div class="input-wrap">
+        <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <select id="role" style="padding-left:2.75rem">
           <option value="staff">Staff</option>
           <option value="admin">Admin</option>
         </select>
       </div>
     </div>
-
     <div class="form-group">
       <label>Password</label>
-      <div class="input-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input type="password" id="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)" />
+      <div class="input-wrap">
+        <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="password" placeholder="Minimum 8 characters" oninput="checkStrength(this.value)" />
       </div>
-      <div class="password-strength" id="strength-bar" style="background:var(--border)"></div>
+      <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
     </div>
-
     <div class="form-group">
       <label>Confirm Password</label>
-      <div class="input-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input type="password" id="confirm-password" placeholder="Repeat password" />
+      <div class="input-wrap">
+        <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="confirm" placeholder="Repeat password" />
       </div>
     </div>
 
-    <button class="btn btn-gold" style="width:100%;justify-content:center;padding:0.85rem" onclick="signup()">
-      Create Account
-    </button>
-
-    <div class="auth-link">
-      Already have an account? <a href="/login/">Sign In</a>
+    <button class="btn btn-gold btn-full btn-lg" onclick="signup()" style="margin-top:0.5rem">Create Account</button>
+    <div style="text-align:center;margin-top:1.25rem;font-size:0.82rem;color:var(--text-muted)">
+      Already registered? <a href="/login/" style="color:var(--gold);text-decoration:none">Sign in</a>
     </div>
   </div>
 </div>
 {% endblock %}
 {% block extra_js %}
 <script>
-function checkEmail(val) {
-  const hint = document.getElementById('email-hint');
-  if(!val) { hint.className='domain-hint'; hint.textContent='Must use @restaurant.com email'; return; }
-  if(val.endsWith('@restaurant.com')) { hint.className='domain-hint valid'; hint.textContent='Valid email domain'; }
-  else { hint.className='domain-hint invalid'; hint.textContent='Must use @restaurant.com email'; }
+function checkEmail(v){
+  const h=document.getElementById('email-hint');
+  if(!v){h.className='email-hint neutral';h.textContent='Must use @restaurant.com email';return;}
+  if(v.endsWith('@restaurant.com')){h.className='email-hint ok';h.textContent='✓ Valid domain';}
+  else{h.className='email-hint bad';h.textContent='Must use @restaurant.com email';}
 }
-
-function checkStrength(val) {
-  const bar = document.getElementById('strength-bar');
-  if(val.length === 0) { bar.style.background='var(--border)'; bar.style.width='0%'; return; }
-  let score = 0;
-  if(val.length >= 8) score++;
-  if(/[A-Z]/.test(val)) score++;
-  if(/[0-9]/.test(val)) score++;
-  if(/[^A-Za-z0-9]/.test(val)) score++;
-  const colors = ['#f87171','#fbbf24','#4ade80','#22c55e'];
-  const widths = ['25%','50%','75%','100%'];
-  bar.style.background = colors[score-1] || 'var(--border)';
-  bar.style.width = widths[score-1] || '25%';
+function checkStrength(v){
+  const f=document.getElementById('strength-fill');
+  let s=0;
+  if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
+  const c=['#f87171','#fbbf24','#52B788','#22c55e'][s-1]||'transparent';
+  f.style.width=(s*25)+'%'; f.style.background=c;
 }
-
-async function signup() {
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const role = document.getElementById('role').value;
-  const password = document.getElementById('password').value;
-  const confirm = document.getElementById('confirm-password').value;
-  const errEl = document.getElementById('error-msg');
-  const sucEl = document.getElementById('success-msg');
-  errEl.style.display = 'none';
-  sucEl.style.display = 'none';
-
-  if(!name || !email || !password) { errEl.textContent='All fields are required'; errEl.style.display='block'; return; }
-  if(!email.endsWith('@restaurant.com')) { errEl.textContent='Must use @restaurant.com email'; errEl.style.display='block'; return; }
-  if(password.length < 8) { errEl.textContent='Password must be at least 8 characters'; errEl.style.display='block'; return; }
-  if(password !== confirm) { errEl.textContent='Passwords do not match'; errEl.style.display='block'; return; }
-
-  try {
-    const res = await fetch('/api/signup/', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({name, email, password, role})
-    });
-    const data = await res.json();
-    if(res.ok) {
-      sucEl.textContent = 'Account created! Redirecting to login...';
-      sucEl.style.display = 'block';
-      setTimeout(() => window.location.href = '/login/', 1500);
-    } else {
-      errEl.textContent = data.message || 'Signup failed';
-      errEl.style.display = 'block';
-    }
-  } catch(e) {
-    errEl.textContent = 'Connection error. Please try again.';
-    errEl.style.display = 'block';
-  }
+async function signup(){
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const role=document.getElementById('role').value;
+  const password=document.getElementById('password').value;
+  const confirm=document.getElementById('confirm').value;
+  const errEl=document.getElementById('msg-error');
+  errEl.style.display='none';
+  if(!name||!email||!password){showErr('All fields are required');return;}
+  if(!email.endsWith('@restaurant.com')){showErr('Must use @restaurant.com email');return;}
+  if(password.length<8){showErr('Password must be at least 8 characters');return;}
+  if(password!==confirm){showErr('Passwords do not match');return;}
+  try{
+    const res=await fetch('/api/signup/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password,role})});
+    const data=await res.json();
+    if(res.ok){document.getElementById('msg-success').style.display='flex';setTimeout(()=>window.location.href='/login/',1500);}
+    else{showErr(data.message||'Registration failed');}
+  }catch(e){showErr('Connection error. Please try again.');}
 }
+function showErr(msg){document.getElementById('err-text').textContent=msg;document.getElementById('msg-error').style.display='flex';}
 </script>
 {% endblock %}
