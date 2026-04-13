@@ -17,9 +17,12 @@ def _api(path, timeout=5):
 
 def menu_view(request):
     table_id = request.GET.get('table_id', '')
-    data = _api('/menu-full') or {}
-    categories = data.get('categories', [])
-    menu_items = data.get('menu', [])
+    data = _api('/menu') or []
+    menu_items = data if isinstance(data, list) else data.get('menu', [])
+    categories = data.get('categories', []) if isinstance(data, dict) else []
+    for cat in categories:
+        if isinstance(cat, dict) and 'items' in cat:
+            cat['dishes'] = cat.pop('items')
     return render(request, 'menu/menu.html', {'categories': categories, 'menu_items': menu_items, 'table_id': table_id})
 
 def cart_view(request):
@@ -113,3 +116,5 @@ def api_signup(request):
         return JsonResponse(res.json(), status=res.status_code)
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=500)
+
+

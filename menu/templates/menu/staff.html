@@ -92,7 +92,6 @@
 <script>
 const token = localStorage.getItem('token');
 if(!token) window.location.href = '/login/';
-const API = 'https://qr-backend-app.onrender.com';
 let orders = [];
 
 function logout(){ localStorage.removeItem('token'); window.location.href='/login/'; }
@@ -192,3 +191,5 @@ setInterval(fetchOrders,20000);
 setInterval(fetchInv,60000);
 </script>
 {% endblock %}
+
+

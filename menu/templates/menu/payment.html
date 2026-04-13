@@ -128,7 +128,6 @@
 {% endblock %}
 {% block extra_js %}
 <script>
-const API = 'https://qr-backend-app.onrender.com';
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 const tableId = localStorage.getItem('tableId') || '';
 let currentMethod = 'mpesa';
@@ -260,3 +259,5 @@ function showErr(msg) {
 renderSummary();
 </script>
 {% endblock %}
+
+

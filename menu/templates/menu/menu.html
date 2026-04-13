@@ -107,7 +107,7 @@
     <p>{{ category.description|default:"Crafted with the finest ingredients" }}</p>
   </div>
   <div class="menu-grid">
-    {% for item in category.items %}
+    {% for item in category.dishes %}
     {% if item.availability %}
     <div class="menu-card">
       {% if item.is_featured %}<div class="featured-badge"><span class="badge badge-gold">Featured</span></div>{% endif %}
@@ -203,3 +203,5 @@ checkWaiter();
 {% endif %}
 </script>
 {% endblock %}
+
+
