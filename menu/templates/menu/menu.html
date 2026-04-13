@@ -1,93 +1,165 @@
 {% extends 'menu/base.html' %}
 {% load static %}
-{% block title %}Menu — Saveur Luxury Dining{% endblock %}
+{% block title %}Menu — Saveur Restaurant{% endblock %}
 {% block extra_css %}
 <style>
-.hero{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,0.06) 0%,transparent 70%)}
-.hero-eyebrow{font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem}
-.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,6rem);font-weight:300;color:var(--text);line-height:1.05;margin-bottom:1.5rem}
+.hero{background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 50%,var(--primary-dark) 100%);padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,0.15),transparent 70%)}
+.hero-eye{font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,6vw,4.5rem);font-weight:300;color:var(--sand);line-height:1.1;margin-bottom:1rem}
 .hero h1 em{font-style:italic;color:var(--gold)}
-.hero-sub{font-size:0.9rem;color:var(--text-muted);letter-spacing:0.08em;max-width:400px;line-height:1.7;margin-bottom:2.5rem}
-.hero-table-badge{display:inline-flex;align-items:center;gap:0.75rem;background:var(--gold-pale);border:1px solid var(--border-hover);border-radius:var(--radius-xl);padding:0.6rem 1.5rem;font-size:0.8rem;color:var(--gold);letter-spacing:0.1em}
-.section-header{text-align:center;padding:3rem 2rem 2rem}
-.section-header h2{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;color:var(--text);margin-bottom:0.5rem}
-.section-header p{font-size:0.8rem;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase}
-.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;padding:0 3rem 4rem;max-width:1400px;margin:0 auto}
-.menu-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all 0.4s;cursor:pointer;position:relative}
-.menu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);opacity:0;transition:opacity 0.3s}
-.menu-card:hover{border-color:var(--border-hover);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,0.4)}
-.menu-card:hover::before{opacity:1}
-.menu-card-img{width:100%;height:220px;object-fit:cover;background:var(--dark3);display:block;filter:brightness(0.85);transition:filter 0.4s}
-.menu-card:hover .menu-card-img{filter:brightness(1)}
-.menu-card-body{padding:1.5rem}
-.menu-card-category{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem}
-.menu-card-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;margin-bottom:0.5rem;color:var(--text)}
-.menu-card-desc{font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-bottom:1rem}
-.menu-card-footer{display:flex;align-items:center;justify-content:space-between}
-.menu-card-price{font-size:1rem;font-weight:500;color:var(--text)}
-.menu-card-price .kes{font-size:0.75rem;color:var(--text-dim);display:block;margin-top:2px}
-.add-btn{width:36px;height:36px;border-radius:50%;background:var(--gold-pale);border:1px solid var(--border-hover);color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;font-size:1.2rem}
-.add-btn:hover{background:var(--gold);color:var(--black)}
-.add-btn:disabled{opacity:0.3;cursor:not-allowed}
-.sold-out-overlay{position:absolute;top:1rem;right:1rem}
+.hero-sub{font-size:0.9rem;color:var(--text-dim);max-width:400px;margin:0 auto 2rem;line-height:1.7}
+.table-pill{display:inline-flex;align-items:center;gap:0.6rem;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:30px;padding:0.5rem 1.25rem;font-size:0.82rem;color:var(--gold)}
+.waiter-notif{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--radius-lg);padding:1rem 1.5rem;margin:0 auto 1.5rem;max-width:400px;display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow)}
+.waiter-avatar{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
+.waiter-info{text-align:left}
+.waiter-name{font-weight:600;color:var(--sand);font-size:0.9rem}
+.waiter-role{font-size:0.75rem;color:rgba(245,230,200,0.7)}
+
+/* CATEGORY TABS */
+.category-bar{background:white;border-bottom:2px solid var(--sand-dark);position:sticky;top:68px;z-index:100;overflow-x:auto;scrollbar-width:none}
+.category-bar::-webkit-scrollbar{display:none}
+.category-tabs{display:flex;gap:0;padding:0 1.5rem;min-width:max-content}
+.cat-tab{padding:1rem 1.5rem;font-size:0.82rem;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;text-transform:uppercase;letter-spacing:0.08em;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif}
+.cat-tab:hover{color:var(--primary)}
+.cat-tab.active{color:var(--primary);border-bottom-color:var(--gold)}
+.cat-icon{margin-right:0.4rem}
+
+/* MENU SECTION */
+.menu-section{display:none;padding:2rem;max-width:1300px;margin:0 auto}
+.menu-section.active{display:block}
+.section-header{margin-bottom:2rem}
+.section-header h2{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:var(--text);margin-bottom:0.25rem}
+.section-header p{font-size:0.82rem;color:var(--text-muted)}
+
+/* MENU GRID */
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem}
+.menu-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all 0.3s;position:relative}
+.menu-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--border-hover)}
+.menu-card.unavailable{opacity:0.5;pointer-events:none}
+.card-img{width:100%;height:180px;object-fit:cover;background:var(--sand-light);display:block}
+.card-body{padding:1.1rem}
+.card-category{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:0.3rem}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;color:var(--text);margin-bottom:0.3rem}
+.card-desc{font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.75rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.card-price{font-size:0.95rem;font-weight:600;color:var(--primary)}
+.card-prep{font-size:0.7rem;color:var(--text-dim)}
+.add-btn{width:36px;height:36px;border-radius:50%;background:var(--primary);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all 0.2s;flex-shrink:0}
+.add-btn:hover{background:var(--primary-light);transform:scale(1.1)}
+.featured-badge{position:absolute;top:0.75rem;left:0.75rem}
+.out-badge{position:absolute;top:0.75rem;right:0.75rem}
+.prep-badge{position:absolute;top:0.75rem;right:0.75rem;background:rgba(26,15,0,0.7);color:var(--sand);padding:0.2rem 0.5rem;border-radius:20px;font-size:0.65rem}
+
+@media(max-width:768px){
+  .menu-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem}
+  .card-img{height:140px}
+  .menu-section{padding:1rem}
+  .category-tabs{padding:0 0.5rem}
+  .cat-tab{padding:0.75rem 1rem;font-size:0.75rem}
+  .hero{padding:2.5rem 1rem 2rem}
+}
+@media(max-width:480px){
+  .menu-grid{grid-template-columns:1fr 1fr;gap:0.6rem}
+  .card-img{height:120px}
+  .card-body{padding:0.75rem}
+  .card-name{font-size:1rem}
+}
 </style>
 {% endblock %}
 {% block content %}
 <div class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-eyebrow">Est. 2024 — Nairobi, Kenya</div>
-  <h1>An <em>Extraordinary</em><br>Culinary Journey</h1>
-  <p class="hero-sub">Experience the finest cuisine crafted by our world-class chefs, where every dish tells a story</p>
+  <div class="hero-eye">Est. 2024 — Nairobi, Kenya</div>
+  <h1>Welcome to<br><em>Saveur</em></h1>
+  <p class="hero-sub">Authentic flavours, warm hospitality, unforgettable moments</p>
   {% if table_id %}
-  <div class="hero-table-badge">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    Dining at Table {{ table_id }}
+  <div id="waiter-notif" class="waiter-notif" style="display:none">
+    <div class="waiter-avatar" id="waiter-avatar">?</div>
+    <div class="waiter-info">
+      <div class="waiter-name" id="waiter-name">Assigning your waiter...</div>
+      <div class="waiter-role">Will be with you shortly</div>
+    </div>
+  </div>
+  <div class="table-pill">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    Table {{ table_id }}
   </div>
   {% else %}
-  <a href="#menu" class="btn btn-outline btn-lg">Explore Our Menu</a>
+  <a href="#menu" class="btn btn-gold btn-lg" style="margin-top:0.5rem">Explore Our Menu</a>
   {% endif %}
 </div>
 
-<div id="menu" class="section-header">
-  <div class="ornament">
-    <div class="ornament-line"></div>
-    <div class="ornament-diamond"></div>
-    <div class="ornament-line right"></div>
+<!-- CATEGORY TABS -->
+<div class="category-bar" id="menu">
+  <div class="category-tabs">
+    <button class="cat-tab active" onclick="showCat('food',this)"><span class="cat-icon">🍽️</span>Food</button>
+    <button class="cat-tab" onclick="showCat('drinks',this)"><span class="cat-icon">🥤</span>Drinks</button>
+    <button class="cat-tab" onclick="showCat('snacks',this)"><span class="cat-icon">🍿</span>Snacks</button>
+    <button class="cat-tab" onclick="showCat('desserts',this)"><span class="cat-icon">🍰</span>Desserts</button>
+    <button class="cat-tab" onclick="showCat('specials',this)"><span class="cat-icon">⭐</span>Specials</button>
   </div>
-  <h2>Tonight's Selection</h2>
-  <p>Seasonal ingredients, timeless recipes</p>
 </div>
 
-<div class="menu-grid">
-  {% for item in menu_items %}
-  <div class="menu-card">
-    {% if not item.availability %}<div class="sold-out-overlay"><span class="badge badge-red">Sold Out</span></div>{% endif %}
-    <img class="menu-card-img" src="{% static 'images/' %}{{ item.image_url|slice:'8:' }}" alt="{{ item.name }}"
-      onerror="this.style.background='#1C1C1C';this.removeAttribute('src')" />
-    <div class="menu-card-body">
-      <div class="menu-card-category">Signature Dish</div>
-      <div class="menu-card-name">{{ item.name }}</div>
-      <div class="menu-card-desc">Expertly prepared with the finest seasonal ingredients</div>
-      <div class="menu-card-footer">
-        <div class="menu-card-price">
-          ${{ item.price }}
-          <span class="kes">KES {{ item.price|floatformat:0 }} × 130</span>
+{% for category in categories %}
+<div class="menu-section {% if forloop.first %}active{% endif %}" id="cat-{{ category.slug }}">
+  <div class="section-header">
+    <h2>{{ category.icon }} {{ category.name }}</h2>
+    <p>{{ category.description|default:"Crafted with the finest ingredients" }}</p>
+  </div>
+  <div class="menu-grid">
+    {% for item in category.items %}
+    {% if item.availability %}
+    <div class="menu-card">
+      {% if item.is_featured %}<div class="featured-badge"><span class="badge badge-gold">Featured</span></div>{% endif %}
+      <img class="card-img" src="{% static 'images/' %}{{ item.image_url|slice:'8:' }}" alt="{{ item.name }}"
+        onerror="this.style.background='var(--sand-light)';this.style.height='180px';this.removeAttribute('src')" />
+      <div class="card-body">
+        <div class="card-name">{{ item.name }}</div>
+        <div class="card-desc">{{ item.description|default:"Expertly prepared with fresh ingredients" }}</div>
+        <div class="card-footer">
+          <div>
+            <div class="card-price">KES {{ item.price_kes|floatformat:0 }}</div>
+            <div class="card-prep">~{{ item.prep_time_mins|default:15 }} mins</div>
+          </div>
+          <button class="add-btn" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price_kes }})" title="Add to order">+</button>
         </div>
-        <button class="add-btn" {% if not item.availability %}disabled{% endif %}
-          onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price }})" title="Add to order">
-          +
-        </button>
       </div>
     </div>
+    {% endif %}
+    {% empty %}
+    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)">
+      <div style="font-size:2rem;margin-bottom:0.5rem">🍽️</div>
+      <div>No items in this category yet</div>
+    </div>
+    {% endfor %}
   </div>
-  {% empty %}
-  <div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--text-muted)">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text-dim);margin-bottom:0.5rem">No items available</div>
-    <div style="font-size:0.85rem">Please check back shortly</div>
-  </div>
-  {% endfor %}
 </div>
+{% empty %}
+<!-- Fallback if no categories -->
+<div class="menu-section active" id="cat-food">
+  <div class="section-header" style="padding-top:2rem">
+    <h2>🍽️ Our Menu</h2>
+  </div>
+  <div class="menu-grid">
+    {% for item in menu_items %}
+    {% if item.availability %}
+    <div class="menu-card">
+      <img class="card-img" src="{% static 'images/' %}{{ item.image_url|slice:'8:' }}" alt="{{ item.name }}"
+        onerror="this.style.background='var(--sand-light)';this.style.height='180px';this.removeAttribute('src')" />
+      <div class="card-body">
+        <div class="card-name">{{ item.name }}</div>
+        <div class="card-desc">Expertly prepared with fresh ingredients</div>
+        <div class="card-footer">
+          <div class="card-price">KES {{ item.price_kes|default:item.price|floatformat:0 }}</div>
+          <button class="add-btn" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price_kes|default:item.price }})">+</button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
 {% endblock %}
 {% block extra_js %}
 <script>
@@ -95,13 +167,39 @@ let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 const tableId = '{{ table_id }}';
 if(tableId) localStorage.setItem('tableId', tableId);
 
+function showCat(slug, btn) {
+  document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('cat-'+slug);
+  if(el) el.classList.add('active');
+  btn.classList.add('active');
+}
+
 function addToCart(id, name, price) {
   const existing = cart.find(i => i.id === id);
   if(existing) existing.quantity++;
-  else cart.push({id, name, price, quantity: 1});
+  else cart.push({id, name, price, quantity:1});
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
-  showToast(name + ' added to your order', 'gold');
+  showToast(name + ' added to cart', 'gold');
 }
+
+{% if table_id %}
+// Fetch waiter assignment
+async function checkWaiter() {
+  try {
+    const res = await fetch(`${API}/waiter-for-table/{{ table_id }}`);
+    if(res.ok) {
+      const d = await res.json();
+      if(d.waiter) {
+        document.getElementById('waiter-name').textContent = d.waiter.name + ' will serve you';
+        document.getElementById('waiter-avatar').textContent = d.waiter.name.substring(0,2).toUpperCase();
+        document.getElementById('waiter-notif').style.display = 'flex';
+      }
+    }
+  } catch(e) {}
+}
+checkWaiter();
+{% endif %}
 </script>
 {% endblock %}

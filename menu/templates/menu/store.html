@@ -1,0 +1,217 @@
+{% extends 'menu/base.html' %}
+{% block title %}Store Inventory — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+body{background:var(--sand-light)!important}
+.store{max-width:1300px;margin:0 auto;padding:2rem}
+.store-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.store-title{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text);font-weight:400}
+.inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.inv-section{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
+.inv-section-header{padding:1.25rem 1.5rem;border-bottom:2px solid var(--sand-dark);display:flex;align-items:center;justify-content:space-between}
+.inv-section-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--text)}
+.inv-section-sub{font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em}
+.inv-table{width:100%;border-collapse:collapse}
+.inv-table th{padding:0.75rem 1.25rem;text-align:left;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--sand-light)}
+.inv-table td{padding:0.85rem 1.25rem;font-size:0.875rem;border-bottom:1px solid var(--border)}
+.inv-table tr:last-child td{border-bottom:none}
+.inv-table tr:hover td{background:var(--sand-light)}
+.stock-bar{width:80px;height:6px;background:var(--sand-dark);border-radius:3px;overflow:hidden;display:inline-block}
+.stock-fill{height:100%;border-radius:3px;transition:width 0.4s}
+.stock-ok{background:var(--success-light)}
+.stock-med{background:var(--warning)}
+.stock-low{background:var(--error-light)}
+.qty-edit{width:70px;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.8rem;text-align:center}
+.transfer-btn{background:var(--primary);color:white;border:none;border-radius:var(--radius);padding:0.35rem 0.75rem;font-size:0.72rem;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif}
+.transfer-btn:hover{background:var(--primary-light)}
+.add-stock-btn{background:var(--gold);color:var(--dark);border:none;border-radius:var(--radius);padding:0.35rem 0.75rem;font-size:0.72rem;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600}
+.alerts-bar{background:linear-gradient(135deg,rgba(192,57,43,0.08),rgba(192,57,43,0.04));border:1px solid rgba(192,57,43,0.2);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem}
+.alerts-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#C0392B;margin-bottom:0.75rem;font-weight:600;display:flex;align-items:center;gap:0.5rem}
+.alert-pills{display:flex;flex-wrap:wrap;gap:0.5rem}
+.alert-pill{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.2);border-radius:20px;padding:0.3rem 0.75rem;font-size:0.75rem;color:#C0392B}
+.tx-log{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-top:2rem}
+.tx-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
+.tx-item{display:flex;align-items:center;gap:1rem;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.82rem}
+.tx-item:last-child{border-bottom:none}
+.tx-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+.tx-in{background:rgba(45,106,79,0.1);color:var(--success)}
+.tx-out{background:rgba(192,57,43,0.1);color:var(--error-light)}
+.tx-transfer{background:rgba(27,108,168,0.1);color:var(--info)}
+
+@media(max-width:900px){.inv-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.store{padding:1rem}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="store">
+  <div class="store-header">
+    <div>
+      <h1 class="store-title">Store & Kitchen Inventory</h1>
+      <div style="font-size:0.78rem;color:var(--text-muted)">Manage stock across both levels</div>
+    </div>
+    <div style="display:flex;gap:0.75rem">
+      <button class="btn btn-gold btn-sm" onclick="showAddModal()">+ Add Stock</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="alerts-bar" id="alerts-bar" style="display:none">
+    <div class="alerts-title">⚠️ Low Stock Alerts</div>
+    <div class="alert-pills" id="alert-pills"></div>
+  </div>
+
+  <div class="inv-grid">
+    <!-- STORE INVENTORY -->
+    <div class="inv-section">
+      <div class="inv-section-header">
+        <div>
+          <div class="inv-section-title">🏪 Main Store</div>
+          <div class="inv-section-sub">Warehouse / Bulk Stock</div>
+        </div>
+        <span class="badge badge-earth" id="store-count">0 items</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="inv-table">
+          <thead><tr><th>Item</th><th>Stock</th><th>Level</th><th>Action</th></tr></thead>
+          <tbody id="store-tbody"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-dim)">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KITCHEN INVENTORY -->
+    <div class="inv-section">
+      <div class="inv-section-header">
+        <div>
+          <div class="inv-section-title">👨‍🍳 Kitchen</div>
+          <div class="inv-section-sub">Ready-to-use ingredients</div>
+        </div>
+        <span class="badge badge-blue" id="kitchen-count">0 items</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="inv-table">
+          <thead><tr><th>Item</th><th>Stock</th><th>Level</th><th>Update</th></tr></thead>
+          <tbody id="kitchen-tbody"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-dim)">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION LOG -->
+  <div class="tx-log">
+    <div class="tx-title">Recent Transactions</div>
+    <div id="tx-list"><div style="text-align:center;padding:1rem;color:var(--text-dim);font-size:0.85rem">Loading transactions...</div></div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const token = localStorage.getItem('token');
+if(!token) window.location.href = '/login/';
+function logout() { localStorage.removeItem('token'); window.location.href='/login/'; }
+
+function stockBar(qty, reorder, max=100) {
+  const pct = Math.min(100,(qty/max)*100);
+  const cls = qty <= reorder ? 'stock-low' : qty <= reorder*2 ? 'stock-med' : 'stock-ok';
+  return `<div class="stock-bar"><div class="stock-fill ${cls}" style="width:${pct}%"></div></div>`;
+}
+
+async function fetchStore() {
+  try {
+    const res = await fetch(`${API}/inventory/store`,{headers:{'Authorization':'Bearer '+token}});
+    const items = await res.json();
+    document.getElementById('store-count').textContent = items.length+' items';
+    const low = items.filter(i => i.quantity <= i.reorder_level);
+    if(low.length) {
+      document.getElementById('alerts-bar').style.display='block';
+      document.getElementById('alert-pills').innerHTML = low.map(i =>
+        `<div class="alert-pill">⚠️ ${i.name}: ${i.quantity} ${i.unit}</div>`
+      ).join('');
+    }
+    document.getElementById('store-tbody').innerHTML = items.map(i => `
+      <tr>
+        <td><strong>${i.name}</strong><br><span style="font-size:0.72rem;color:var(--text-dim)">${i.category||'General'}</span></td>
+        <td>${i.quantity} ${i.unit}${i.quantity<=i.reorder_level?` <span class="badge badge-red" style="font-size:0.6rem">LOW</span>`:''}</td>
+        <td>${stockBar(i.quantity, i.reorder_level)}</td>
+        <td><button class="transfer-btn" onclick="transferToKitchen(${i.id},'${i.name}',${i.quantity})">→ Kitchen</button></td>
+      </tr>
+    `).join('');
+  } catch(e){}
+}
+
+async function fetchKitchen() {
+  try {
+    const res = await fetch(`${API}/inventory/kitchen`,{headers:{'Authorization':'Bearer '+token}});
+    const items = await res.json();
+    document.getElementById('kitchen-count').textContent = items.length+' items';
+    document.getElementById('kitchen-tbody').innerHTML = items.map(i => `
+      <tr>
+        <td><strong>${i.name}</strong></td>
+        <td>${i.quantity} ${i.unit}${i.quantity<=i.reorder_level?` <span class="badge badge-red" style="font-size:0.6rem">LOW</span>`:''}</td>
+        <td>${stockBar(i.quantity, i.reorder_level, 50)}</td>
+        <td>
+          <input type="number" class="qty-edit" value="${i.quantity}" min="0" onchange="updateKitchen(${i.id},this.value)" />
+        </td>
+      </tr>
+    `).join('');
+  } catch(e){}
+}
+
+async function fetchTransactions() {
+  try {
+    const res = await fetch(`${API}/inventory/transactions`,{headers:{'Authorization':'Bearer '+token}});
+    const txs = await res.json();
+    document.getElementById('tx-list').innerHTML = txs.slice(0,10).map(t => {
+      const icons = {in:'📥',out:'📤',transfer:'🔄'};
+      const cls = {in:'tx-in',out:'tx-out',transfer:'tx-transfer'};
+      return `<div class="tx-item">
+        <div class="tx-icon ${cls[t.type]||'tx-in'}">${icons[t.type]||'📦'}</div>
+        <div style="flex:1"><strong>${t.item_name}</strong> — ${t.quantity} ${t.unit}</div>
+        <div style="color:var(--text-dim);font-size:0.75rem">${new Date(t.created_at).toLocaleDateString()}</div>
+      </div>`;
+    }).join('') || '<div style="text-align:center;color:var(--text-dim);font-size:0.85rem">No transactions yet</div>';
+  } catch(e){}
+}
+
+async function transferToKitchen(id, name, maxQty) {
+  const qty = prompt(`Transfer how much of "${name}" to Kitchen? (Max: ${maxQty})`);
+  if(!qty || isNaN(qty) || qty <= 0) return;
+  try {
+    await fetch(`${API}/inventory/transfer`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body: JSON.stringify({storeItemId:id, quantity:parseFloat(qty)})
+    });
+    showToast(`Transferred ${qty} ${name} to Kitchen`,'gold');
+    fetchStore(); fetchKitchen(); fetchTransactions();
+  } catch(e){ showToast('Transfer failed','error'); }
+}
+
+async function updateKitchen(id, qty) {
+  try {
+    await fetch(`${API}/inventory/kitchen/${id}`,{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body: JSON.stringify({quantity:parseFloat(qty)})
+    });
+    showToast('Kitchen stock updated','gold');
+  } catch(e){}
+}
+
+function showAddModal() {
+  const name = prompt('Item name:');
+  if(!name) return;
+  const qty = prompt('Initial quantity:');
+  const unit = prompt('Unit (kg, litres, units):') || 'units';
+  if(!qty) return;
+  fetch(`${API}/inventory/store`,{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+    body: JSON.stringify({name, quantity:parseFloat(qty), unit})
+  }).then(()=>{ showToast('Item added to store','gold'); fetchStore(); });
+}
+
+fetchStore(); fetchKitchen(); fetchTransactions();
+setInterval(fetchStore, 30000);
+setInterval(fetchKitchen, 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends 'menu/base.html' %}
+{% block title %}Reserve a Table — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+.res-page{max-width:800px;margin:0 auto;padding:3rem 2rem}
+.res-hero{text-align:center;margin-bottom:3rem}
+.res-hero h1{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--text);margin-bottom:0.5rem}
+.res-hero p{color:var(--text-muted);font-size:0.9rem;line-height:1.7}
+.packages{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:2.5rem}
+.pkg-card{border-radius:var(--radius-lg);padding:1.5rem;cursor:pointer;transition:all 0.3s;border:2px solid transparent;text-align:center}
+.pkg-card:hover{transform:translateY(-3px)}
+.pkg-card.selected{border-color:var(--gold)}
+.pkg-bronze{background:linear-gradient(135deg,#FFF8EE,#F5E6C8);border-color:rgba(139,69,19,0.2)}
+.pkg-silver{background:linear-gradient(135deg,#F5F5F5,#E8E8E8);border-color:rgba(100,100,100,0.2)}
+.pkg-gold{background:linear-gradient(135deg,#FFF8E1,#FFE082);border-color:rgba(201,168,76,0.3)}
+.pkg-icon{font-size:2rem;margin-bottom:0.75rem;display:block}
+.pkg-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;margin-bottom:0.25rem}
+.pkg-bronze .pkg-name{color:#8B4513}
+.pkg-silver .pkg-name{color:#555}
+.pkg-gold .pkg-name{color:#9A7830}
+.pkg-price{font-size:1rem;font-weight:700;margin-bottom:0.75rem}
+.pkg-feature{font-size:0.75rem;color:var(--text-muted);line-height:1.8}
+.res-form{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.selected-pkg{background:var(--sand-light);border:1px solid var(--sand-dark);border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--text-muted)}
+.selected-pkg strong{color:var(--primary)}
+@media(max-width:600px){
+  .packages{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .res-page{padding:1.5rem 1rem}
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="res-page">
+  <div class="res-hero">
+    <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond"></div><div class="ornament-line r"></div></div>
+    <h1>Reserve Your Table</h1>
+    <p>Book your dining experience at Saveur.<br>Choose a package that suits your occasion.</p>
+  </div>
+
+  <!-- PACKAGES -->
+  <div class="packages">
+    <div class="pkg-card pkg-bronze" id="pkg-bronze" onclick="selectPkg('bronze')">
+      <span class="pkg-icon">🥉</span>
+      <div class="pkg-name">Bronze</div>
+      <div class="pkg-price" style="color:#8B4513">KES 500 deposit</div>
+      <div class="pkg-feature">
+        Standard seating<br>
+        Up to 4 guests<br>
+        2-hour dining<br>
+        Welcome drink
+      </div>
+    </div>
+    <div class="pkg-card pkg-silver" id="pkg-silver" onclick="selectPkg('silver')">
+      <span class="pkg-icon">🥈</span>
+      <div class="pkg-name">Silver</div>
+      <div class="pkg-price" style="color:#555">KES 1,500 deposit</div>
+      <div class="pkg-feature">
+        Premium seating<br>
+        Up to 6 guests<br>
+        3-hour dining<br>
+        Appetizers included<br>
+        Priority service
+      </div>
+    </div>
+    <div class="pkg-card pkg-gold" id="pkg-gold" onclick="selectPkg('gold')">
+      <span class="pkg-icon">🥇</span>
+      <div class="pkg-name">Gold</div>
+      <div class="pkg-price" style="color:#9A7830">KES 3,000 deposit</div>
+      <div class="pkg-feature">
+        VIP private area<br>
+        Up to 10 guests<br>
+        Unlimited dining<br>
+        Full course meal<br>
+        Dedicated waiter<br>
+        Complimentary cake
+      </div>
+    </div>
+  </div>
+
+  <div id="msg-error" class="alert alert-error" style="display:none"></div>
+  <div id="msg-success" class="alert alert-success" style="display:none"></div>
+
+  <div class="res-form">
+    <div class="selected-pkg" id="selected-pkg-info">Select a package above to continue</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" id="res-name" placeholder="Full name" />
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="res-phone" placeholder="07XXXXXXXX" />
+      </div>
+      <div class="form-group">
+        <label>Email (optional)</label>
+        <input type="email" id="res-email" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Number of Guests</label>
+        <input type="number" id="res-guests" placeholder="2" min="1" max="20" />
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="res-date" />
+      </div>
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="res-time" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Special Requests</label>
+      <textarea id="res-special" placeholder="Birthday celebration, dietary requirements, seating preferences..." rows="3" style="resize:vertical"></textarea>
+    </div>
+    <button class="btn btn-gold btn-full btn-lg" onclick="makeReservation()">Confirm Reservation</button>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+let selectedPkg = null;
+const deposits = {bronze:500, silver:1500, gold:3000};
+const minDate = new Date();
+minDate.setDate(minDate.getDate()+1);
+document.getElementById('res-date').min = minDate.toISOString().split('T')[0];
+
+function selectPkg(pkg) {
+  selectedPkg = pkg;
+  document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('pkg-'+pkg).classList.add('selected');
+  const names={bronze:'Bronze — KES 500 deposit',silver:'Silver — KES 1,500 deposit',gold:'Gold VIP — KES 3,000 deposit'};
+  document.getElementById('selected-pkg-info').innerHTML = `Selected: <strong>${names[pkg]}</strong>`;
+}
+
+async function makeReservation() {
+  if(!selectedPkg){ showErr('Please select a package'); return; }
+  const name=document.getElementById('res-name').value.trim();
+  const phone=document.getElementById('res-phone').value.trim();
+  const guests=document.getElementById('res-guests').value;
+  const date=document.getElementById('res-date').value;
+  const time=document.getElementById('res-time').value;
+  if(!name||!phone||!guests||!date||!time){ showErr('Please fill in all required fields'); return; }
+
+  document.getElementById('msg-error').style.display='none';
+  try {
+    const res = await fetch(`${API}/reservations`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        customer_name:name, customer_phone:phone,
+        customer_email:document.getElementById('res-email').value,
+        package:selectedPkg, guests:parseInt(guests),
+        date, time,
+        special_requests:document.getElementById('res-special').value,
+        deposit_kes:deposits[selectedPkg]
+      })
+    });
+    const d = await res.json();
+    if(res.ok) {
+      document.getElementById('msg-success').textContent = `Reservation confirmed! Reference: #${d.id}. We'll contact you at ${phone} to confirm.`;
+      document.getElementById('msg-success').style.display='flex';
+      document.querySelector('.res-form').style.opacity='0.5';
+      document.querySelector('.res-form button').disabled=true;
+    } else { showErr(d.message||'Reservation failed'); }
+  } catch(e){ showErr('Connection error. Please try again.'); }
+}
+function showErr(msg){ const e=document.getElementById('msg-error'); e.textContent=msg; e.style.display='flex'; }
+</script>
+{% endblock %}

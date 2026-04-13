@@ -1,0 +1,127 @@
+{% extends 'menu/base.html' %}
+{% block title %}Loyalty Rewards — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+.loyalty-page{max-width:800px;margin:0 auto;padding:3rem 2rem}
+.loyalty-hero{text-align:center;margin-bottom:3rem}
+.loyalty-hero h1{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;margin-bottom:0.5rem}
+.loyalty-hero p{color:var(--text-muted);font-size:0.9rem;line-height:1.7}
+.points-card{background:linear-gradient(135deg,var(--dark) 0%,var(--primary-dark) 100%);border-radius:var(--radius-xl);padding:2rem;margin-bottom:2rem;position:relative;overflow:hidden;text-align:center}
+.points-card::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;border-radius:50%;background:rgba(201,168,76,0.08)}
+.points-label{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,230,200,0.6);margin-bottom:0.5rem}
+.points-num{font-family:'Cormorant Garamond',serif;font-size:4rem;color:var(--gold);line-height:1;margin-bottom:0.25rem}
+.points-value{font-size:0.88rem;color:rgba(245,230,200,0.7)}
+.points-phone{font-size:0.78rem;color:rgba(245,230,200,0.5);margin-top:0.5rem}
+.how-it-works{background:var(--sand-light);border:1px solid var(--sand-dark);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem}
+.hwt-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--primary);font-weight:600;margin-bottom:1rem}
+.hwt-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.hwt-step{text-align:center}
+.hwt-icon{font-size:1.8rem;margin-bottom:0.5rem;display:block}
+.hwt-label{font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:0.2rem}
+.hwt-desc{font-size:0.72rem;color:var(--text-muted);line-height:1.5}
+.check-balance{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem;box-shadow:var(--shadow)}
+.check-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;font-weight:600}
+.history-section{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow)}
+.history-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;font-weight:600}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid var(--border);font-size:0.85rem}
+.history-item:last-child{border-bottom:none}
+.history-desc{color:var(--text-muted)}
+.history-pts{font-weight:600}
+.pts-earned{color:var(--success)}
+.pts-redeemed{color:var(--error-light)}
+@media(max-width:600px){
+  .hwt-steps{grid-template-columns:1fr}
+  .loyalty-page{padding:1.5rem 1rem}
+  .points-num{font-size:3rem}
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="loyalty-page">
+  <div class="loyalty-hero">
+    <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond"></div><div class="ornament-line r"></div></div>
+    <h1>🏆 Loyalty Rewards</h1>
+    <p>Earn points every time you dine at Saveur.<br>Redeem them for free meals and exclusive perks.</p>
+  </div>
+
+  <div class="points-card" id="points-card">
+    <div class="points-label">Your Points Balance</div>
+    <div class="points-num" id="pts-num">—</div>
+    <div class="points-value" id="pts-value">Check your balance below</div>
+    <div class="points-phone" id="pts-phone"></div>
+  </div>
+
+  <div class="how-it-works">
+    <div class="hwt-title">How It Works</div>
+    <div class="hwt-steps">
+      <div class="hwt-step">
+        <span class="hwt-icon">🍽️</span>
+        <div class="hwt-label">Dine & Pay</div>
+        <div class="hwt-desc">For every KES 100 spent, earn 1 loyalty point automatically</div>
+      </div>
+      <div class="hwt-step">
+        <span class="hwt-icon">🏆</span>
+        <div class="hwt-label">Accumulate</div>
+        <div class="hwt-desc">Points never expire. Keep earning on every visit</div>
+      </div>
+      <div class="hwt-step">
+        <span class="hwt-icon">🎁</span>
+        <div class="hwt-label">Redeem</div>
+        <div class="hwt-desc">1 point = KES 50 value. Redeem at checkout for free meals</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="check-balance">
+    <div class="check-title">Check Your Points Balance</div>
+    <div style="display:flex;gap:0.75rem">
+      <input type="tel" id="check-phone" placeholder="Enter your M-Pesa number (07XXXXXXXX)" style="flex:1" />
+      <button class="btn btn-gold" onclick="checkBalance()">Check</button>
+    </div>
+    <div id="balance-result" style="margin-top:1rem;display:none"></div>
+  </div>
+
+  <div class="history-section" id="history-section" style="display:none">
+    <div class="history-title">Points History</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const savedPhone = localStorage.getItem('customerPhone');
+if(savedPhone) {
+  document.getElementById('check-phone').value = savedPhone;
+  checkBalance();
+}
+
+async function checkBalance() {
+  const phone = document.getElementById('check-phone').value.trim();
+  if(!phone){ showToast('Please enter your phone number'); return; }
+  localStorage.setItem('customerPhone', phone);
+  try {
+    const res = await fetch(`${API}/customer/points?phone=${encodeURIComponent(phone)}`);
+    const d = await res.json();
+    const pts = d.points || 0;
+    const value = pts * 50;
+    document.getElementById('pts-num').textContent = pts;
+    document.getElementById('pts-value').textContent = `Worth KES ${value.toLocaleString()} in free meals`;
+    document.getElementById('pts-phone').textContent = phone;
+
+    const result = document.getElementById('balance-result');
+    result.style.display = 'block';
+    result.innerHTML = `<div class="alert alert-success">✓ Found! You have <strong>${pts} points</strong> worth KES ${value.toLocaleString()}</div>`;
+
+    if(d.history?.length) {
+      document.getElementById('history-section').style.display='block';
+      document.getElementById('history-list').innerHTML = d.history.map(h => `
+        <div class="history-item">
+          <div><div style="font-weight:500">${h.description||'Order #'+h.order_id}</div><div class="history-desc">${new Date(h.created_at).toLocaleDateString()}</div></div>
+          <div class="history-pts ${h.type==='earned'?'pts-earned':'pts-redeemed'}">${h.type==='earned'?'+':'-'}${h.points} pts</div>
+        </div>
+      `).join('');
+    }
+  } catch(e){ showToast('Could not fetch balance'); }
+}
+</script>
+{% endblock %}

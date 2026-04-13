@@ -1,0 +1,208 @@
+{% extends 'menu/base.html' %}
+{% block title %}Waiter Dashboard — Saveur{% endblock %}
+{% block extra_css %}
+<style>
+body{background:var(--warm-white)!important}
+.waiter{max-width:1100px;margin:0 auto;padding:2rem}
+.waiter-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.waiter-greeting{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--text)}
+.waiter-sub{font-size:0.78rem;color:var(--text-muted);margin-top:0.25rem}
+.waiter-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+.wstat{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem;text-align:center;box-shadow:var(--shadow)}
+.wstat-num{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--primary)}
+.wstat-label{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted)}
+.orders-layout{display:grid;grid-template-columns:1fr 320px;gap:1.5rem}
+.section-label{font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--success-light);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.waiter-order{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:0.75rem;box-shadow:var(--shadow);transition:all 0.3s;position:relative;overflow:hidden}
+.waiter-order::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.waiter-order.pending::before{background:var(--gold)}
+.waiter-order.preparing::before{background:#60a5fa}
+.waiter-order.ready::before{background:var(--success-light);animation:glow 1s infinite}
+@keyframes glow{0%,100%{opacity:1}50%{opacity:0.5}}
+.wo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
+.wo-id{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text)}
+.wo-table{font-size:0.78rem;color:var(--text-muted)}
+.wo-items{font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;line-height:1.6}
+.wo-footer{display:flex;align-items:center;justify-content:space-between}
+.wo-total{font-weight:600;color:var(--primary);font-size:0.9rem}
+.serve-btn{background:var(--success);color:white;border:none;border-radius:var(--radius);padding:0.4rem 1rem;font-size:0.78rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.serve-btn:hover{background:var(--success-light)}
+/* RATING PANEL */
+.rating-panel{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow)}
+.rating-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
+.rating-avg{text-align:center;padding:1rem 0;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.rating-num{font-family:'Cormorant Garamond',serif;font-size:3rem;color:var(--primary);line-height:1}
+.rating-stars{display:flex;justify-content:center;gap:3px;margin:0.4rem 0}
+.rating-count{font-size:0.75rem;color:var(--text-muted)}
+.review-item{padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.82rem}
+.review-item:last-child{border-bottom:none}
+.review-stars{color:var(--gold);font-size:0.85rem;margin-bottom:0.2rem}
+.review-text{color:var(--text-muted);font-style:italic}
+.review-time{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem}
+.no-orders{text-align:center;padding:2rem;color:var(--text-muted);font-size:0.875rem}
+/* NOTIFICATION */
+.order-notif{position:fixed;top:80px;right:1.5rem;background:white;border:1px solid var(--gold);border-radius:var(--radius-lg);padding:1.1rem 1.5rem;max-width:320px;transform:translateX(380px);transition:transform 0.4s;z-index:500;box-shadow:var(--shadow-lg)}
+.order-notif.show{transform:translateX(0)}
+.notif-title{font-weight:600;color:var(--primary);font-size:0.88rem;margin-bottom:0.3rem}
+.notif-body{font-size:0.8rem;color:var(--text-muted)}
+@media(max-width:900px){.orders-layout{grid-template-columns:1fr}}
+@media(max-width:768px){.waiter{padding:1rem}.waiter-stats{grid-template-columns:repeat(3,1fr)}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="waiter">
+  <div class="waiter-header">
+    <div>
+      <div class="waiter-greeting">Welcome, <span id="waiter-name">Waiter</span></div>
+      <div class="waiter-sub" id="waiter-time"></div>
+    </div>
+    <div style="display:flex;gap:0.75rem;align-items:center">
+      <span class="badge badge-green" id="conn">Live</span>
+      <button class="btn btn-ghost btn-sm" onclick="checkIn()">Check In/Out</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="waiter-stats">
+    <div class="wstat"><div class="wstat-num" id="w-active">0</div><div class="wstat-label">Active</div></div>
+    <div class="wstat"><div class="wstat-num" id="w-ready">0</div><div class="wstat-label">Ready to Serve</div></div>
+    <div class="wstat"><div class="wstat-num" id="w-tips" style="color:var(--gold-dark)">KES 0</div><div class="wstat-label">Tips Today</div></div>
+  </div>
+
+  <div class="orders-layout">
+    <div>
+      <div class="section-label"><div class="live-dot"></div>My Assigned Orders</div>
+      <div id="orders-list"><div class="no-orders">No orders assigned yet</div></div>
+    </div>
+    <div>
+      <div class="rating-panel">
+        <div class="rating-title">My Ratings</div>
+        <div class="rating-avg">
+          <div class="rating-num" id="avg-rating">—</div>
+          <div class="rating-stars" id="avg-stars">☆☆☆☆☆</div>
+          <div class="rating-count" id="rating-count">No reviews yet</div>
+        </div>
+        <div id="reviews-list"><div style="text-align:center;font-size:0.82rem;color:var(--text-dim)">No reviews yet</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="order-notif" id="order-notif">
+  <div class="notif-title" id="notif-title">New Order!</div>
+  <div class="notif-body" id="notif-body"></div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+const token = localStorage.getItem('token');
+const role = localStorage.getItem('role');
+if(!token) window.location.href = '/login/';
+let myOrders = [];
+let waiterId = null;
+
+function logout(){ localStorage.removeItem('token'); window.location.href='/login/'; }
+function updateTime(){ document.getElementById('waiter-time').textContent = new Date().toLocaleDateString('en-KE',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+updateTime();
+
+async function loadProfile() {
+  try {
+    const res = await fetch(`${API}/me`,{headers:{'Authorization':'Bearer '+token}});
+    const u = await res.json();
+    waiterId = u.id;
+    document.getElementById('waiter-name').textContent = u.name;
+    loadRatings(u.id);
+    loadOrders(u.id);
+  } catch(e){}
+}
+
+async function loadOrders(wid) {
+  try {
+    const res = await fetch(`${API}/waiter/orders/${wid}`,{headers:{'Authorization':'Bearer '+token}});
+    myOrders = await res.json();
+    renderOrders();
+  } catch(e){}
+}
+
+function renderOrders() {
+  const active = myOrders.filter(o => !['completed','served'].includes(o.status));
+  const el = document.getElementById('orders-list');
+  if(!active.length){ el.innerHTML='<div class="no-orders">No active orders assigned</div>'; return; }
+  el.innerHTML = active.map(o => `
+    <div class="waiter-order ${o.status}">
+      <div class="wo-header">
+        <div><div class="wo-id">Order #${o.id}</div><div class="wo-table">Table ${o.table_number||o.table_id}</div></div>
+        <span class="badge ${sb(o.status)}">${o.status}</span>
+      </div>
+      <div class="wo-items">${(o.items||[]).map(i=>`${i.quantity}× ${i.name}`).join(', ')||'Loading...'}</div>
+      <div class="wo-footer">
+        <div class="wo-total">KES ${Math.round(o.total_kes||o.total_amount||0).toLocaleString()}</div>
+        ${o.status==='ready'?`<button class="serve-btn" onclick="markServed(${o.id})">Mark Served ✓</button>`:''}
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('w-active').textContent = active.length;
+  document.getElementById('w-ready').textContent = active.filter(o=>o.status==='ready').length;
+  const tips = myOrders.reduce((s,o)=>s+(parseFloat(o.tip_kes)||0),0);
+  document.getElementById('w-tips').textContent = 'KES '+Math.round(tips).toLocaleString();
+}
+
+function sb(s){return{pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',served:'badge-gold'}[s]||'badge-yellow';}
+
+async function markServed(id) {
+  try {
+    await fetch(`${API}/orders/${id}/status`,{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({status:'served'})});
+    if(waiterId) loadOrders(waiterId);
+  } catch(e){}
+}
+
+async function loadRatings(wid) {
+  try {
+    const res = await fetch(`${API}/waiter/ratings/${wid}`,{headers:{'Authorization':'Bearer '+token}});
+    const d = await res.json();
+    if(d.avg) {
+      document.getElementById('avg-rating').textContent = parseFloat(d.avg).toFixed(1);
+      document.getElementById('avg-stars').textContent = '★'.repeat(Math.round(d.avg)) + '☆'.repeat(5-Math.round(d.avg));
+      document.getElementById('rating-count').textContent = `${d.count} review${d.count!==1?'s':''}`;
+    }
+    if(d.reviews?.length) {
+      document.getElementById('reviews-list').innerHTML = d.reviews.slice(0,5).map(r=>`
+        <div class="review-item">
+          <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+          ${r.comment?`<div class="review-text">"${r.comment}"</div>`:''}
+          <div class="review-time">${new Date(r.created_at).toLocaleDateString()}</div>
+        </div>
+      `).join('');
+    }
+  } catch(e){}
+}
+
+async function checkIn() {
+  try {
+    await fetch(`${API}/attendance/checkin`,{method:'POST',headers:{'Authorization':'Bearer '+token}});
+    showToast('Attendance recorded','gold');
+  } catch(e){ showToast('Could not record attendance','error'); }
+}
+
+function showNotif(title,body) {
+  document.getElementById('notif-title').textContent=title;
+  document.getElementById('notif-body').textContent=body;
+  const n=document.getElementById('order-notif');
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),5000);
+}
+
+const socket = io(API,{transports:['websocket','polling']});
+socket.on('connect',()=>{ document.getElementById('conn').textContent='Live'; document.getElementById('conn').className='badge badge-green'; });
+socket.on('disconnect',()=>{ document.getElementById('conn').textContent='Offline'; document.getElementById('conn').className='badge badge-red'; });
+socket.on('waiterAssigned',d=>{ if(d.waiterId===waiterId){ showNotif('New Assignment!',`Table ${d.tableId} needs you`); if(waiterId) loadOrders(waiterId); }});
+socket.on('orderStatusUpdate',()=>{ if(waiterId) loadOrders(waiterId); });
+
+loadProfile();
+setInterval(()=>{ if(waiterId) loadOrders(waiterId); },20000);
+</script>
+{% endblock %}
