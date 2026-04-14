@@ -2,126 +2,179 @@
 {% block title %}Loyalty Rewards — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-.loyalty-page{max-width:800px;margin:0 auto;padding:3rem 2rem}
-.loyalty-hero{text-align:center;margin-bottom:3rem}
-.loyalty-hero h1{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;margin-bottom:0.5rem}
-.loyalty-hero p{color:var(--text-muted);font-size:0.9rem;line-height:1.7}
-.points-card{background:linear-gradient(135deg,var(--dark) 0%,var(--primary-dark) 100%);border-radius:var(--radius-xl);padding:2rem;margin-bottom:2rem;position:relative;overflow:hidden;text-align:center}
-.points-card::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;border-radius:50%;background:rgba(201,168,76,0.08)}
-.points-label{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,230,200,0.6);margin-bottom:0.5rem}
-.points-num{font-family:'Cormorant Garamond',serif;font-size:4rem;color:var(--gold);line-height:1;margin-bottom:0.25rem}
-.points-value{font-size:0.88rem;color:rgba(245,230,200,0.7)}
-.points-phone{font-size:0.78rem;color:rgba(245,230,200,0.5);margin-top:0.5rem}
-.how-it-works{background:var(--sand-light);border:1px solid var(--sand-dark);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem}
-.hwt-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--primary);font-weight:600;margin-bottom:1rem}
-.hwt-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.hwt-step{text-align:center}
-.hwt-icon{font-size:1.8rem;margin-bottom:0.5rem;display:block}
-.hwt-label{font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:0.2rem}
-.hwt-desc{font-size:0.72rem;color:var(--text-muted);line-height:1.5}
-.check-balance{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem;box-shadow:var(--shadow)}
-.check-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;font-weight:600}
-.history-section{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow)}
-.history-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;font-weight:600}
-.history-item{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid var(--border);font-size:0.85rem}
-.history-item:last-child{border-bottom:none}
-.history-desc{color:var(--text-muted)}
-.history-pts{font-weight:600}
-.pts-earned{color:var(--success)}
-.pts-redeemed{color:var(--error-light)}
-@media(max-width:600px){
-  .hwt-steps{grid-template-columns:1fr}
-  .loyalty-page{padding:1.5rem 1rem}
-  .points-num{font-size:3rem}
+.loyalty-wrap{max-width:700px;margin:0 auto;padding:2rem 1.25rem}
+/* HERO CARD */
+.loyalty-hero{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);border-radius:var(--radius-xl);padding:2rem;color:#fff;text-align:center;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.loyalty-hero::before{content:'★';position:absolute;top:-20px;right:-20px;font-size:8rem;opacity:0.07;line-height:1}
+.loyalty-pts-big{font-size:3.5rem;font-weight:700;line-height:1;margin:0.5rem 0}
+.loyalty-pts-label{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.8}
+.loyalty-kes-value{font-size:1rem;opacity:0.85;margin-top:0.35rem}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-align:center;box-shadow:var(--shadow)}
+.stat-val{font-size:1.4rem;font-weight:700;color:var(--primary)}
+.stat-label{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-top:0.2rem}
+/* HOW IT WORKS */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem}
+.how-item{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-align:center}
+.how-icon{font-size:1.5rem;margin-bottom:0.35rem}
+.how-title{font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:0.2rem}
+.how-desc{font-size:0.72rem;color:var(--text-muted);line-height:1.4}
+/* REDEEM */
+.redeem-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.25rem;box-shadow:var(--shadow)}
+.redeem-row{display:flex;gap:0.6rem;margin-top:0.75rem}
+@media(max-width:500px){
+  .stats-row,.how-grid{grid-template-columns:1fr 1fr}
+  .loyalty-pts-big{font-size:2.5rem}
 }
 </style>
 {% endblock %}
+
 {% block content %}
-<div class="loyalty-page">
-  <div class="loyalty-hero">
-    <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond"></div><div class="ornament-line r"></div></div>
-    <h1>🏆 Loyalty Rewards</h1>
-    <p>Earn points every time you dine at Saveur.<br>Redeem them for free meals and exclusive perks.</p>
-  </div>
+<div class="loyalty-wrap">
+  <h1 class="page-title">Loyalty Rewards</h1>
+  <p class="page-sub">Earn points every time you dine</p>
 
-  <div class="points-card" id="points-card">
-    <div class="points-label">Your Points Balance</div>
-    <div class="points-num" id="pts-num">—</div>
-    <div class="points-value" id="pts-value">Check your balance below</div>
-    <div class="points-phone" id="pts-phone"></div>
-  </div>
-
-  <div class="how-it-works">
-    <div class="hwt-title">How It Works</div>
-    <div class="hwt-steps">
-      <div class="hwt-step">
-        <span class="hwt-icon">🍽️</span>
-        <div class="hwt-label">Dine & Pay</div>
-        <div class="hwt-desc">For every KES 100 spent, earn 1 loyalty point automatically</div>
-      </div>
-      <div class="hwt-step">
-        <span class="hwt-icon">🏆</span>
-        <div class="hwt-label">Accumulate</div>
-        <div class="hwt-desc">Points never expire. Keep earning on every visit</div>
-      </div>
-      <div class="hwt-step">
-        <span class="hwt-icon">🎁</span>
-        <div class="hwt-label">Redeem</div>
-        <div class="hwt-desc">1 point = KES 50 value. Redeem at checkout for free meals</div>
-      </div>
+  <!-- Phone lookup -->
+  <div class="card" id="phone-lookup" style="margin-bottom:1.5rem">
+    <label class="form-label">Your Phone Number</label>
+    <div style="display:flex;gap:0.6rem">
+      <input type="tel" id="loyalty-phone" placeholder="0712 345 678" style="flex:1">
+      <button class="btn btn-primary" onclick="loadLoyalty()">Check</button>
     </div>
   </div>
 
-  <div class="check-balance">
-    <div class="check-title">Check Your Points Balance</div>
-    <div style="display:flex;gap:0.75rem">
-      <input type="tel" id="check-phone" placeholder="Enter your M-Pesa number (07XXXXXXXX)" style="flex:1" />
-      <button class="btn btn-gold" onclick="checkBalance()">Check</button>
+  <!-- Points dashboard (shown after lookup) -->
+  <div id="loyalty-dashboard" style="display:none">
+    <!-- Hero -->
+    <div class="loyalty-hero">
+      <div class="loyalty-pts-label">Your Points Balance</div>
+      <div class="loyalty-pts-big" id="loy-pts">0</div>
+      <div class="loyalty-kes-value" id="loy-kes-val">= KES 0 redeemable value</div>
     </div>
-    <div id="balance-result" style="margin-top:1rem;display:none"></div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val" id="loy-total-spent">KES 0</div>
+        <div class="stat-label">Total Spent</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="loy-pts-earned">0</div>
+        <div class="stat-label">Points Earned</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="loy-redemption-val">KES 0</div>
+        <div class="stat-label">Cash Value</div>
+      </div>
+    </div>
+
+    <!-- Redeem -->
+    <div class="redeem-card" id="redeem-section">
+      <h4 style="font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--primary)">Redeem Points</h4>
+      <div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.35rem">100 points = KES 50 off your next order</div>
+      <div class="redeem-row">
+        <input type="number" id="redeem-pts" placeholder="Points to redeem" min="100" step="100" style="flex:1">
+        <input type="number" id="redeem-order" placeholder="Order ID" min="1" style="flex:1">
+        <button class="btn btn-gold btn-sm" onclick="redeemPoints()">Redeem</button>
+      </div>
+      <div style="font-size:0.73rem;color:var(--text-dim);margin-top:0.4rem">Minimum 100 points per redemption · One redemption per order</div>
+    </div>
+
+    <!-- Order history -->
+    <div class="card" style="margin-top:1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 style="font-size:0.88rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em">Recent Orders</h3>
+        <a href="/order-history/" style="font-size:0.78rem;color:var(--primary)">View All →</a>
+      </div>
+      <div id="recent-orders"><div class="spinner"></div></div>
+    </div>
   </div>
 
-  <div class="history-section" id="history-section" style="display:none">
-    <div class="history-title">Points History</div>
-    <div id="history-list"></div>
+  <!-- How it works -->
+  <div style="margin-top:1.5rem">
+    <h3 style="font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:1rem">How Points Work</h3>
+    <div class="how-grid">
+      <div class="how-item">
+        <div class="how-icon">🍽️</div>
+        <div class="how-title">Dine & Pay</div>
+        <div class="how-desc">Earn 1 point for every KES 1 spent</div>
+      </div>
+      <div class="how-item">
+        <div class="how-icon">⭐</div>
+        <div class="how-title">Accumulate</div>
+        <div class="how-desc">Points never expire · Stack up over visits</div>
+      </div>
+      <div class="how-item">
+        <div class="how-icon">🎁</div>
+        <div class="how-title">Redeem</div>
+        <div class="how-desc">100 pts = KES 50 off your order</div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script>
-const savedPhone = localStorage.getItem('customerPhone');
-if(savedPhone) {
-  document.getElementById('check-phone').value = savedPhone;
-  checkBalance();
+const savedPhone=localStorage.getItem('customerPhone');
+if(savedPhone){ document.getElementById('loyalty-phone').value=savedPhone; loadLoyalty(); }
+
+async function loadLoyalty(){
+  const phone=document.getElementById('loyalty-phone').value.trim();
+  if(!phone){showToast('Enter your phone number','error');return;}
+  localStorage.setItem('customerPhone',phone);
+  try{
+    const [pts,orders]=await Promise.all([
+      fetch(`${API}/customer/points?phone=${encodeURIComponent(phone)}`).then(r=>r.json()),
+      fetch(`${API}/customer/orders?phone=${encodeURIComponent(phone)}`).then(r=>r.json())
+    ]);
+    document.getElementById('loyalty-dashboard').style.display='block';
+    const p=pts.loyalty_points||0;
+    const ks=pts.kes_value||p*0.5;
+    const spent=pts.total_spent||0;
+    document.getElementById('loy-pts').textContent=p.toLocaleString();
+    document.getElementById('loy-kes-val').textContent=`= KES ${ks.toLocaleString()} redeemable value`;
+    document.getElementById('loy-pts-earned').textContent=p.toLocaleString();
+    document.getElementById('loy-total-spent').textContent=`KES ${parseFloat(spent).toLocaleString()}`;
+    document.getElementById('loy-redemption-val').textContent=`KES ${ks.toLocaleString()}`;
+    if(p<100) document.getElementById('redeem-section').style.display='none';
+
+    const ordersHtml=Array.isArray(orders)&&orders.length
+      ? orders.slice(0,5).map(o=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-size:0.85rem;font-weight:500">Order #${o.id}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted)">${new Date(o.created_at).toLocaleDateString('en-KE')}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:0.88rem;font-weight:600;color:var(--primary)">KES ${parseFloat(o.total_kes).toLocaleString()}</div>
+              <div style="font-size:0.72rem;color:var(--success)">+${o.points_earned||0} pts</div>
+            </div>
+          </div>
+        `).join('')
+      : '<div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.85rem">No orders yet</div>';
+    document.getElementById('recent-orders').innerHTML=ordersHtml;
+  }catch(e){ showToast('Could not load loyalty data','error'); }
 }
 
-async function checkBalance() {
-  const phone = document.getElementById('check-phone').value.trim();
-  if(!phone){ showToast('Please enter your phone number'); return; }
-  localStorage.setItem('customerPhone', phone);
-  try {
-    const res = await fetch(`${API}/customer/points?phone=${encodeURIComponent(phone)}`);
-    const d = await res.json();
-    const pts = d.points || 0;
-    const value = pts * 50;
-    document.getElementById('pts-num').textContent = pts;
-    document.getElementById('pts-value').textContent = `Worth KES ${value.toLocaleString()} in free meals`;
-    document.getElementById('pts-phone').textContent = phone;
-
-    const result = document.getElementById('balance-result');
-    result.style.display = 'block';
-    result.innerHTML = `<div class="alert alert-success">✓ Found! You have <strong>${pts} points</strong> worth KES ${value.toLocaleString()}</div>`;
-
-    if(d.history?.length) {
-      document.getElementById('history-section').style.display='block';
-      document.getElementById('history-list').innerHTML = d.history.map(h => `
-        <div class="history-item">
-          <div><div style="font-weight:500">${h.description||'Order #'+h.order_id}</div><div class="history-desc">${new Date(h.created_at).toLocaleDateString()}</div></div>
-          <div class="history-pts ${h.type==='earned'?'pts-earned':'pts-redeemed'}">${h.type==='earned'?'+':'-'}${h.points} pts</div>
-        </div>
-      `).join('');
-    }
-  } catch(e){ showToast('Could not fetch balance'); }
+async function redeemPoints(){
+  const phone=document.getElementById('loyalty-phone').value.trim();
+  const pts=parseInt(document.getElementById('redeem-pts').value);
+  const orderId=document.getElementById('redeem-order').value.trim();
+  if(!pts||pts<100){showToast('Minimum 100 points','error');return;}
+  if(!orderId){showToast('Enter your order ID','error');return;}
+  try{
+    const r=await fetch(`${API}/redeem-points`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({phone,points:pts,orderId})
+    });
+    const d=await r.json();
+    if(d.discount_kes){
+      showToast(`✓ ${pts} points redeemed — KES ${d.discount_kes} discount applied!`,'gold');
+      loadLoyalty();
+    }else{ showToast(d.message||'Redemption failed','error'); }
+  }catch(e){ showToast('Error redeeming points','error'); }
 }
 </script>
 {% endblock %}

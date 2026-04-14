@@ -2,30 +2,26 @@
 {% block title %}Order Confirmed — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-.confirm-page{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:3rem 2rem}
-.confirm-card{max-width:520px;width:100%;text-align:center}
-.confirm-icon{width:80px;height:80px;border-radius:50%;background:rgba(82,183,136,0.1);border:1px solid rgba(82,183,136,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 2rem}
-.confirm-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;margin-bottom:0.75rem}
-.confirm-sub{color:var(--text-muted);font-size:0.875rem;line-height:1.7;max-width:360px;margin:0 auto 2.5rem}
-.order-num{display:inline-flex;align-items:center;gap:0.75rem;background:var(--gold-pale);border:1px solid var(--border-hover);border-radius:var(--radius-xl);padding:0.75rem 2rem;margin-bottom:2.5rem;font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold);letter-spacing:0.05em}
-.confirm-actions{display:flex;flex-direction:column;gap:0.75rem;max-width:280px;margin:0 auto}
+.confirm-page{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:3rem 1.5rem}
+.confirm-card{max-width:480px;width:100%;text-align:center}
+.confirm-icon{width:80px;height:80px;border-radius:50%;background:rgba(82,183,136,0.1);border:1px solid rgba(82,183,136,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:2rem}
+.confirm-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;margin-bottom:0.6rem}
+.confirm-sub{color:var(--text-muted);font-size:0.875rem;line-height:1.7;max-width:360px;margin:0 auto 2rem}
+.order-num-badge{display:inline-flex;align-items:center;gap:0.6rem;background:var(--gold-pale);border:1px solid var(--border-hover);border-radius:var(--radius-xl);padding:0.7rem 1.75rem;margin-bottom:2rem;font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--primary)}
+.confirm-actions{display:flex;flex-direction:column;gap:0.65rem;max-width:280px;margin:0 auto}
 </style>
 {% endblock %}
 {% block content %}
 <div class="confirm-page">
   <div class="confirm-card">
-    <div class="confirm-icon">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#52B788" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
+    <div class="confirm-icon">✅</div>
     <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond"></div><div class="ornament-line r"></div></div>
     <h1 class="confirm-title">Order Confirmed</h1>
-    <p class="confirm-sub">Your order has been received and our culinary team has been notified. We will begin preparing your meal shortly.</p>
-    <div class="order-num" id="order-num">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      Confirmed
-    </div>
+    <p class="confirm-sub">Your order has been received. Our kitchen team has been notified and will begin preparing your meal shortly.</p>
+    <div class="order-num-badge" id="order-num">✓ Confirmed</div>
     <div class="confirm-actions">
-      <a href="#" id="track-btn" class="btn btn-gold btn-lg">Track My Order</a>
+      <a href="#" id="track-btn" class="btn btn-primary btn-lg">Track My Order</a>
+      <a href="/loyalty/" class="btn btn-outline">⭐ View Rewards</a>
       <a href="/" class="btn btn-ghost">Return to Menu</a>
     </div>
   </div>
@@ -33,16 +29,11 @@
 {% endblock %}
 {% block extra_js %}
 <script>
-const params = new URLSearchParams(window.location.search);
-const orderId = params.get('order_id');
-if(orderId) {
-  document.getElementById('order-num').innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    Order #${orderId}
-  `;
-  document.getElementById('track-btn').href = `/track-order/?order_id=${orderId}`;
+const params=new URLSearchParams(location.search);
+const orderId=params.get('order_id')||localStorage.getItem('lastOrderId');
+if(orderId){
+  document.getElementById('order-num').textContent=`Order #${orderId}`;
+  document.getElementById('track-btn').href=`/track-order/?order_id=${orderId}`;
 }
 </script>
 {% endblock %}
-
-

@@ -2,262 +2,280 @@
 {% block title %}Payment — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-.payment-page{max-width:560px;margin:0 auto;padding:3rem 2rem}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;margin-bottom:0.25rem}
-.page-subtitle{font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2.5rem}
-.order-summary-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem;position:relative;overflow:hidden}
-.order-summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.summary-label{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
-.summary-item{display:flex;justify-content:space-between;font-size:0.875rem;padding:0.4rem 0;border-bottom:1px solid var(--border)}
-.summary-item:last-of-type{border-bottom:none}
-.summary-total{display:flex;justify-content:space-between;padding-top:0.75rem;border-top:1px solid var(--border);font-weight:500;margin-top:0.5rem}
-.summary-total .amount{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold)}
-.summary-kes{text-align:right;font-size:0.75rem;color:var(--text-dim);margin-top:0.2rem}
-.method-label{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
-.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem}
-.method-btn{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 0.75rem;cursor:pointer;transition:all 0.3s;text-align:center;position:relative;overflow:hidden}
-.method-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform 0.3s}
-.method-btn:hover{border-color:var(--border-hover)}
-.method-btn.selected{border-color:var(--border-strong);background:var(--gold-pale)}
-.method-btn.selected::before{transform:scaleX(1)}
-.method-name{font-size:0.8rem;font-weight:500;color:var(--text);margin-bottom:0.2rem}
-.method-sub{font-size:0.68rem;color:var(--text-muted)}
-.payment-form{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
-.payment-form::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.mpesa-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
-.mpesa-icon{width:44px;height:44px;border-radius:var(--radius);background:linear-gradient(135deg,#00A651,#007A3D);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:white;font-family:'Inter',sans-serif}
-.stk-status{display:none;text-align:center;padding:1.5rem 0}
-.stk-status.show{display:block}
-.stk-icon{width:64px;height:64px;border-radius:50%;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;transition:all 0.3s}
-.stk-icon.pending{background:rgba(251,191,36,0.1);border:2px solid rgba(251,191,36,0.3);animation:pulse-ring 1.5s infinite}
-.stk-icon.success{background:rgba(82,183,136,0.1);border:2px solid rgba(82,183,136,0.4)}
-.stk-icon.failed{background:rgba(248,113,113,0.1);border:2px solid rgba(248,113,113,0.4)}
-@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,0.3)}50%{box-shadow:0 0 0 12px rgba(251,191,36,0)}}
-.stk-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;margin-bottom:0.5rem}
-.stk-desc{font-size:0.82rem;color:var(--text-muted);line-height:1.7;max-width:340px;margin:0 auto}
-.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
-.cash-center{text-align:center;padding:1.5rem 0}
-.cash-emoji{font-size:2.5rem;margin-bottom:1rem;display:block}
+.pay-layout{max-width:520px;margin:0 auto;padding:2rem 1.25rem}
+.pay-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1.1rem;box-shadow:var(--shadow)}
+.pay-card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);background:var(--sand-light)}
+.pay-card-body{padding:1.25rem}
+/* METHOD TABS */
+.method-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1.25rem}
+.method-tab{padding:0.85rem;border:2px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;text-align:center;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+.method-tab:hover{border-color:var(--border-hover)}
+.method-tab.active{border-color:var(--primary);background:rgba(139,69,19,0.04)}
+.method-tab .mt-icon{font-size:1.5rem;display:block;margin-bottom:0.3rem}
+.method-tab .mt-label{font-size:0.75rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)}
+.method-tab.active .mt-label{color:var(--primary)}
+/* ORDER SUMMARY */
+.order-line{display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;font-size:0.88rem;border-bottom:1px solid var(--border)}
+.order-line:last-child{border:none}
+.order-total{font-size:1.1rem;font-weight:700;color:var(--primary);padding-top:0.75rem;border-top:2px solid var(--border)}
+/* TIP */
+.tip-opts{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem}
+.tip-btn{padding:0.4rem 0.85rem;border:1.5px solid var(--border);border-radius:20px;font-size:0.78rem;cursor:pointer;background:#fff;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.tip-btn.active,.tip-btn:hover{border-color:var(--primary);color:var(--primary);background:rgba(139,69,19,0.05)}
+/* STATUS */
+.pay-status{text-align:center;padding:2rem;display:none}
+.pay-status.show{display:block}
+.status-icon{font-size:3rem;margin-bottom:0.75rem}
+.status-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--text)}
+.status-sub{font-size:0.85rem;color:var(--text-muted);margin-top:0.35rem;line-height:1.6}
+.mpesa-waiting{background:var(--sand-light);border:1px solid var(--sand-dark);border-radius:var(--radius);padding:1rem;text-align:center;font-size:0.85rem;color:var(--text-muted);margin:1rem 0}
+.pulse{animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+@media(max-width:480px){
+  .method-tabs{grid-template-columns:1fr 1fr}
+}
 </style>
 {% endblock %}
+
 {% block content %}
-<div class="payment-page">
-  <div class="ornament" style="justify-content:flex-start;margin-bottom:0.5rem">
-    <div class="ornament-line" style="width:30px"></div>
-    <div class="ornament-diamond" style="width:4px;height:4px"></div>
-  </div>
-  <h1 class="page-title">Secure Payment</h1>
-  <p class="page-subtitle">Choose your preferred payment method</p>
+<div class="pay-layout">
+  <h1 class="page-title">Payment</h1>
+  <p class="page-sub">Secure checkout · All amounts in KES</p>
 
-  <div class="order-summary-card">
-    <div class="summary-label">Your Order</div>
-    <div id="summary-items"></div>
-    <div class="summary-total"><span>Total</span><span class="amount" id="total-usd">$0.00</span></div>
-    <div class="summary-kes" id="total-kes"></div>
-  </div>
-
-  <div class="method-label">Payment Method</div>
-  <div class="method-grid">
-    <div class="method-btn selected" id="btn-mpesa" onclick="selectMethod('mpesa')">
-      <div style="font-size:1.6rem;margin-bottom:0.4rem">📱</div>
-      <div class="method-name">M-Pesa</div>
-      <div class="method-sub">STK Push</div>
-    </div>
-    <div class="method-btn" id="btn-card" onclick="selectMethod('card')">
-      <div style="font-size:1.6rem;margin-bottom:0.4rem">💳</div>
-      <div class="method-name">Card</div>
-      <div class="method-sub">Visa / MC</div>
-    </div>
-    <div class="method-btn" id="btn-cash" onclick="selectMethod('cash')">
-      <div style="font-size:1.6rem;margin-bottom:0.4rem">💵</div>
-      <div class="method-name">Cash</div>
-      <div class="method-sub">Pay at table</div>
+  <!-- Order summary -->
+  <div class="pay-card">
+    <div class="pay-card-header">📋 Order Summary</div>
+    <div class="pay-card-body">
+      <div id="order-summary-lines"></div>
+      <div class="order-line order-total">
+        <span>Total</span>
+        <span id="pay-total">KES 0</span>
+      </div>
+      <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.5rem" id="pts-earn-msg"></div>
     </div>
   </div>
 
-  <div class="payment-form" id="mpesa-form">
-    <div class="mpesa-header">
-      <div class="mpesa-icon">M</div>
-      <div>
-        <div style="font-size:0.9rem;font-weight:600">Lipa na M-Pesa</div>
-        <div style="font-size:0.72rem;color:var(--text-muted)">Instant STK Push to your phone</div>
+  <!-- Payment form (hidden after payment) -->
+  <div id="pay-form">
+    <!-- Method selection -->
+    <div class="pay-card">
+      <div class="pay-card-header">💳 Payment Method</div>
+      <div class="pay-card-body">
+        <div class="method-tabs">
+          <div class="method-tab active" onclick="selectMethod('mpesa',this)">
+            <span class="mt-icon">📱</span>
+            <div class="mt-label">M-Pesa</div>
+          </div>
+          <div class="method-tab" onclick="selectMethod('cash',this)">
+            <span class="mt-icon">💵</span>
+            <div class="mt-label">Cash</div>
+          </div>
+        </div>
+
+        <!-- M-Pesa fields -->
+        <div id="mpesa-fields">
+          <div class="form-group">
+            <label>M-Pesa Phone Number</label>
+            <input type="tel" id="mpesa-phone" placeholder="e.g. 0712 345 678" maxlength="13">
+            <div style="font-size:0.73rem;color:var(--text-dim);margin-top:0.35rem">You'll receive a payment prompt on this number</div>
+          </div>
+        </div>
+
+        <!-- Cash fields -->
+        <div id="cash-fields" style="display:none">
+          <div class="alert alert-info">
+            💡 Please pay at the till. Your waiter will confirm payment.
+          </div>
+        </div>
       </div>
     </div>
-    <div id="mpesa-input">
-      <div class="form-group">
-        <label>M-Pesa Phone Number</label>
-        <input type="tel" id="mpesa-phone" placeholder="07XXXXXXXX" maxlength="13" />
-        <div style="font-size:0.72rem;color:var(--text-dim);margin-top:0.3rem">A payment prompt will be sent directly to this number</div>
+
+    <!-- Tip section -->
+    <div class="pay-card">
+      <div class="pay-card-header">🤝 Add a Tip for Your Waiter <span style="font-weight:400;color:var(--text-dim)">(optional)</span></div>
+      <div class="pay-card-body">
+        <div class="tip-opts">
+          <button class="tip-btn" onclick="setTip(0,this)">No tip</button>
+          <button class="tip-btn" onclick="setTip(50,this)">KES 50</button>
+          <button class="tip-btn" onclick="setTip(100,this)">KES 100</button>
+          <button class="tip-btn" onclick="setTip(200,this)">KES 200</button>
+          <button class="tip-btn" onclick="setTip(500,this)">KES 500</button>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center">
+          <input type="number" id="custom-tip" placeholder="Custom amount (KES)" min="0" style="flex:1" oninput="setCustomTip(this.value)">
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.5rem">Tips go directly to your waiter — thank you for your generosity!</div>
       </div>
-      <button class="btn btn-gold btn-full btn-lg" onclick="initiateMpesa()">Send Payment Prompt</button>
     </div>
-    <div class="stk-status" id="stk-status">
-      <div class="stk-icon pending" id="stk-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      </div>
-      <div class="stk-title" id="stk-title">Waiting for payment...</div>
-      <div class="stk-desc" id="stk-desc">Check your phone and enter your M-Pesa PIN to complete payment</div>
-      <button class="btn btn-ghost btn-sm" style="margin-top:1.25rem" onclick="resetMpesa()">Use different number</button>
+
+    <!-- Pay button -->
+    <button class="btn btn-primary btn-full btn-lg" id="pay-btn" onclick="initiatePayment()">
+      💳 Pay Now
+    </button>
+
+    <!-- STK waiting -->
+    <div class="mpesa-waiting" id="mpesa-waiting" style="display:none">
+      <div class="pulse" style="font-size:1.5rem;margin-bottom:0.5rem">📱</div>
+      <strong>Check your phone</strong><br>
+      A payment prompt has been sent to your M-Pesa number.<br>
+      Enter your PIN to complete payment.<br>
+      <div style="margin-top:0.75rem;font-size:0.78rem">Waiting for confirmation<span class="pulse">…</span></div>
     </div>
   </div>
 
-  <div class="payment-form" id="card-form" style="display:none">
-    <div class="form-group"><label>Cardholder Name</label><input type="text" id="card-name" placeholder="Full name on card" /></div>
-    <div class="form-group"><label>Card Number</label><input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)" /></div>
-    <div class="card-grid">
-      <div class="form-group"><label>Expiry</label><input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)" /></div>
-      <div class="form-group"><label>CVV</label><input type="password" id="card-cvv" placeholder="•••" maxlength="3" /></div>
+  <!-- Success state -->
+  <div class="pay-status" id="pay-success">
+    <div class="status-icon">✅</div>
+    <div class="ornament"><div class="ornament-line"></div><div class="ornament-diamond"></div><div class="ornament-line r"></div></div>
+    <div class="status-title">Payment Confirmed</div>
+    <div class="status-sub">Your order is being prepared.<br>You earned <strong id="pts-earned">0</strong> loyalty points!</div>
+    <div style="display:flex;flex-direction:column;gap:0.6rem;margin-top:1.75rem;max-width:280px;margin-left:auto;margin-right:auto">
+      <a id="track-link-success" href="/track-order/" class="btn btn-primary btn-lg">Track My Order</a>
+      <a href="/" class="btn btn-ghost">Back to Menu</a>
     </div>
-    <button class="btn btn-gold btn-full btn-lg" onclick="payWithCard()">Pay Now</button>
-  </div>
-
-  <div class="payment-form" id="cash-form" style="display:none">
-    <div class="cash-center">
-      <span class="cash-emoji">💵</span>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:0.5rem">Pay at the Table</div>
-      <div style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;max-width:300px;margin:0 auto 1.5rem">Your order will be prepared immediately. A member of our team will collect payment when your food is served.</div>
-      <button class="btn btn-gold btn-full btn-lg" onclick="payWithCash()">Confirm Order</button>
-    </div>
-  </div>
-
-  <div id="msg-error" class="alert alert-error" style="display:none;margin-top:1rem">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span id="err-text"></span>
   </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script>
-let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-const tableId = localStorage.getItem('tableId') || '';
-let currentMethod = 'mpesa';
+const params=new URLSearchParams(location.search);
+const orderId=params.get('order_id')||localStorage.getItem('lastOrderId');
+let cart=JSON.parse(localStorage.getItem('cart')||'[]');
+let total=parseFloat(localStorage.getItem('lastOrderTotal'))||0;
+let tipAmount=0, currentMethod='mpesa';
 
-function renderSummary() {
-  if(!cart.length) { window.location.href = '/cart/'; return; }
-  const total = cart.reduce((s,i) => s+i.price*i.quantity, 0);
-  const kes = Math.round(total * 130);
-  document.getElementById('summary-items').innerHTML =
-    cart.map(i => `<div class="summary-item"><span style="color:var(--text-muted)">${i.name} ×${i.quantity}</span><span>$${(i.price*i.quantity).toFixed(2)}</span></div>`).join('');
-  document.getElementById('total-usd').textContent = '$'+total.toFixed(2);
-  document.getElementById('total-kes').textContent = 'KES '+kes.toLocaleString();
+// Pre-fill phone
+const savedPhone=localStorage.getItem('customerPhone');
+if(savedPhone) document.getElementById('mpesa-phone').value=savedPhone;
+
+function renderSummary(){
+  if(!total) total=cart.reduce((s,i)=>s+(i.price||0)*(i.quantity||1),0);
+  const grandTotal=total+tipAmount;
+  const lines=cart.length
+    ? cart.map(i=>`<div class="order-line"><span>${i.name} × ${i.quantity||1}</span><span>KES ${((i.price||0)*(i.quantity||1)).toLocaleString()}</span></div>`).join('')
+    : `<div class="order-line"><span>Order #${orderId}</span><span></span></div>`;
+  document.getElementById('order-summary-lines').innerHTML=lines;
+  if(tipAmount>0){
+    document.getElementById('order-summary-lines').innerHTML+=`<div class="order-line" style="color:var(--success)"><span>Tip for waiter</span><span>KES ${tipAmount.toLocaleString()}</span></div>`;
+  }
+  document.getElementById('pay-total').textContent=`KES ${grandTotal.toLocaleString()}`;
+  document.getElementById('pts-earn-msg').textContent=`You'll earn ${Math.floor(total)} loyalty points`;
 }
 
-function selectMethod(m) {
-  currentMethod = m;
-  ['mpesa','card','cash'].forEach(x => {
-    document.getElementById('btn-'+x).classList.toggle('selected', x===m);
-    document.getElementById(x+'-form').style.display = x===m ? 'block' : 'none';
-  });
-  document.getElementById('msg-error').style.display = 'none';
+function selectMethod(m,el){
+  currentMethod=m;
+  document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('mpesa-fields').style.display=m==='mpesa'?'':'none';
+  document.getElementById('cash-fields').style.display=m==='cash'?'':'none';
 }
 
-function formatCard(el) {
-  let v = el.value.replace(/\D/g,'').substring(0,16);
-  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+function setTip(amt,btn){
+  tipAmount=amt;
+  document.querySelectorAll('.tip-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('custom-tip').value='';
+  renderSummary();
 }
-function formatExpiry(el) {
-  let v = el.value.replace(/\D/g,'');
-  if(v.length >= 2) v = v.substring(0,2)+'/'+v.substring(2,4);
-  el.value = v;
-}
-
-async function placeOrder(paymentMethod, extra={}) {
-  const res = await fetch(`${API}/order`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({tableId, items:cart, paymentMethod, ...extra})
-  });
-  const data = await res.json();
-  if(!res.ok) throw new Error(data.message || 'Failed to place order');
-  return data.orderId;
+function setCustomTip(v){
+  tipAmount=parseFloat(v)||0;
+  document.querySelectorAll('.tip-btn').forEach(b=>b.classList.remove('active'));
+  renderSummary();
 }
 
-async function initiateMpesa() {
-  const raw = document.getElementById('mpesa-phone').value.trim().replace(/\s/g,'');
-  if(!raw || raw.length < 10) { showErr('Please enter a valid M-Pesa number'); return; }
-  const phone = raw.startsWith('0') ? '254'+raw.substring(1) : raw.startsWith('+') ? raw.substring(1) : raw;
-  const total = cart.reduce((s,i) => s+i.price*i.quantity, 0);
-  const amountKes = Math.round(total * 130);
+async function initiatePayment(){
+  if(!orderId){showToast('No order found. Please order from the menu first.','error');return;}
+  const btn=document.getElementById('pay-btn');
 
-  document.getElementById('mpesa-input').style.display = 'none';
-  document.getElementById('stk-status').classList.add('show');
-  showErr('');
-
-  try {
-    const orderId = await placeOrder('mpesa', {mpesaPhone: phone});
-    const stkRes = await fetch(`${API}/mpesa/stk-push`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({phone, amount: amountKes, orderId})
-    });
-    const stkData = await stkRes.json();
-    if(stkRes.ok && stkData.success) {
-      updateStk('pending','Check your phone',`A payment request of KES ${amountKes.toLocaleString()} has been sent to +${phone}. Enter your M-Pesa PIN to complete.`);
-      pollStatus(orderId, amountKes);
-    } else {
-      updateStk('failed','Could not send prompt', stkData.message || 'Please check the number and try again.');
-    }
-  } catch(e) {
-    updateStk('failed','Error', e.message);
+  if(currentMethod==='mpesa'){
+    const phone=document.getElementById('mpesa-phone').value.replace(/\s/g,'');
+    if(!phone){showToast('Please enter your M-Pesa phone number','error');return;}
+    let e164=phone;
+    if(phone.startsWith('0')) e164='254'+phone.slice(1);
+    else if(phone.startsWith('+')) e164=phone.slice(1);
+    btn.disabled=true; btn.textContent='Sending STK Push…';
+    try{
+      const r=await fetch(`${API}/mpesa/stk-push`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({phone:e164,amount:Math.ceil(total+tipAmount),orderId})
+      });
+      const d=await r.json();
+      if(d.success){
+        document.getElementById('mpesa-waiting').style.display='block';
+        btn.textContent='Waiting for payment…';
+        if(d.sandbox) setTimeout(()=>checkPaymentStatus(),3500);
+        else pollPaymentStatus();
+      }else{
+        showToast(d.message||'STK Push failed','error');
+        btn.disabled=false; btn.textContent='💳 Pay Now';
+      }
+    }catch(e){showToast('Network error','error');btn.disabled=false;btn.textContent='💳 Pay Now';}
+  } else {
+    // Cash — record immediately
+    btn.disabled=true; btn.textContent='Recording…';
+    try{
+      await fetch(`${API}/order/${orderId}/pay`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({method:'cash',tip_kes:tipAmount})
+      });
+      showSuccess(Math.floor(total));
+    }catch(e){showToast('Error recording payment','error');btn.disabled=false;btn.textContent='💳 Pay Now';}
   }
 }
 
-function pollStatus(orderId, kes) {
-  let tries = 0;
-  const iv = setInterval(async () => {
-    tries++;
-    if(tries > 12) { clearInterval(iv); updateStk('failed','Timeout','No response. Please try again.'); return; }
-    try {
-      const r = await fetch(`${API}/payment/status/${orderId}`);
-      const d = await r.json();
-      if(d.status === 'paid') {
-        clearInterval(iv);
-        updateStk('success','Payment confirmed!','Your payment was successful. Redirecting...');
-        setTimeout(() => { localStorage.removeItem('cart'); localStorage.removeItem('tableId'); window.location.href='/confirmation/?order_id='+orderId; }, 1500);
-      } else if(d.status === 'failed') {
-        clearInterval(iv);
-        updateStk('failed','Payment declined','Your M-Pesa payment was not completed.');
-      }
-    } catch(e) {}
-  }, 5000);
+let pollCount=0;
+function pollPaymentStatus(){
+  const interval=setInterval(async()=>{
+    pollCount++;
+    if(pollCount>24){clearInterval(interval);showToast('Payment timeout — please try again','error');resetPayBtn();return;}
+    const status=await checkPaymentStatus();
+    if(status==='paid'||status==='failed') clearInterval(interval);
+  },5000);
 }
 
-function updateStk(type, title, desc) {
-  const icons = {
-    pending:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-    success:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#52B788" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`,
-    failed:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
-  };
-  document.getElementById('stk-icon').className = 'stk-icon '+type;
-  document.getElementById('stk-icon').innerHTML = icons[type];
-  document.getElementById('stk-title').textContent = title;
-  document.getElementById('stk-desc').textContent = desc;
+async function checkPaymentStatus(){
+  try{
+    const r=await fetch(`${API}/payment/status/${orderId}`);
+    const d=await r.json();
+    if(d.payment_status==='paid'||d.status==='paid'){showSuccess(d.points_earned||Math.floor(total));return'paid';}
+    if(d.payment_status==='failed'||d.status==='failed'){showToast('Payment failed. Please try again.','error');resetPayBtn();return'failed';}
+  }catch(e){}
+  return'pending';
 }
 
-function resetMpesa() {
-  document.getElementById('mpesa-input').style.display = 'block';
-  document.getElementById('stk-status').classList.remove('show');
-  document.getElementById('mpesa-phone').value = '';
+// Also listen for socket payment update
+window.addEventListener('paymentUpdate',e=>{
+  const d=e.detail;
+  if(String(d.orderId)===String(orderId)){
+    if(d.status==='paid') showSuccess(Math.floor(total));
+    else if(d.status==='failed'){showToast('Payment failed. Please try again.','error');resetPayBtn();}
+  }
+});
+
+function showSuccess(pts){
+  // Record tip if any
+  if(tipAmount>0){
+    fetch(`${API}/tips`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({orderId,tipKes:tipAmount})}).catch(()=>{});
+  }
+  document.getElementById('pay-form').style.display='none';
+  document.getElementById('mpesa-waiting').style.display='none';
+  const s=document.getElementById('pay-success');
+  s.classList.add('show');
+  document.getElementById('pts-earned').textContent=pts;
+  document.getElementById('track-link-success').href=`/track-order/?order_id=${orderId}`;
+  localStorage.removeItem('cart');
+  localStorage.removeItem('lastOrderTotal');
+  updateCartCount();
 }
 
-async function payWithCard() {
-  if(!document.getElementById('card-name').value || !document.getElementById('card-number').value) { showErr('Please fill in all card details'); return; }
-  try { const id = await placeOrder('card'); localStorage.removeItem('cart'); localStorage.removeItem('tableId'); window.location.href='/confirmation/?order_id='+id; }
-  catch(e) { showErr(e.message); }
-}
-
-async function payWithCash() {
-  try { const id = await placeOrder('cash'); localStorage.removeItem('cart'); localStorage.removeItem('tableId'); window.location.href='/confirmation/?order_id='+id; }
-  catch(e) { showErr(e.message); }
-}
-
-function showErr(msg) {
-  const el = document.getElementById('msg-error');
-  if(!msg) { el.style.display='none'; return; }
-  document.getElementById('err-text').textContent = msg;
-  el.style.display = 'flex';
+function resetPayBtn(){
+  const btn=document.getElementById('pay-btn');
+  btn.disabled=false; btn.textContent='💳 Pay Now';
+  document.getElementById('mpesa-waiting').style.display='none';
 }
 
 renderSummary();
 </script>
 {% endblock %}
-
-

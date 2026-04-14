@@ -2,194 +2,196 @@
 {% block title %}Track Order — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-.track-page{max-width:620px;margin:0 auto;padding:2.5rem 2rem}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:400;margin-bottom:0.25rem}
-.page-sub{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2rem}
-.order-meta{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem;box-shadow:var(--shadow)}
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.meta-item{}
-.meta-label{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.25rem}
-.meta-val{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--text)}
-.progress-wrap{margin-bottom:2rem}
-.prog-title{font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.25rem}
-.steps{display:flex;flex-direction:column;gap:0}
-.step{display:flex;align-items:flex-start;gap:1.25rem;position:relative}
-.step:not(:last-child)::after{content:'';position:absolute;left:19px;top:44px;width:2px;height:48px;background:var(--border);transition:background 0.5s}
-.step.done:not(:last-child)::after,.step.active:not(:last-child)::after{background:var(--gold)}
-.step.done:not(:last-child)::after{background:var(--primary)}
-.step-dot{width:40px;height:40px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:white;z-index:1;transition:all 0.4s}
-.step.done .step-dot{background:var(--primary);border-color:var(--primary);color:white}
-.step.active .step-dot{border-color:var(--gold);color:var(--primary);box-shadow:0 0 0 4px rgba(201,168,76,0.2);animation:glow 1.5s infinite}
-.step.pending .step-dot{color:var(--text-dim)}
-@keyframes glow{0%,100%{box-shadow:0 0 0 4px rgba(201,168,76,0.2)}50%{box-shadow:0 0 0 8px rgba(201,168,76,0.05)}}
-.step-body{padding:0.5rem 0 3rem}
-.step-name{font-weight:500;font-size:0.9rem;margin-bottom:0.2rem;transition:color 0.3s}
-.step.active .step-name{color:var(--primary)}
-.step.done .step-name{color:var(--text-muted)}
-.step.pending .step-name{color:var(--text-dim)}
-.step-desc{font-size:0.78rem;color:var(--text-dim);line-height:1.5}
-.step.active .step-desc{color:var(--text-muted)}
-.items-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem;box-shadow:var(--shadow)}
-.items-title{font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border)}
-.order-row{display:flex;justify-content:space-between;font-size:0.875rem;padding:0.4rem 0;border-bottom:1px solid var(--border)}
-.order-row:last-of-type{border-bottom:none}
-.total-row{display:flex;justify-content:space-between;padding-top:0.75rem;border-top:1px solid var(--border);font-weight:600}
-.total-row .kes{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--primary)}
+.track-wrap{max-width:600px;margin:0 auto;padding:2rem 1.25rem}
+/* SEARCH */
+.track-search{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem;box-shadow:var(--shadow)}
+.track-search-row{display:flex;gap:0.6rem}
+/* STATUS TRACK */
+.status-steps{display:flex;align-items:flex-start;gap:0;margin:1.5rem 0;position:relative}
+.status-steps::before{content:'';position:absolute;top:20px;left:20px;right:20px;height:2px;background:var(--border);z-index:0}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.5rem;position:relative;z-index:1}
+.step-circle{width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.3s}
+.step.done .step-circle{background:var(--success);border-color:var(--success);color:#fff}
+.step.active .step-circle{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 0 0 4px rgba(139,69,19,0.15);animation:stepPulse 1.5s ease-in-out infinite}
+@keyframes stepPulse{0%,100%{box-shadow:0 0 0 4px rgba(139,69,19,0.15)}50%{box-shadow:0 0 0 8px rgba(139,69,19,0.08)}}
+.step-line{flex:1;height:2px;background:var(--border);margin-top:20px;transition:background 0.3s}
+.step-line.done{background:var(--success)}
+.step-label{font-size:0.68rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);text-align:center;max-width:70px}
+.step.active .step-label,.step.done .step-label{color:var(--text)}
+/* ORDER CARD */
+.order-detail-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1rem;box-shadow:var(--shadow)}
+.odc-header{padding:1rem 1.25rem;background:var(--sand-light);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.odc-body{padding:1.25rem}
+.item-row{display:flex;justify-content:space-between;padding:0.45rem 0;font-size:0.88rem;border-bottom:1px solid var(--border)}
+.item-row:last-child{border:none}
 /* WAITER CARD */
-.waiter-card{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--radius-lg);padding:1.1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem}
-.waiter-av{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
-.waiter-info .wname{font-weight:600;color:white;font-size:0.9rem}
-.waiter-info .wrole{font-size:0.72rem;color:rgba(255,255,255,0.65)}
+.waiter-card{background:#fff;border:1px solid var(--border-hover);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:1rem}
+.waiter-big-avatar{width:52px;height:52px;border-radius:50%;background:var(--gold-pale);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:var(--gold-dark);flex-shrink:0}
 /* REVIEW */
-.review-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.5rem}
-.review-card-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
-.star-row{display:flex;gap:0.5rem;margin-bottom:1rem}
-.star-btn{font-size:1.8rem;cursor:pointer;color:var(--sand-dark);transition:color 0.15s;background:none;border:none;padding:0}
-.star-btn.filled{color:var(--gold)}
-.refresh-row{display:flex;align-items:center;justify-content:space-between;font-size:0.75rem;color:var(--text-dim)}
-@media(max-width:480px){.track-page{padding:1.5rem 1rem}.meta-grid{grid-template-columns:1fr}}
+.review-card{background:var(--sand-light);border:1px solid var(--sand-dark);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1rem}
+.review-card h4{font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--primary);margin-bottom:0.85rem}
+.star-row{display:flex;gap:6px;margin-bottom:0.75rem}
+.star{font-size:1.6rem;cursor:pointer;color:#ddd;transition:color 0.15s;-webkit-tap-highlight-color:transparent}
+.star.filled{color:var(--gold)}
+@media(max-width:500px){
+  .track-search-row{flex-direction:column}
+  .step-label{font-size:0.62rem;max-width:55px}
+  .step-circle{width:34px;height:34px;font-size:0.85rem}
+}
 </style>
 {% endblock %}
-{% block content %}
-<div class="track-page">
-  <div class="ornament" style="justify-content:flex-start;margin-bottom:0.5rem">
-    <div class="ornament-line" style="width:24px;flex:0"></div>
-    <div class="ornament-diamond" style="width:4px;height:4px"></div>
-  </div>
-  <h1 class="page-title">Track Your Order</h1>
-  <p class="page-sub">Live updates every 15 seconds</p>
 
-  <div id="loading" style="text-align:center;padding:4rem"><div class="spinner"></div><div style="margin-top:1rem;font-size:0.82rem;color:var(--text-muted)">Fetching your order...</div></div>
-  <div id="content" style="display:none">
-    <div class="order-meta"><div class="meta-grid" id="meta-grid"></div></div>
-    <div id="waiter-section" style="display:none"></div>
-    <div class="progress-wrap">
-      <div class="prog-title">Order Progress</div>
-      <div class="steps">
-        <div class="step pending" id="s-pending">
-          <div class="step-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-          <div class="step-body"><div class="step-name">Order Received</div><div class="step-desc">Your order has been placed and confirmed</div></div>
-        </div>
-        <div class="step pending" id="s-preparing">
-          <div class="step-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg></div>
-          <div class="step-body"><div class="step-name">Preparing</div><div class="step-desc">Our chef is crafting your meal with care</div></div>
-        </div>
-        <div class="step pending" id="s-ready">
-          <div class="step-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="step-body"><div class="step-name">Ready</div><div class="step-desc">Your meal is ready — waiter is on the way</div></div>
-        </div>
-        <div class="step pending" id="s-served">
-          <div class="step-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div class="step-body" style="padding-bottom:0"><div class="step-name">Served — Enjoy!</div><div class="step-desc">Bon appétit! We hope you love your meal</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="items-card"><div class="items-title">Your Items</div><div id="items-rows"></div></div>
-    <div class="review-card" id="review-card" style="display:none">
-      <div class="review-card-title">Rate Your Waiter</div>
-      <div class="star-row" id="star-row">
-        <button class="star-btn" onclick="setRating(1)">★</button>
-        <button class="star-btn" onclick="setRating(2)">★</button>
-        <button class="star-btn" onclick="setRating(3)">★</button>
-        <button class="star-btn" onclick="setRating(4)">★</button>
-        <button class="star-btn" onclick="setRating(5)">★</button>
-      </div>
-      <textarea id="review-comment" placeholder="Leave a comment (optional)..." rows="2" style="margin-bottom:0.75rem"></textarea>
-      <button class="btn btn-gold btn-full" onclick="submitReview()">Submit Rating</button>
-    </div>
-    <div class="refresh-row">
-      <span id="refresh-text">Auto-refreshing every 15s</span>
-      <button class="btn btn-ghost btn-sm" onclick="loadOrder()">↻ Refresh</button>
+{% block content %}
+<div class="track-wrap">
+  <h1 class="page-title">Track Order</h1>
+  <p class="page-sub">Live status updates</p>
+
+  <!-- Search -->
+  <div class="track-search">
+    <div class="track-search-row">
+      <input type="number" id="order-id-input" placeholder="Enter Order ID" min="1" style="flex:1">
+      <button class="btn btn-primary" onclick="loadOrder()">Track</button>
     </div>
   </div>
-  <div id="error" style="display:none;text-align:center;padding:4rem">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text-muted);margin-bottom:0.75rem">Order not found</div>
-    <a href="/" class="btn btn-gold">Back to Menu</a>
-  </div>
+
+  <div id="track-content"></div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-const params = new URLSearchParams(window.location.search);
-const orderId = params.get('order_id');
-const statusOrder = ['pending','preparing','ready','served','completed'];
-let currentRating = 0;
-let waiterId = null;
-let refreshTimer;
+const params=new URLSearchParams(location.search);
+const preId=params.get('order_id')||localStorage.getItem('lastOrderId');
+if(preId){ document.getElementById('order-id-input').value=preId; loadOrder(); }
 
-function updateSteps(status) {
-  const idx = statusOrder.indexOf(status);
-  statusOrder.forEach((s,i) => {
-    const el = document.getElementById('s-'+s);
-    if(!el) return;
-    el.className = 'step ' + (i<idx?'done':i===idx?'active':'pending');
-  });
-}
+const STATUS_STEPS=['pending','preparing','ready','served'];
+const STATUS_LABELS=['Order Placed','Preparing','Ready','Served'];
+const STATUS_ICONS=['📋','👨‍🍳','✅','🤵'];
 
-async function loadOrder() {
-  if(!orderId) { show('error'); return; }
-  try {
-    const res = await fetch(`${API}/order/${orderId}`);
-    if(!res.ok) throw new Error();
-    const {order,items} = await res.json();
-    document.getElementById('loading').style.display='none';
-    document.getElementById('content').style.display='block';
-    document.getElementById('meta-grid').innerHTML = `
-      <div><div class="meta-label">Order</div><div class="meta-val">#${order.id}</div></div>
-      <div><div class="meta-label">Table</div><div class="meta-val">${order.table_id}</div></div>
-      <div><div class="meta-label">Status</div><div class="meta-val"><span class="badge ${sb(order.status)}">${order.status}</span></div></div>
-      <div><div class="meta-label">Total</div><div class="meta-val">KES ${Math.round(order.total_kes||order.total_amount||0).toLocaleString()}</div></div>
-    `;
-    updateSteps(order.status);
-    if(order.waiter_name) {
-      waiterId = order.waiter_id;
-      document.getElementById('waiter-section').style.display='block';
-      document.getElementById('waiter-section').innerHTML = `
-        <div class="waiter-card">
-          <div class="waiter-av">${(order.waiter_name||'W').substring(0,2).toUpperCase()}</div>
-          <div class="waiter-info"><div class="wname">${order.waiter_name}</div><div class="wrole">Your waiter</div></div>
-        </div>`;
-    }
-    document.getElementById('items-rows').innerHTML =
-      (items||[]).map(i=>`<div class="order-row"><span style="color:var(--text-muted)">${i.name} ×${i.quantity}</span><span>KES ${Math.round(i.price_kes||i.price).toLocaleString()}</span></div>`).join('') +
-      `<div class="total-row"><span>Total</span><span class="kes">KES ${Math.round(order.total_kes||order.total_amount||0).toLocaleString()}</span></div>`;
-    if(['served','completed'].includes(order.status) && order.waiter_id) {
-      document.getElementById('review-card').style.display='block';
-    }
-    if(['served','completed'].includes(order.status)) {
-      clearInterval(refreshTimer);
-      document.getElementById('refresh-text').textContent = 'Order complete';
-    }
-  } catch(e) {
-    document.getElementById('loading').style.display='none';
-    document.getElementById('error').style.display='block';
+let currentOrderId=null, currentWaiterId=null, reviewSubmitted=false;
+
+async function loadOrder(){
+  const id=document.getElementById('order-id-input').value.trim();
+  if(!id){showToast('Please enter an order ID','error');return;}
+  currentOrderId=id;
+  document.getElementById('track-content').innerHTML='<div style="text-align:center;padding:2rem"><div class="spinner"></div></div>';
+  try{
+    const r=await fetch(`${API}/order/${id}`);
+    if(!r.ok) throw new Error('Order not found');
+    const d=await r.json();
+    renderOrder(d);
+  }catch(e){
+    document.getElementById('track-content').innerHTML=`<div class="alert alert-error">Order #${id} not found. Please check your order ID.</div>`;
   }
 }
 
-function sb(s){return{pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',served:'badge-gold',completed:'badge-earth'}[s]||'badge-yellow';}
+function renderOrder({order, items}){
+  if(!order){document.getElementById('track-content').innerHTML='<div class="alert alert-error">Order not found</div>';return;}
+  currentWaiterId=order.waiter_id;
+  const stepIdx=STATUS_STEPS.indexOf(order.status);
 
-function setRating(n) {
-  currentRating = n;
-  document.querySelectorAll('.star-btn').forEach((b,i) => b.classList.toggle('filled',i<n));
+  let stepsHtml=STATUS_STEPS.map((s,i)=>{
+    const state=i<stepIdx?'done':i===stepIdx?'active':'';
+    return `
+      <div class="step ${state}">
+        ${i>0?`<div class="step-line ${i<=stepIdx?'done':''}"></div>`:''}
+        <div class="step-circle">${STATUS_ICONS[i]}</div>
+        <div class="step-label">${STATUS_LABELS[i]}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Waiter card
+  const waiterHtml=order.waiter_name?`
+    <div class="waiter-card">
+      <div class="waiter-big-avatar">${order.waiter_name.substring(0,2).toUpperCase()}</div>
+      <div>
+        <div style="font-weight:600;font-size:0.95rem;color:var(--text)">${order.waiter_name}</div>
+        <div style="font-size:0.78rem;color:var(--text-muted)">Your waiter · Table ${order.table_number||'—'}</div>
+      </div>
+    </div>
+  `:'';
+
+  // Review (only if served/completed)
+  const canReview=['served','completed'].includes(order.status)&&order.waiter_id&&!reviewSubmitted;
+  const reviewHtml=canReview?`
+    <div class="review-card">
+      <h4>⭐ Rate Your Waiter</h4>
+      <div class="star-row" id="stars">
+        ${[1,2,3,4,5].map(n=>`<span class="star" onclick="setRating(${n})" data-val="${n}">★</span>`).join('')}
+      </div>
+      <textarea id="review-comment" rows="2" placeholder="Leave a comment (optional)" style="margin-bottom:0.75rem;resize:none"></textarea>
+      <button class="btn btn-primary btn-sm" onclick="submitReview()">Submit Review</button>
+    </div>
+  `:'';
+
+  document.getElementById('track-content').innerHTML=`
+    ${waiterHtml}
+    <div class="order-detail-card">
+      <div class="odc-header">
+        <div>
+          <div style="font-weight:600;font-size:0.9rem">Order #${order.id}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted)">${new Date(order.created_at).toLocaleString('en-KE')}</div>
+        </div>
+        <span class="badge ${getStatusBadge(order.status)}">${order.status}</span>
+      </div>
+      <div class="odc-body">
+        <div class="status-steps">${stepsHtml}</div>
+        <div style="margin:1rem 0">
+          ${items.map(i=>`
+            <div class="item-row">
+              <span>${i.name} × ${i.quantity}</span>
+              <span style="color:var(--text-muted)">KES ${(i.price_kes*i.quantity).toLocaleString()}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;padding-top:0.75rem;border-top:1px solid var(--border);font-weight:700;color:var(--primary)">
+          <span>Total</span><span>KES ${parseFloat(order.total_kes).toLocaleString()}</span>
+        </div>
+        ${order.tip_kes>0?`<div style="font-size:0.78rem;color:var(--success);margin-top:0.3rem">+ KES ${parseFloat(order.tip_kes).toLocaleString()} tip</div>`:''}
+        <div style="display:flex;gap:0.6rem;margin-top:1.1rem;flex-wrap:wrap">
+          <a href="/payment/?order_id=${order.id}" class="btn btn-primary btn-sm" ${order.payment_status==='paid'?'style="display:none"':''}>Pay Now</a>
+          <button class="btn btn-ghost btn-sm" onclick="loadOrder()">🔄 Refresh</button>
+        </div>
+      </div>
+    </div>
+    ${reviewHtml}
+  `;
+
+  // Auto-refresh every 12s if active
+  if(!['served','completed'].includes(order.status)){
+    setTimeout(loadOrder, 12000);
+  }
 }
 
-async function submitReview() {
-  if(!currentRating){ showToast('Please select a star rating'); return; }
-  try {
+function getStatusBadge(s){
+  return{pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',served:'badge-gold',completed:'badge-earth'}[s]||'badge-gray';
+}
+
+let selectedRating=0;
+function setRating(n){
+  selectedRating=n;
+  document.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.toggle('filled',i<n);
+  });
+}
+
+async function submitReview(){
+  if(!selectedRating){showToast('Please select a star rating','error');return;}
+  try{
     await fetch(`${API}/reviews`,{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({order_id:orderId, waiter_id:waiterId, rating:currentRating, comment:document.getElementById('review-comment').value})
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({orderId:currentOrderId,waiterId:currentWaiterId,rating:selectedRating,comment:document.getElementById('review-comment').value.trim()})
     });
-    document.getElementById('review-card').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--success)">✓ Thank you for your feedback!</div>';
-    showToast('Review submitted! Thank you','gold');
-  } catch(e){ showToast('Could not submit review'); }
+    reviewSubmitted=true;
+    document.querySelector('.review-card').innerHTML='<div class="alert alert-success">✓ Thank you for your review!</div>';
+    showToast('Review submitted!','gold');
+  }catch(e){showToast('Could not submit review','error');}
 }
 
-const socket = io(API,{transports:['websocket','polling']});
-socket.on('orderStatusUpdate',d=>{ if(String(d.orderId)===String(orderId)) loadOrder(); });
-
-loadOrder();
-refreshTimer = setInterval(loadOrder,15000);
+// Live socket updates
+window.addEventListener('orderStatusUpdate',e=>{
+  if(String(e.detail.orderId)===String(currentOrderId)) loadOrder();
+});
 </script>
 {% endblock %}

@@ -1,207 +1,219 @@
 {% extends 'menu/base.html' %}
 {% load static %}
 {% block title %}Menu — Saveur Restaurant{% endblock %}
+
 {% block extra_css %}
 <style>
-.hero{background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 50%,var(--primary-dark) 100%);padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,0.15),transparent 70%)}
-.hero-eye{font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
-.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,6vw,4.5rem);font-weight:300;color:var(--sand);line-height:1.1;margin-bottom:1rem}
-.hero h1 em{font-style:italic;color:var(--gold)}
-.hero-sub{font-size:0.9rem;color:var(--text-dim);max-width:400px;margin:0 auto 2rem;line-height:1.7}
-.table-pill{display:inline-flex;align-items:center;gap:0.6rem;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:30px;padding:0.5rem 1.25rem;font-size:0.82rem;color:var(--gold)}
-.waiter-notif{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--radius-lg);padding:1rem 1.5rem;margin:0 auto 1.5rem;max-width:400px;display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow)}
-.waiter-avatar{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
-.waiter-info{text-align:left}
-.waiter-name{font-weight:600;color:var(--sand);font-size:0.9rem}
-.waiter-role{font-size:0.75rem;color:rgba(245,230,200,0.7)}
+/* ── HERO ── */
+.menu-hero{background:linear-gradient(135deg,var(--sand-light) 0%,var(--cream) 100%);border-bottom:1px solid var(--border);padding:2rem 1.5rem 1.5rem;text-align:center}
+.menu-hero h1{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:var(--primary);letter-spacing:0.05em}
+.menu-hero p{color:var(--text-muted);font-size:0.88rem;margin-top:0.35rem}
 
-/* CATEGORY TABS */
-.category-bar{background:white;border-bottom:2px solid var(--sand-dark);position:sticky;top:68px;z-index:100;overflow-x:auto;scrollbar-width:none}
-.category-bar::-webkit-scrollbar{display:none}
-.category-tabs{display:flex;gap:0;padding:0 1.5rem;min-width:max-content}
-.cat-tab{padding:1rem 1.5rem;font-size:0.82rem;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;text-transform:uppercase;letter-spacing:0.08em;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif}
+/* ── WAITER BANNER ── */
+#waiter-notif{display:none;background:#fff;border:1px solid var(--border-hover);border-left:4px solid var(--gold);border-radius:var(--radius);padding:0.85rem 1.25rem;margin:1rem 1.5rem 0;align-items:center;gap:1rem;box-shadow:var(--shadow);animation:slideIn 0.4s ease}
+#waiter-notif.show{display:flex}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CATEGORY TABS ── */
+.cat-bar{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:var(--nav-h);z-index:100;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.cat-bar::-webkit-scrollbar{display:none}
+.cat-tabs{display:flex;gap:0;min-width:max-content;padding:0 1rem}
+.cat-tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0.8rem 1.1rem;font-size:0.72rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;font-family:'Inter',sans-serif}
 .cat-tab:hover{color:var(--primary)}
-.cat-tab.active{color:var(--primary);border-bottom-color:var(--gold)}
-.cat-icon{margin-right:0.4rem}
+.cat-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.cat-icon{font-size:1.1rem}
 
-/* MENU SECTION */
-.menu-section{display:none;padding:2rem;max-width:1300px;margin:0 auto}
+/* ── MENU GRID ── */
+.menu-wrap{max-width:1200px;margin:0 auto;padding:1.5rem 1.25rem}
+.menu-section{display:none}
 .menu-section.active{display:block}
-.section-header{margin-bottom:2rem}
-.section-header h2{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:var(--text);margin-bottom:0.25rem}
-.section-header p{font-size:0.82rem;color:var(--text-muted)}
+.section-header{margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)}
+.section-header h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:400;color:var(--primary)}
+.section-header p{font-size:0.82rem;color:var(--text-muted);margin-top:0.2rem}
 
-/* MENU GRID */
-.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem}
-.menu-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all 0.3s;position:relative}
-.menu-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--border-hover)}
-.menu-card.unavailable{opacity:0.5;pointer-events:none}
-.card-img{width:100%;height:180px;object-fit:cover;background:var(--sand-light);display:block}
-.card-body{padding:1.1rem}
-.card-category{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:0.3rem}
-.card-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;color:var(--text);margin-bottom:0.3rem}
-.card-desc{font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.75rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-footer{display:flex;align-items:center;justify-content:space-between}
-.card-price{font-size:0.95rem;font-weight:600;color:var(--primary)}
-.card-prep{font-size:0.7rem;color:var(--text-dim)}
-.add-btn{width:36px;height:36px;border-radius:50%;background:var(--primary);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:all 0.2s;flex-shrink:0}
-.add-btn:hover{background:var(--primary-light);transform:scale(1.1)}
-.featured-badge{position:absolute;top:0.75rem;left:0.75rem}
-.out-badge{position:absolute;top:0.75rem;right:0.75rem}
-.prep-badge{position:absolute;top:0.75rem;right:0.75rem;background:rgba(26,15,0,0.7);color:var(--sand);padding:0.2rem 0.5rem;border-radius:20px;font-size:0.65rem}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.1rem}
 
-@media(max-width:768px){
+/* ── MENU CARD ── */
+.menu-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all 0.22s;display:flex;flex-direction:column}
+.menu-card:hover{border-color:var(--border-hover);box-shadow:var(--shadow)}
+.card-img-wrap{position:relative;height:170px;background:var(--sand-light);overflow:hidden}
+.card-img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s}
+.menu-card:hover .card-img{transform:scale(1.04)}
+.featured-ribbon{position:absolute;top:10px;left:0;background:var(--gold);color:var(--dark);font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.75rem 0.25rem 0.6rem;clip-path:polygon(0 0,100% 0,95% 50%,100% 100%,0 100%)}
+.card-body{padding:1rem;display:flex;flex-direction:column;flex:1;gap:0.35rem}
+.card-name{font-weight:600;font-size:0.95rem;color:var(--text);line-height:1.3}
+.card-desc{font-size:0.8rem;color:var(--text-muted);line-height:1.5;flex:1}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:0.5rem;gap:0.5rem}
+.card-price{font-weight:700;font-size:1rem;color:var(--primary)}
+.card-prep{font-size:0.72rem;color:var(--text-dim)}
+.add-btn{background:var(--primary);color:#fff;border:none;border-radius:50%;width:34px;height:34px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.add-btn:hover{background:var(--primary-dark);transform:scale(1.1)}
+.add-btn:active{transform:scale(0.95)}
+
+/* ── EMPTY STATE ── */
+.empty-cat{grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)}
+.empty-cat-icon{font-size:2.5rem;margin-bottom:0.75rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .menu-hero h1{font-size:1.9rem}
   .menu-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem}
-  .card-img{height:140px}
-  .menu-section{padding:1rem}
-  .category-tabs{padding:0 0.5rem}
-  .cat-tab{padding:0.75rem 1rem;font-size:0.75rem}
-  .hero{padding:2.5rem 1rem 2rem}
-}
-@media(max-width:480px){
-  .menu-grid{grid-template-columns:1fr 1fr;gap:0.6rem}
-  .card-img{height:120px}
+  .card-img-wrap{height:130px}
   .card-body{padding:0.75rem}
-  .card-name{font-size:1rem}
+  .card-name{font-size:0.88rem}
+  .card-desc{display:none}
+  .cat-tab{padding:0.65rem 0.85rem;font-size:0.68rem}
+}
+@media(max-width:360px){
+  .menu-grid{grid-template-columns:1fr 1fr}
 }
 </style>
 {% endblock %}
+
 {% block content %}
-<div class="hero">
-  <div class="hero-eye">Est. 2024 — Nairobi, Kenya</div>
-  <h1>Welcome to<br><em>Saveur</em></h1>
-  <p class="hero-sub">Authentic flavours, warm hospitality, unforgettable moments</p>
-  {% if table_id %}
-  <div id="waiter-notif" class="waiter-notif" style="display:none">
-    <div class="waiter-avatar" id="waiter-avatar">?</div>
-    <div class="waiter-info">
-      <div class="waiter-name" id="waiter-name">Assigning your waiter...</div>
-      <div class="waiter-role">Will be with you shortly</div>
-    </div>
-  </div>
-  <div class="table-pill">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-    Table {{ table_id }}
-  </div>
-  {% else %}
-  <a href="#menu" class="btn btn-gold btn-lg" style="margin-top:0.5rem">Explore Our Menu</a>
-  {% endif %}
+<!-- Hero -->
+<div class="menu-hero">
+  <h1>🍽️ Our Menu</h1>
+  <p>Crafted with the finest Kenyan ingredients · All prices in KES</p>
 </div>
 
-<!-- CATEGORY TABS -->
-<div class="category-bar" id="menu">
-  <div class="category-tabs">
-    <button class="cat-tab active" onclick="showCat('food',this)"><span class="cat-icon">🍽️</span>Food</button>
-    <button class="cat-tab" onclick="showCat('drinks',this)"><span class="cat-icon">🥤</span>Drinks</button>
-    <button class="cat-tab" onclick="showCat('snacks',this)"><span class="cat-icon">🍿</span>Snacks</button>
-    <button class="cat-tab" onclick="showCat('desserts',this)"><span class="cat-icon">🍰</span>Desserts</button>
-    <button class="cat-tab" onclick="showCat('specials',this)"><span class="cat-icon">⭐</span>Specials</button>
+<!-- Waiter notification banner -->
+<div id="waiter-notif">
+  <div class="waiter-avatar-sm" id="waiter-avatar">WA</div>
+  <div>
+    <div style="font-size:0.82rem;font-weight:600;color:var(--text)" id="waiter-name">Your waiter will be with you shortly</div>
+    <div style="font-size:0.75rem;color:var(--text-muted)">Tap the + button to add items to your order</div>
   </div>
 </div>
 
-{% for category in categories %}
-<div class="menu-section {% if forloop.first %}active{% endif %}" id="cat-{{ category.slug }}">
-  <div class="section-header">
-    <h2>{{ category.icon }} {{ category.name }}</h2>
-    <p>{{ category.description|default:"Crafted with the finest ingredients" }}</p>
-  </div>
-  <div class="menu-grid">
-    {% for item in category.dishes %}
-    {% if item.availability %}
-    <div class="menu-card">
-      {% if item.is_featured %}<div class="featured-badge"><span class="badge badge-gold">Featured</span></div>{% endif %}
-      <img class="card-img" src="{% static 'images/' %}{{ item.image_url|slice:'8:' }}" alt="{{ item.name }}"
-        onerror="this.style.background='var(--sand-light)';this.style.height='180px';this.removeAttribute('src')" />
-      <div class="card-body">
-        <div class="card-name">{{ item.name }}</div>
-        <div class="card-desc">{{ item.description|default:"Expertly prepared with fresh ingredients" }}</div>
-        <div class="card-footer">
-          <div>
-            <div class="card-price">KES {{ item.price_kes|floatformat:0 }}</div>
-            <div class="card-prep">~{{ item.prep_time_mins|default:15 }} mins</div>
-          </div>
-          <button class="add-btn" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price_kes }})" title="Add to order">+</button>
-        </div>
-      </div>
-    </div>
-    {% endif %}
+<!-- Category tabs -->
+<div class="cat-bar">
+  <div class="cat-tabs" id="cat-tabs">
+    {% for category in categories %}
+    <button class="cat-tab {% if forloop.first %}active{% endif %}"
+            onclick="showCat('{{ category.slug }}',this)"
+            data-slug="{{ category.slug }}">
+      <span class="cat-icon">{{ category.icon }}</span>
+      {{ category.name }}
+    </button>
     {% empty %}
-    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)">
-      <div style="font-size:2rem;margin-bottom:0.5rem">🍽️</div>
-      <div>No items in this category yet</div>
-    </div>
+    <button class="cat-tab active" onclick="showCat('all',this)" data-slug="all">
+      <span class="cat-icon">🍽️</span> All Items
+    </button>
     {% endfor %}
   </div>
 </div>
-{% empty %}
-<!-- Fallback if no categories -->
-<div class="menu-section active" id="cat-food">
-  <div class="section-header" style="padding-top:2rem">
-    <h2>🍽️ Our Menu</h2>
-  </div>
-  <div class="menu-grid">
-    {% for item in menu_items %}
-    {% if item.availability %}
-    <div class="menu-card">
-      <img class="card-img" src="{% static 'images/' %}{{ item.image_url|slice:'8:' }}" alt="{{ item.name }}"
-        onerror="this.style.background='var(--sand-light)';this.style.height='180px';this.removeAttribute('src')" />
-      <div class="card-body">
-        <div class="card-name">{{ item.name }}</div>
-        <div class="card-desc">Expertly prepared with fresh ingredients</div>
-        <div class="card-footer">
-          <div class="card-price">KES {{ item.price_kes|default:item.price|floatformat:0 }}</div>
-          <button class="add-btn" onclick="addToCart({{ item.id }}, '{{ item.name }}', {{ item.price_kes|default:item.price }})">+</button>
+
+<!-- Menu sections -->
+<div class="menu-wrap">
+  {% for category in categories %}
+  <div class="menu-section {% if forloop.first %}active{% endif %}" id="cat-{{ category.slug }}">
+    <div class="section-header">
+      <h2>{{ category.icon }} {{ category.name }}</h2>
+      <p>{{ category.description|default:"Expertly crafted with the finest ingredients" }}</p>
+    </div>
+    <div class="menu-grid">
+      {% for item in category.dishes %}
+      <div class="menu-card">
+        <div class="card-img-wrap">
+          {% if item.is_featured %}<div class="featured-ribbon">⭐ Featured</div>{% endif %}
+          <img class="card-img" src="{{ item.image_url|default:'' }}" alt="{{ item.name }}"
+               onerror="this.parentElement.style.background='var(--sand-light)';this.style.display='none'">
+        </div>
+        <div class="card-body">
+          <div class="card-name">{{ item.name }}</div>
+          <div class="card-desc">{{ item.description|default:"Expertly prepared with fresh ingredients" }}</div>
+          <div class="card-footer">
+            <div>
+              <div class="card-price">KES {{ item.price_kes|floatformat:0 }}</div>
+              <div class="card-prep">~{{ item.prep_time_mins|default:15 }} mins</div>
+            </div>
+            <button class="add-btn" onclick="addToCart({{ item.id }},'{{ item.name|escapejs }}',{{ item.price_kes }})" title="Add to cart">+</button>
+          </div>
         </div>
       </div>
+      {% empty %}
+      <div class="empty-cat">
+        <div class="empty-cat-icon">{{ category.icon }}</div>
+        <div>No items available in this category</div>
+      </div>
+      {% endfor %}
     </div>
-    {% endif %}
-    {% endfor %}
   </div>
+  {% empty %}
+  <!-- Fallback flat list -->
+  <div class="menu-section active" id="cat-all">
+    <div class="section-header"><h2>🍽️ Our Menu</h2></div>
+    <div class="menu-grid">
+      {% for item in menu_items %}
+      <div class="menu-card">
+        <div class="card-img-wrap">
+          <img class="card-img" src="{{ item.image_url|default:'' }}" alt="{{ item.name }}"
+               onerror="this.parentElement.style.background='var(--sand-light)';this.style.display='none'">
+        </div>
+        <div class="card-body">
+          <div class="card-name">{{ item.name }}</div>
+          <div class="card-footer">
+            <div class="card-price">KES {{ item.price_kes|default:item.price|floatformat:0 }}</div>
+            <button class="add-btn" onclick="addToCart({{ item.id }},'{{ item.name|escapejs }}',{{ item.price_kes|default:item.price }})">+</button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
 </div>
-{% endfor %}
 {% endblock %}
+
 {% block extra_js %}
 <script>
-let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-const tableId = '{{ table_id }}';
-if(tableId) localStorage.setItem('tableId', tableId);
+const tableId='{{ table_id }}';
+if(tableId) localStorage.setItem('tableId',tableId);
 
-function showCat(slug, btn) {
-  document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-  const el = document.getElementById('cat-'+slug);
+let cart=JSON.parse(localStorage.getItem('cart')||'[]');
+
+function showCat(slug,btn){
+  document.querySelectorAll('.menu-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  const el=document.getElementById('cat-'+slug);
   if(el) el.classList.add('active');
   btn.classList.add('active');
+  // scroll tab into view on mobile
+  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
 }
 
-function addToCart(id, name, price) {
-  const existing = cart.find(i => i.id === id);
-  if(existing) existing.quantity++;
-  else cart.push({id, name, price, quantity:1});
-  localStorage.setItem('cart', JSON.stringify(cart));
+function addToCart(id,name,price){
+  const existing=cart.find(i=>i.id===id);
+  if(existing) existing.quantity=(existing.quantity||1)+1;
+  else cart.push({id,name,price:parseFloat(price),quantity:1});
+  localStorage.setItem('cart',JSON.stringify(cart));
   updateCartCount();
-  showToast(name + ' added to cart', 'gold');
+  showToast(name+' added to cart ✓','gold');
 }
 
+// Waiter notification
 {% if table_id %}
-// Fetch waiter assignment
-async function checkWaiter() {
-  try {
-    const res = await fetch(`${API}/waiter-for-table/{{ table_id }}`);
-    if(res.ok) {
-      const d = await res.json();
-      if(d.waiter) {
-        document.getElementById('waiter-name').textContent = d.waiter.name + ' will serve you';
-        document.getElementById('waiter-avatar').textContent = d.waiter.name.substring(0,2).toUpperCase();
-        document.getElementById('waiter-notif').style.display = 'flex';
-      }
+async function checkWaiter(){
+  try{
+    const r=await fetch(`${API}/waiter-for-table/{{ table_id }}`);
+    const d=await r.json();
+    if(d.waiter){
+      document.getElementById('waiter-name').textContent=d.waiter.name+' will be your waiter today';
+      document.getElementById('waiter-avatar').textContent=d.waiter.name.substring(0,2).toUpperCase();
+      document.getElementById('waiter-notif').classList.add('show');
     }
-  } catch(e) {}
+  }catch(e){}
 }
 checkWaiter();
+window.addEventListener('waiterAssigned',e=>{
+  const d=e.detail;
+  if(String(d.tableId)===String('{{ table_id }}')){
+    document.getElementById('waiter-name').textContent=d.waiterName+' has been assigned to your table';
+    document.getElementById('waiter-avatar').textContent=d.waiterName.substring(0,2).toUpperCase();
+    document.getElementById('waiter-notif').classList.add('show');
+  }
+});
 {% endif %}
 </script>
 {% endblock %}
-
-

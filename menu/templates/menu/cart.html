@@ -1,264 +1,264 @@
 {% extends 'menu/base.html' %}
-{% block title %}Your Cart — Saveur{% endblock %}
+{% block title %}Cart — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-.cart-page{max-width:1100px;margin:0 auto;padding:2rem}
-.page-header{margin-bottom:2rem}
-.page-header h1{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:400;color:var(--text)}
-.page-header p{font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em}
-.cart-layout{display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start}
+.cart-layout{max-width:1100px;margin:0 auto;padding:2rem 1.25rem;display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start}
 /* MINI DASHBOARD */
-.mini-dash{background:var(--dark);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:2rem}
-.mini-dash-title{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:1rem}
-.mini-dash-links{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem}
-.dash-link{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);border-radius:var(--radius);padding:0.75rem 0.5rem;text-align:center;text-decoration:none;transition:all 0.2s;cursor:pointer}
-.dash-link:hover{background:rgba(201,168,76,0.15);border-color:rgba(201,168,76,0.35)}
-.dash-link-icon{font-size:1.2rem;margin-bottom:0.3rem;display:block}
-.dash-link-label{font-size:0.68rem;color:var(--sand);text-transform:uppercase;letter-spacing:0.06em}
+.dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;margin-bottom:1.5rem}
+.dash-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-decoration:none;display:flex;align-items:center;gap:0.75rem;transition:all 0.2s}
+.dash-card:hover{border-color:var(--border-hover);box-shadow:var(--shadow);transform:translateY(-1px)}
+.dash-icon{width:40px;height:40px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.dash-label{font-size:0.72rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)}
+.dash-val{font-size:0.88rem;font-weight:600;color:var(--text)}
 /* CART ITEMS */
-.cart-items-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:2px solid var(--sand-dark)}
-.cart-item{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)}
-.cart-item-img{width:60px;height:60px;border-radius:var(--radius);object-fit:cover;background:var(--sand-light);flex-shrink:0}
-.cart-item-info{flex:1;min-width:0}
-.cart-item-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;margin-bottom:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cart-item-price{font-size:0.78rem;color:var(--text-muted)}
-.special-req{width:100%;margin-top:0.5rem;padding:0.4rem 0.6rem;font-size:0.78rem;border-radius:var(--radius);border:1px solid var(--border);background:var(--warm-white);color:var(--text);font-family:'Inter',sans-serif;resize:none}
+.cart-section{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.cart-section-header{padding:1.1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cart-section-header h2{font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text)}
+.cart-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border);transition:background 0.15s}
+.cart-item:last-child{border-bottom:none}
+.cart-item:hover{background:var(--sand-light)}
+.ci-name{flex:1;font-size:0.9rem;font-weight:500;color:var(--text)}
+.ci-price{font-size:0.85rem;color:var(--text-muted);min-width:80px;text-align:right}
 .qty-ctrl{display:flex;align-items:center;gap:0.5rem}
-.qty-btn{width:28px;height:28px;border-radius:50%;background:var(--sand-dark);border:none;color:var(--text);cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
-.qty-btn:hover{background:var(--primary);color:white}
-.qty-num{font-size:0.9rem;font-weight:600;min-width:20px;text-align:center}
-.item-total{font-size:0.95rem;font-weight:600;color:var(--primary);min-width:80px;text-align:right}
-.remove-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;padding:4px;transition:color 0.2s;flex-shrink:0}
-.remove-btn:hover{color:var(--error-light)}
-/* ORDER SUMMARY */
-.order-summary{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;position:sticky;top:88px;box-shadow:var(--shadow)}
-.summary-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.25rem}
-.summary-row{display:flex;justify-content:space-between;font-size:0.85rem;padding:0.45rem 0;color:var(--text-muted)}
-.summary-divider{height:1px;background:var(--border);margin:0.75rem 0}
-.summary-total{display:flex;justify-content:space-between;font-size:1rem;font-weight:600;color:var(--text)}
-.summary-total .kes{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--primary)}
+.qty-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.qty-btn:hover{border-color:var(--primary);color:var(--primary)}
+.qty-num{font-size:0.88rem;font-weight:600;min-width:20px;text-align:center}
+.cart-empty{text-align:center;padding:3rem;color:var(--text-muted)}
+/* SUMMARY */
+.summary-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;position:sticky;top:calc(var(--nav-h) + 1rem)}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:0.45rem 0;font-size:0.88rem}
+.summary-total{font-size:1.1rem;font-weight:700;color:var(--primary);padding-top:0.75rem;border-top:1.5px solid var(--border);margin-top:0.5rem}
 /* POINTS */
-.points-section{background:linear-gradient(135deg,var(--sand-light),var(--warm-white));border:1px solid var(--sand-dark);border-radius:var(--radius);padding:1rem;margin:1rem 0}
-.points-title{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:0.5rem;font-weight:600}
-.points-row{display:flex;align-items:center;justify-content:space-between;font-size:0.82rem}
-.points-balance{color:var(--gold-dark);font-weight:600}
-.redeem-toggle{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--text-muted);cursor:pointer}
-/* TIP SECTION */
-.tip-section{margin:1rem 0}
-.tip-title{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.6rem;font-weight:600}
-.tip-options{display:flex;gap:0.4rem;flex-wrap:wrap}
-.tip-btn{padding:0.4rem 0.75rem;border:1px solid var(--border);border-radius:20px;font-size:0.75rem;cursor:pointer;transition:all 0.2s;background:white;color:var(--text-muted);font-family:'Inter',sans-serif}
-.tip-btn:hover,.tip-btn.selected{background:var(--primary);color:white;border-color:var(--primary)}
-/* EMPTY */
-.empty-cart{text-align:center;padding:4rem 2rem;grid-column:1/-1}
-.empty-icon{font-size:3rem;margin-bottom:1rem;opacity:0.4;display:block}
-
-@media(max-width:900px){.cart-layout{grid-template-columns:1fr}}
-@media(max-width:768px){
-  .cart-page{padding:1rem}
-  .mini-dash-links{grid-template-columns:repeat(3,1fr)}
-  .order-summary{position:static}
+.points-box{background:var(--sand-light);border:1px solid var(--sand-dark);border-radius:var(--radius);padding:1rem;margin:1rem 0}
+.points-box h4{font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--primary);margin-bottom:0.5rem}
+.points-redeem-row{display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem}
+.points-redeem-row input{flex:1}
+.points-applied{background:rgba(45,106,79,0.08);border:1px solid rgba(82,183,136,0.3);border-radius:var(--radius);padding:0.5rem 0.75rem;font-size:0.82rem;color:#1A7A4A;display:none;margin-top:0.5rem}
+/* NOTES */
+.special-notes{margin:1rem 0}
+/* RESPONSIVE */
+@media(max-width:860px){
+  .cart-layout{grid-template-columns:1fr}
+  .summary-card{position:static}
+}
+@media(max-width:500px){
+  .dash-grid{grid-template-columns:repeat(2,1fr)}
+  .cart-item{gap:0.6rem}
+  .ci-price{min-width:60px;font-size:0.78rem}
 }
 </style>
 {% endblock %}
+
 {% block content %}
-<div class="cart-page">
-  <div class="page-header">
-    <h1>Your Order</h1>
-    <p>Review • Pay • Enjoy</p>
+<div class="page-wrap" style="padding-bottom:0">
+  <h1 class="page-title">Your Cart</h1>
+  <p class="page-sub">Review your order before payment</p>
+</div>
+
+<!-- Mini Dashboard -->
+<div style="max-width:1100px;margin:0 auto;padding:0 1.25rem 1rem">
+  <div class="dash-grid">
+    <a href="/payment/" class="dash-card">
+      <div class="dash-icon" style="background:rgba(139,69,19,0.08)">💳</div>
+      <div><div class="dash-label">Payment</div><div class="dash-val">Pay Now</div></div>
+    </a>
+    <a href="/track-order/" class="dash-card" id="track-link">
+      <div class="dash-icon" style="background:rgba(27,108,168,0.08)">🔍</div>
+      <div><div class="dash-label">Track</div><div class="dash-val">Live Order</div></div>
+    </a>
+    <a href="/order-history/" class="dash-card">
+      <div class="dash-icon" style="background:rgba(45,106,79,0.08)">📋</div>
+      <div><div class="dash-label">History</div><div class="dash-val">Past Orders</div></div>
+    </a>
+    <a href="/loyalty/" class="dash-card">
+      <div class="dash-icon" style="background:rgba(201,168,76,0.12)">⭐</div>
+      <div><div class="dash-label">Rewards</div><div class="dash-val" id="dash-pts">0 pts</div></div>
+    </a>
+    <a href="/reservations/" class="dash-card">
+      <div class="dash-icon" style="background:rgba(212,160,23,0.08)">📅</div>
+      <div><div class="dash-label">Reserve</div><div class="dash-val">Book Table</div></div>
+    </a>
+    <a href="/" class="dash-card">
+      <div class="dash-icon" style="background:rgba(139,69,19,0.06)">🍽️</div>
+      <div><div class="dash-label">Menu</div><div class="dash-val">Add More</div></div>
+    </a>
   </div>
+</div>
 
-  <!-- MINI DASHBOARD -->
-  <div class="mini-dash">
-    <div class="mini-dash-title">Quick Access</div>
-    <div class="mini-dash-links">
-      <a href="/" class="dash-link">
-        <span class="dash-link-icon">🍽️</span>
-        <span class="dash-link-label">Menu</span>
-      </a>
-      <a href="/payment/" class="dash-link">
-        <span class="dash-link-icon">💳</span>
-        <span class="dash-link-label">Payment</span>
-      </a>
-      <a href="/track-order/" class="dash-link" id="track-link">
-        <span class="dash-link-icon">📍</span>
-        <span class="dash-link-label">Track</span>
-      </a>
-      <a href="/order-history/" class="dash-link">
-        <span class="dash-link-icon">📋</span>
-        <span class="dash-link-label">History</span>
-      </a>
-      <a href="/loyalty/" class="dash-link">
-        <span class="dash-link-icon">⭐</span>
-        <span class="dash-link-label">Rewards</span>
-      </a>
-      <a href="/reservations/" class="dash-link">
-        <span class="dash-link-icon">📅</span>
-        <span class="dash-link-label">Reserve</span>
-      </a>
-    </div>
-  </div>
-
-  <div id="empty-cart" class="empty-cart" style="display:none">
-    <span class="empty-icon">🛒</span>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--text-muted);margin-bottom:0.5rem">Your cart is empty</div>
-    <p style="color:var(--text-dim);margin-bottom:1.5rem">Browse our menu and add some items</p>
-    <a href="/" class="btn btn-gold">Explore Menu</a>
-  </div>
-
-  <div class="cart-layout" id="cart-layout">
-    <div>
-      <div class="cart-items-title">Selected Items</div>
-      <div id="cart-items"></div>
-    </div>
-    <div>
-      <div class="order-summary">
-        <div class="summary-title">Order Summary</div>
-        <div id="summary-rows"></div>
-        <div class="summary-divider"></div>
-
-        <!-- LOYALTY POINTS -->
-        <div class="points-section" id="points-section" style="display:none">
-          <div class="points-title">🏆 Your Loyalty Points</div>
-          <div class="points-row">
-            <span>Balance: <span class="points-balance" id="points-balance">0 pts</span></span>
-            <label class="redeem-toggle">
-              <input type="checkbox" id="redeem-check" onchange="toggleRedeem(this)"> Redeem
-            </label>
-          </div>
-          <div id="redeem-value" style="font-size:0.75rem;color:var(--success);margin-top:0.4rem;display:none"></div>
-        </div>
-
-        <!-- TIP -->
-        <div class="tip-section">
-          <div class="tip-title">Add a Tip for Your Waiter</div>
-          <div class="tip-options">
-            <button class="tip-btn" onclick="setTip(0,this)">No tip</button>
-            <button class="tip-btn" onclick="setTip(50,this)">KES 50</button>
-            <button class="tip-btn" onclick="setTip(100,this)">KES 100</button>
-            <button class="tip-btn" onclick="setTip(200,this)">KES 200</button>
-            <button class="tip-btn" onclick="setTip(-1,this)">Custom</button>
-          </div>
-          <input type="number" id="custom-tip" placeholder="Enter amount (KES)" style="margin-top:0.6rem;display:none" oninput="setCustomTip(this.value)" />
-        </div>
-
-        <div class="summary-divider"></div>
-        <div class="summary-total">
-          <span>Total</span>
-          <span class="kes" id="total-display">KES 0</span>
-        </div>
-        <div style="font-size:0.72rem;color:var(--text-dim);text-align:right;margin-top:0.25rem" id="points-earn">You'll earn 0 points</div>
-
-        <a href="/payment/" class="btn btn-gold btn-full btn-lg" style="margin-top:1.25rem" onclick="saveCartState()">
-          Proceed to Payment
-        </a>
-        <a href="/" class="btn btn-ghost btn-full btn-sm" style="margin-top:0.6rem">Continue Shopping</a>
+<div class="cart-layout">
+  <!-- Cart items -->
+  <div>
+    <div class="cart-section">
+      <div class="cart-section-header">
+        <h2>Order Items</h2>
+        <button class="btn btn-ghost btn-sm" onclick="clearCart()">Clear All</button>
       </div>
+      <div id="cart-items-list"></div>
+    </div>
+
+    <!-- Special notes -->
+    <div class="special-notes card" style="margin-top:1rem">
+      <label class="form-label">Special Requests / Allergies</label>
+      <textarea id="order-notes" rows="2" placeholder="Any dietary requirements or special requests..." style="resize:none"></textarea>
+    </div>
+
+    <!-- Phone for loyalty -->
+    <div class="card" style="margin-top:1rem">
+      <label class="form-label">Your Phone Number (for loyalty points)</label>
+      <input type="tel" id="customer-phone" placeholder="e.g. 0712 345 678" maxlength="13">
+      <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.4rem">Earn 1 point per KES spent. Points can be redeemed for discounts.</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-card">
+    <h3 style="font-size:0.9rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1rem">Order Summary</h3>
+
+    <div id="summary-lines"></div>
+
+    <!-- Points redemption -->
+    <div class="points-box" id="points-box" style="display:none">
+      <h4>⭐ Redeem Points</h4>
+      <div style="font-size:0.8rem;color:var(--text-muted)" id="pts-available">You have <strong>0</strong> points (KES 0 value)</div>
+      <div class="points-redeem-row">
+        <input type="number" id="redeem-input" placeholder="Points to use" min="0" style="padding:0.5rem 0.75rem;font-size:0.85rem">
+        <button class="btn btn-outline btn-sm" onclick="applyPoints()">Apply</button>
+      </div>
+      <div class="points-applied" id="pts-applied">✓ Points applied</div>
+    </div>
+
+    <div class="summary-row summary-total">
+      <span>Total</span>
+      <span id="summary-total">KES 0</span>
+    </div>
+
+    <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-dim);text-align:center" id="pts-earn-preview"></div>
+
+    <button class="btn btn-primary btn-full" style="margin-top:1.25rem" onclick="placeOrder()" id="place-btn">
+      Place Order
+    </button>
+    <a href="/payment/" class="btn btn-gold btn-full" style="margin-top:0.6rem" id="pay-btn" style="display:none">
+      Proceed to Payment
+    </a>
+    <div style="margin-top:0.75rem;font-size:0.73rem;color:var(--text-dim);text-align:center">
+      Orders are prepared fresh · KES prices inclusive
     </div>
   </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script>
-let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-const tableId = localStorage.getItem('tableId') || '';
-let tipAmount = 0;
-let redeemPoints = false;
-let userPoints = 0;
+let cart=JSON.parse(localStorage.getItem('cart')||'[]');
+let pointsBalance=0, pointsRedeemed=0, discount=0;
+const tableId=localStorage.getItem('tableId')||'{{ table_id }}';
+const lastOrder=localStorage.getItem('lastOrderId');
+if(lastOrder) document.getElementById('track-link').href=`/track-order/?order_id=${lastOrder}`;
 
-// Load user points from localStorage
-const savedPhone = localStorage.getItem('customerPhone');
-if(savedPhone) {
-  fetch(`${API}/customer/points?phone=${savedPhone}`)
-    .then(r => r.json())
-    .then(d => {
-      userPoints = d.points || 0;
-      if(userPoints > 0) {
-        document.getElementById('points-section').style.display = 'block';
-        document.getElementById('points-balance').textContent = userPoints + ' pts (KES ' + (userPoints*50) + ')';
-      }
-    }).catch(()=>{});
+// Load customer points
+const savedPhone=localStorage.getItem('customerPhone');
+if(savedPhone){
+  document.getElementById('customer-phone').value=savedPhone;
+  loadPoints(savedPhone);
+}
+document.getElementById('customer-phone').addEventListener('blur',e=>{
+  const p=e.target.value.trim();
+  if(p){ localStorage.setItem('customerPhone',p); loadPoints(p); }
+});
+
+async function loadPoints(phone){
+  try{
+    const r=await fetch(`${API}/customer/points?phone=${encodeURIComponent(phone)}`);
+    const d=await r.json();
+    pointsBalance=d.loyalty_points||0;
+    document.getElementById('dash-pts').textContent=`${pointsBalance} pts`;
+    if(pointsBalance>0){
+      document.getElementById('points-box').style.display='block';
+      document.getElementById('pts-available').innerHTML=`You have <strong>${pointsBalance}</strong> points (KES ${(pointsBalance*0.5).toLocaleString()} value)`;
+    }
+  }catch(e){}
 }
 
-function setTip(amount, btn) {
-  document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  const custom = document.getElementById('custom-tip');
-  if(amount === -1) { custom.style.display='block'; return; }
-  custom.style.display='none';
-  tipAmount = amount;
-  render();
-}
-function setCustomTip(v) { tipAmount = parseInt(v) || 0; render(); }
-
-function toggleRedeem(el) {
-  redeemPoints = el.checked;
-  const rdv = document.getElementById('redeem-value');
-  if(redeemPoints) {
-    rdv.style.display='block';
-    rdv.textContent = `Redeeming ${userPoints} pts = KES ${userPoints*50} discount`;
-  } else { rdv.style.display='none'; }
-  render();
+function applyPoints(){
+  const pts=parseInt(document.getElementById('redeem-input').value)||0;
+  if(pts<=0||pts>pointsBalance){showToast('Invalid points amount','error');return;}
+  pointsRedeemed=pts;
+  discount=pts*0.5;
+  document.getElementById('pts-applied').style.display='block';
+  document.getElementById('pts-applied').textContent=`✓ ${pts} points applied — KES ${discount.toLocaleString()} off`;
+  renderSummary();
+  showToast(`KES ${discount} discount applied!`,'gold');
 }
 
-function render() {
-  if(!cart.length) {
-    document.getElementById('cart-layout').style.display='none';
-    document.getElementById('empty-cart').style.display='block';
-    return;
+function renderCart(){
+  const list=document.getElementById('cart-items-list');
+  if(!cart.length){
+    list.innerHTML='<div class="cart-empty">🛒<br><br>Your cart is empty<br><a href="/" class="btn btn-primary btn-sm" style="margin-top:1rem">Browse Menu</a></div>';
+    renderSummary(); return;
   }
-  document.getElementById('cart-layout').style.display='grid';
-  document.getElementById('empty-cart').style.display='none';
-
-  document.getElementById('cart-items').innerHTML = cart.map((item,idx) => `
+  list.innerHTML=cart.map((item,i)=>`
     <div class="cart-item">
-      <div class="cart-item-info" style="flex:1">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">KES ${parseInt(item.price).toLocaleString()} each</div>
-        <textarea class="special-req" placeholder="Special request (optional)..." rows="1"
-          onchange="setSpecial(${idx},this.value)">${item.special||''}</textarea>
-      </div>
+      <div class="ci-name">${item.name}</div>
       <div class="qty-ctrl">
-        <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
-        <span class="qty-num">${item.quantity}</span>
-        <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+        <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+        <span class="qty-num">${item.quantity||1}</span>
+        <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
       </div>
-      <div class="item-total">KES ${(item.price*item.quantity).toLocaleString()}</div>
-      <button class="remove-btn" onclick="removeItem(${idx})">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-      </button>
+      <div class="ci-price">KES ${((item.price||0)*(item.quantity||1)).toLocaleString()}</div>
     </div>
   `).join('');
+  renderSummary();
+}
 
-  const subtotal = cart.reduce((s,i) => s+i.price*i.quantity, 0);
-  const discount = redeemPoints ? Math.min(userPoints*50, subtotal) : 0;
-  const total = subtotal + tipAmount - discount;
-  const pointsEarned = Math.floor(total / 100);
-
-  document.getElementById('summary-rows').innerHTML = `
+function renderSummary(){
+  const subtotal=cart.reduce((s,i)=>s+(i.price||0)*(i.quantity||1),0);
+  const total=Math.max(0,subtotal-discount);
+  const pts=Math.floor(total);
+  document.getElementById('summary-lines').innerHTML=`
     <div class="summary-row"><span>Subtotal</span><span>KES ${subtotal.toLocaleString()}</span></div>
-    <div class="summary-row"><span>Table</span><span>${tableId ? 'Table '+tableId : '—'}</span></div>
-    <div class="summary-row"><span>Tip</span><span>KES ${tipAmount.toLocaleString()}</span></div>
-    ${discount > 0 ? `<div class="summary-row" style="color:var(--success)"><span>Points Discount</span><span>-KES ${discount.toLocaleString()}</span></div>` : ''}
+    ${discount>0?`<div class="summary-row" style="color:var(--success)"><span>Points Discount</span><span>−KES ${discount.toLocaleString()}</span></div>`:''}
   `;
-  document.getElementById('total-display').textContent = 'KES ' + total.toLocaleString();
-  document.getElementById('points-earn').textContent = `You'll earn ${pointsEarned} points`;
-  updateCartCount();
+  document.getElementById('summary-total').textContent=`KES ${total.toLocaleString()}`;
+  document.getElementById('pts-earn-preview').textContent=cart.length?`You'll earn ${pts} points on this order`:'';
 }
 
-function changeQty(idx,d) { cart[idx].quantity+=d; if(cart[idx].quantity<=0) cart.splice(idx,1); save(); render(); }
-function removeItem(idx) { cart.splice(idx,1); save(); render(); }
-function setSpecial(idx,v) { cart[idx].special=v; save(); }
-function save() { localStorage.setItem('cart',JSON.stringify(cart)); }
-function saveCartState() {
-  localStorage.setItem('tipAmount', tipAmount);
-  localStorage.setItem('redeemPoints', redeemPoints);
+function changeQty(i,delta){
+  cart[i].quantity=(cart[i].quantity||1)+delta;
+  if(cart[i].quantity<=0) cart.splice(i,1);
+  saveCart();
+}
+function clearCart(){ cart=[]; saveCart(); }
+function saveCart(){ localStorage.setItem('cart',JSON.stringify(cart)); updateCartCount(); renderCart(); }
+
+async function placeOrder(){
+  if(!cart.length){showToast('Cart is empty','error');return;}
+  const btn=document.getElementById('place-btn');
+  btn.disabled=true; btn.textContent='Placing order…';
+  try{
+    const phone=document.getElementById('customer-phone').value.trim();
+    if(phone) localStorage.setItem('customerPhone',phone);
+    const r=await fetch(`${API}/order`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        tableId: tableId||null,
+        items: cart.map(i=>({id:i.id,name:i.name,price:i.price,quantity:i.quantity||1})),
+        customerPhone: phone||null,
+        pointsRedeemed: pointsRedeemed,
+        notes: document.getElementById('order-notes').value.trim()
+      })
+    });
+    const d=await r.json();
+    if(d.orderId){
+      localStorage.setItem('lastOrderId',d.orderId);
+      localStorage.setItem('lastOrderTotal', cart.reduce((s,i)=>s+(i.price||0)*(i.quantity||1),0)-discount);
+      cart=[]; saveCart();
+      if(d.waiterName) showToast(`Order placed! ${d.waiterName} will serve you 🍽️`,'gold');
+      window.location.href=`/payment/?order_id=${d.orderId}`;
+    }else{ showToast(d.message||'Error placing order','error'); btn.disabled=false; btn.textContent='Place Order'; }
+  }catch(e){ showToast('Network error. Try again.','error'); btn.disabled=false; btn.textContent='Place Order'; }
 }
 
-// Set track link
-const lastOrder = localStorage.getItem('lastOrderId');
-if(lastOrder) document.getElementById('track-link').href = '/track-order/?order_id='+lastOrder;
-
-render();
+renderCart();
 </script>
 {% endblock %}

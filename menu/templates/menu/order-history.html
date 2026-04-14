@@ -2,54 +2,69 @@
 {% block title %}Order History — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-.history-page{max-width:700px;margin:0 auto;padding:2.5rem 2rem}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:400;margin-bottom:0.25rem}
-.page-sub{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2rem}
-.phone-check{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:2rem;box-shadow:var(--shadow);display:flex;gap:0.75rem}
-.order-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:0.75rem;box-shadow:var(--shadow);transition:all 0.2s;cursor:pointer}
-.order-card:hover{border-color:var(--border-hover)}
-.oc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem}
-.oc-id{font-family:'Cormorant Garamond',serif;font-size:1.1rem}
-.oc-date{font-size:0.75rem;color:var(--text-muted)}
-.oc-items{font-size:0.82rem;color:var(--text-muted);margin-bottom:0.5rem}
-.oc-footer{display:flex;align-items:center;justify-content:space-between}
-.oc-total{font-weight:600;color:var(--primary)}
-@media(max-width:480px){.history-page{padding:1.5rem 1rem}}
+.history-wrap{max-width:700px;margin:0 auto;padding:2rem 1.25rem}
+.phone-check{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem;margin-bottom:1.5rem;box-shadow:var(--shadow);display:flex;gap:0.6rem}
+.order-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem;margin-bottom:0.75rem;box-shadow:var(--shadow);cursor:pointer;transition:all 0.2s}
+.order-card:hover{border-color:var(--border-hover);box-shadow:var(--shadow-lg)}
+.oc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;gap:0.5rem}
+.oc-id{font-weight:700;font-size:0.92rem}
+.oc-date{font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem}
+.oc-total{font-weight:700;color:var(--primary);font-size:0.95rem}
+.oc-pts{font-size:0.72rem;color:var(--success);margin-top:0.1rem;text-align:right}
+.oc-items{font-size:0.8rem;color:var(--text-muted);margin-bottom:0.4rem}
 </style>
 {% endblock %}
 {% block content %}
-<div class="history-page">
+<div class="history-wrap">
   <h1 class="page-title">Order History</h1>
-  <p class="page-sub">Your previous orders at Saveur</p>
+  <p class="page-sub">All your past orders</p>
   <div class="phone-check">
-    <input type="tel" id="hist-phone" placeholder="Enter your M-Pesa number to load history" style="flex:1" />
-    <button class="btn btn-gold" onclick="loadHistory()">Load</button>
+    <input type="tel" id="hist-phone" placeholder="Your phone number" style="flex:1">
+    <button class="btn btn-primary" onclick="loadHistory()">Load</button>
   </div>
-  <div id="history-list"><div style="text-align:center;padding:3rem;color:var(--text-muted)">Enter your phone number to view order history</div></div>
+  <div id="history-list">
+    <div style="text-align:center;padding:3rem;color:var(--text-muted);font-size:0.88rem">Enter your phone number to view order history</div>
+  </div>
 </div>
 {% endblock %}
 {% block extra_js %}
 <script>
-const saved = localStorage.getItem('customerPhone');
-if(saved){ document.getElementById('hist-phone').value=saved; loadHistory(); }
+const saved=localStorage.getItem('customerPhone');
+if(saved){document.getElementById('hist-phone').value=saved;loadHistory();}
+
 async function loadHistory(){
   const phone=document.getElementById('hist-phone').value.trim();
-  if(!phone) return;
+  if(!phone){showToast('Enter your phone number','error');return;}
   localStorage.setItem('customerPhone',phone);
   document.getElementById('history-list').innerHTML='<div style="text-align:center;padding:2rem"><div class="spinner"></div></div>';
   try{
-    const res=await fetch(`${API}/customer/orders?phone=${encodeURIComponent(phone)}`);
-    const orders=await res.json();
-    if(!orders.length){ document.getElementById('history-list').innerHTML='<div style="text-align:center;padding:3rem;color:var(--text-muted)">No orders found for this number</div>'; return; }
+    const r=await fetch(`${API}/customer/orders?phone=${encodeURIComponent(phone)}`);
+    const orders=await r.json();
+    if(!orders.length){
+      document.getElementById('history-list').innerHTML='<div style="text-align:center;padding:3rem;color:var(--text-muted)">No orders found for this number</div>';
+      return;
+    }
     document.getElementById('history-list').innerHTML=orders.map(o=>`
       <div class="order-card" onclick="window.location.href='/track-order/?order_id=${o.id}'">
-        <div class="oc-header"><div class="oc-id">Order #${o.id}</div><div class="oc-date">${new Date(o.created_at).toLocaleDateString('en-KE')}</div></div>
-        <div class="oc-items">${(o.items||[]).map(i=>i.name).join(', ')||'View details'}</div>
-        <div class="oc-footer"><span class="oc-total">KES ${Math.round(o.total_kes||o.total_amount||0).toLocaleString()}</span><span class="badge ${sb(o.status)}">${o.status}</span></div>
+        <div class="oc-top">
+          <div>
+            <div class="oc-id">Order #${o.id}</div>
+            <div class="oc-date">${new Date(o.created_at).toLocaleString('en-KE')}</div>
+          </div>
+          <div>
+            <div class="oc-total">KES ${parseFloat(o.total_kes).toLocaleString()}</div>
+            <div class="oc-pts">+${o.points_earned||0} pts earned</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+          <span class="badge ${sb(o.status)}">${o.status}</span>
+          <span class="badge ${o.payment_status==='paid'?'badge-green':'badge-yellow'}">${o.payment_status}</span>
+          ${o.tip_kes>0?`<span class="badge badge-gold">Tip: KES ${parseFloat(o.tip_kes).toLocaleString()}</span>`:''}
+        </div>
       </div>
     `).join('');
-  }catch(e){ document.getElementById('history-list').innerHTML='<div style="text-align:center;padding:2rem;color:var(--error-light)">Could not load history</div>'; }
+  }catch(e){document.getElementById('history-list').innerHTML='<div class="alert alert-error">Could not load history</div>';}
 }
-function sb(s){return{pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',served:'badge-gold',completed:'badge-earth'}[s]||'badge-yellow';}
+function sb(s){return{pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',served:'badge-gold',completed:'badge-earth'}[s]||'badge-gray';}
 </script>
 {% endblock %}
