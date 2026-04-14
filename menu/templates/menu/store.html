@@ -2,216 +2,347 @@
 {% block title %}Store Inventory — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-body{background:var(--sand-light)!important}
-.store{max-width:1300px;margin:0 auto;padding:2rem}
-.store-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
-.store-title{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text);font-weight:400}
-.inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
-.inv-section{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
-.inv-section-header{padding:1.25rem 1.5rem;border-bottom:2px solid var(--sand-dark);display:flex;align-items:center;justify-content:space-between}
-.inv-section-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--text)}
-.inv-section-sub{font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em}
-.inv-table{width:100%;border-collapse:collapse}
-.inv-table th{padding:0.75rem 1.25rem;text-align:left;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--sand-light)}
-.inv-table td{padding:0.85rem 1.25rem;font-size:0.875rem;border-bottom:1px solid var(--border)}
-.inv-table tr:last-child td{border-bottom:none}
+.s-layout{max-width:1300px;margin:0 auto;padding:1.5rem 1.25rem}
+.s-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.s-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1.5rem}
+.s-stat{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-align:center}
+.s-stat-val{font-size:1.6rem;font-weight:700;color:var(--primary)}
+.s-stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-top:0.2rem}
+.low-stock-banner{background:#FFF3CD;border:1px solid #FFC107;border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:1rem;display:none;align-items:flex-start;gap:0.75rem}
+.low-stock-banner.show{display:flex}
+/* TABS */
+.page-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.5rem;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.page-tab{padding:0.75rem 1.25rem;font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;background:none;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;font-family:'Inter',sans-serif;transition:all 0.2s}
+.page-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+/* TABLE */
+.inv-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.inv-table th{padding:0.65rem 0.85rem;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);border-bottom:2px solid var(--border);background:var(--sand-light)}
+.inv-table td{padding:0.65rem 0.85rem;border-bottom:1px solid var(--border);vertical-align:middle}
 .inv-table tr:hover td{background:var(--sand-light)}
-.stock-bar{width:80px;height:6px;background:var(--sand-dark);border-radius:3px;overflow:hidden;display:inline-block}
-.stock-fill{height:100%;border-radius:3px;transition:width 0.4s}
+.stock-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;min-width:80px}
+.stock-fill{height:100%;border-radius:3px}
 .stock-ok{background:var(--success-light)}
-.stock-med{background:var(--warning)}
-.stock-low{background:var(--error-light)}
-.qty-edit{width:70px;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.8rem;text-align:center}
-.transfer-btn{background:var(--primary);color:white;border:none;border-radius:var(--radius);padding:0.35rem 0.75rem;font-size:0.72rem;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif}
-.transfer-btn:hover{background:var(--primary-light)}
-.add-stock-btn{background:var(--gold);color:var(--dark);border:none;border-radius:var(--radius);padding:0.35rem 0.75rem;font-size:0.72rem;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600}
-.alerts-bar{background:linear-gradient(135deg,rgba(192,57,43,0.08),rgba(192,57,43,0.04));border:1px solid rgba(192,57,43,0.2);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem}
-.alerts-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#C0392B;margin-bottom:0.75rem;font-weight:600;display:flex;align-items:center;gap:0.5rem}
-.alert-pills{display:flex;flex-wrap:wrap;gap:0.5rem}
-.alert-pill{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.2);border-radius:20px;padding:0.3rem 0.75rem;font-size:0.75rem;color:#C0392B}
-.tx-log{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-top:2rem}
-.tx-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem}
-.tx-item{display:flex;align-items:center;gap:1rem;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.82rem}
-.tx-item:last-child{border-bottom:none}
-.tx-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
-.tx-in{background:rgba(45,106,79,0.1);color:var(--success)}
-.tx-out{background:rgba(192,57,43,0.1);color:var(--error-light)}
-.tx-transfer{background:rgba(27,108,168,0.1);color:var(--info)}
-
-@media(max-width:900px){.inv-grid{grid-template-columns:1fr}}
-@media(max-width:768px){.store{padding:1rem}}
+.stock-low{background:#FFC107}
+.stock-critical{background:var(--error-light)}
+/* MODAL OVERLAY */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{display:flex}
+.modal-box{background:#fff;border-radius:var(--radius-xl);padding:2rem;width:100%;max-width:440px;box-shadow:var(--shadow-lg)}
+.modal-title{font-size:1rem;font-weight:700;margin-bottom:1.25rem}
+@media(max-width:700px){.s-stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 {% endblock %}
+
 {% block content %}
-<div class="store">
-  <div class="store-header">
+<div class="s-layout">
+  <div class="s-header">
     <div>
-      <h1 class="store-title">Store & Kitchen Inventory</h1>
-      <div style="font-size:0.78rem;color:var(--text-muted)">Manage stock across both levels</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--text)">📦 Store Inventory</div>
+      <div style="font-size:0.75rem;color:var(--text-muted)" id="s-clock"></div>
     </div>
-    <div style="display:flex;gap:0.75rem">
-      <button class="btn btn-gold btn-sm" onclick="showAddModal()">+ Add Stock</button>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
-    </div>
-  </div>
-
-  <div class="alerts-bar" id="alerts-bar" style="display:none">
-    <div class="alerts-title">⚠️ Low Stock Alerts</div>
-    <div class="alert-pills" id="alert-pills"></div>
-  </div>
-
-  <div class="inv-grid">
-    <!-- STORE INVENTORY -->
-    <div class="inv-section">
-      <div class="inv-section-header">
-        <div>
-          <div class="inv-section-title">🏪 Main Store</div>
-          <div class="inv-section-sub">Warehouse / Bulk Stock</div>
-        </div>
-        <span class="badge badge-earth" id="store-count">0 items</span>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="inv-table">
-          <thead><tr><th>Item</th><th>Stock</th><th>Level</th><th>Action</th></tr></thead>
-          <tbody id="store-tbody"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-dim)">Loading...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- KITCHEN INVENTORY -->
-    <div class="inv-section">
-      <div class="inv-section-header">
-        <div>
-          <div class="inv-section-title">👨‍🍳 Kitchen</div>
-          <div class="inv-section-sub">Ready-to-use ingredients</div>
-        </div>
-        <span class="badge badge-blue" id="kitchen-count">0 items</span>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="inv-table">
-          <thead><tr><th>Item</th><th>Stock</th><th>Level</th><th>Update</th></tr></thead>
-          <tbody id="kitchen-tbody"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-dim)">Loading...</td></tr></tbody>
-        </table>
-      </div>
+    <div style="display:flex;gap:0.6rem">
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Item</button>
+      <button class="btn btn-outline btn-sm" onclick="loadAll()">🔄 Refresh</button>
+      <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
     </div>
   </div>
 
-  <!-- TRANSACTION LOG -->
-  <div class="tx-log">
-    <div class="tx-title">Recent Transactions</div>
-    <div id="tx-list"><div style="text-align:center;padding:1rem;color:var(--text-dim);font-size:0.85rem">Loading transactions...</div></div>
+  <!-- Alert -->
+  <div class="low-stock-banner" id="low-stock-banner">
+    <span style="font-size:1.2rem">⚠️</span>
+    <div><strong style="font-size:0.85rem">Low Stock Alert</strong><div id="low-stock-list" style="font-size:0.8rem;margin-top:0.2rem"></div></div>
+    <button onclick="this.parentElement.classList.remove('show')" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-muted)">×</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="s-stats">
+    <div class="s-stat"><div class="s-stat-val" id="st-total">0</div><div class="s-stat-label">Total Items</div></div>
+    <div class="s-stat"><div class="s-stat-val" id="st-low" style="color:var(--warning)">0</div><div class="s-stat-label">Low Stock</div></div>
+    <div class="s-stat"><div class="s-stat-val" id="st-critical" style="color:var(--error)">0</div><div class="s-stat-label">Critical</div></div>
+    <div class="s-stat"><div class="s-stat-val" id="st-transfers">0</div><div class="s-stat-label">Transfers Today</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="page-tabs">
+    <button class="page-tab active" onclick="switchTab('store',this)">Store Stock</button>
+    <button class="page-tab" onclick="switchTab('kitchen',this)">Kitchen Stock</button>
+    <button class="page-tab" onclick="switchTab('transfer',this)">Transfer</button>
+    <button class="page-tab" onclick="switchTab('log',this)">Transaction Log</button>
+  </div>
+
+  <!-- Store Tab -->
+  <div class="tab-panel active" id="tab-store">
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap">
+      <input type="text" id="store-search" placeholder="Search items…" style="flex:1;min-width:180px;padding:0.5rem 0.85rem" oninput="filterStore()">
+      <select id="store-cat-filter" style="padding:0.5rem 0.85rem" onchange="filterStore()">
+        <option value="">All Categories</option>
+        <option>Meat</option><option>Fish</option><option>Vegetables</option><option>Fruits</option>
+        <option>Dry Goods</option><option>Dairy</option><option>Beverages</option><option>Oils</option><option>Baking</option><option>Fuel</option>
+      </select>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="inv-table" id="store-table">
+        <thead><tr><th>Item</th><th>Category</th><th>In Store</th><th>Stock Level</th><th>Unit</th><th>Reorder At</th><th>Actions</th></tr></thead>
+        <tbody id="store-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Kitchen Tab -->
+  <div class="tab-panel" id="tab-kitchen">
+    <div style="overflow-x:auto">
+      <table class="inv-table">
+        <thead><tr><th>Item</th><th>In Kitchen</th><th>Stock Level</th><th>Unit</th><th>Reorder At</th><th>Status</th></tr></thead>
+        <tbody id="kitchen-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Transfer Tab -->
+  <div class="tab-panel" id="tab-transfer">
+    <div class="card" style="max-width:500px">
+      <h3 style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1.25rem">Transfer Store → Kitchen</h3>
+      <div class="form-group">
+        <label>Store Item</label>
+        <select id="t-store-item"><option value="">Select item</option></select>
+      </div>
+      <div class="form-group">
+        <label>Kitchen Item (destination)</label>
+        <select id="t-kitchen-item"><option value="">Select item</option></select>
+      </div>
+      <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" id="t-qty" placeholder="Amount to transfer" min="0.1" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <input type="text" id="t-notes" placeholder="Optional notes">
+      </div>
+      <button class="btn btn-primary" onclick="doTransfer()">Transfer Stock</button>
+    </div>
+    <div class="card" style="max-width:500px;margin-top:1rem">
+      <h3 style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1.25rem">Receive New Stock</h3>
+      <div class="form-group">
+        <label>Store Item</label>
+        <select id="r-store-item"><option value="">Select item</option></select>
+      </div>
+      <div class="form-group">
+        <label>Quantity Received</label>
+        <input type="number" id="r-qty" placeholder="Amount received" min="0.1" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>Notes / Supplier</label>
+        <input type="text" id="r-notes" placeholder="Optional">
+      </div>
+      <button class="btn btn-gold" onclick="receiveStock()">Record Delivery</button>
+    </div>
+  </div>
+
+  <!-- Log Tab -->
+  <div class="tab-panel" id="tab-log">
+    <div style="overflow-x:auto">
+      <table class="inv-table">
+        <thead><tr><th>Time</th><th>Item</th><th>Type</th><th>Qty</th><th>Destination</th><th>By</th><th>Notes</th></tr></thead>
+        <tbody id="log-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal-bg" id="add-modal">
+  <div class="modal-box">
+    <div class="modal-title">Add New Store Item</div>
+    <div class="form-group"><label>Item Name</label><input type="text" id="new-name" placeholder="e.g. Tomatoes"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+      <div class="form-group"><label>Quantity</label><input type="number" id="new-qty" placeholder="0" min="0" step="0.1"></div>
+      <div class="form-group"><label>Unit</label><input type="text" id="new-unit" placeholder="kg / litres / units"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+      <div class="form-group"><label>Reorder Level</label><input type="number" id="new-reorder" placeholder="10" min="0" step="0.1"></div>
+      <div class="form-group"><label>Category</label><select id="new-cat"><option>Meat</option><option>Fish</option><option>Vegetables</option><option>Fruits</option><option>Dry Goods</option><option>Dairy</option><option>Beverages</option><option>Oils</option><option>Baking</option><option>Fuel</option><option>General</option></select></div>
+    </div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.5rem">
+      <button class="btn btn-primary btn-full" onclick="addItem()">Add Item</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('add-modal').classList.remove('open')">Cancel</button>
+    </div>
   </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script>
-const token = localStorage.getItem('token');
-if(!token) window.location.href = '/login/';
-function logout() { localStorage.removeItem('token'); window.location.href='/login/'; }
+const token=localStorage.getItem('token');
+const role=localStorage.getItem('role');
+if(!token){window.location.href='/login/';}
+if(!['store','admin'].includes(role)){window.location.href='/login/';}
 
-function stockBar(qty, reorder, max=100) {
-  const pct = Math.min(100,(qty/max)*100);
-  const cls = qty <= reorder ? 'stock-low' : qty <= reorder*2 ? 'stock-med' : 'stock-ok';
-  return `<div class="stock-bar"><div class="stock-fill ${cls}" style="width:${pct}%"></div></div>`;
+let storeItems=[], kitchenItems=[], logItems=[];
+setInterval(()=>{document.getElementById('s-clock').textContent=new Date().toLocaleString('en-KE',{weekday:'short',hour:'2-digit',minute:'2-digit'});},1000);
+
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='log') loadLog();
 }
 
-async function fetchStore() {
-  try {
-    const res = await fetch(`${API}/inventory/store`,{headers:{'Authorization':'Bearer '+token}});
-    const items = await res.json();
-    document.getElementById('store-count').textContent = items.length+' items';
-    const low = items.filter(i => i.quantity <= i.reorder_level);
-    if(low.length) {
-      document.getElementById('alerts-bar').style.display='block';
-      document.getElementById('alert-pills').innerHTML = low.map(i =>
-        `<div class="alert-pill">⚠️ ${i.name}: ${i.quantity} ${i.unit}</div>`
-      ).join('');
-    }
-    document.getElementById('store-tbody').innerHTML = items.map(i => `
-      <tr>
-        <td><strong>${i.name}</strong><br><span style="font-size:0.72rem;color:var(--text-dim)">${i.category||'General'}</span></td>
-        <td>${i.quantity} ${i.unit}${i.quantity<=i.reorder_level?` <span class="badge badge-red" style="font-size:0.6rem">LOW</span>`:''}</td>
-        <td>${stockBar(i.quantity, i.reorder_level)}</td>
-        <td><button class="transfer-btn" onclick="transferToKitchen(${i.id},'${i.name}',${i.quantity})">→ Kitchen</button></td>
-      </tr>
-    `).join('');
-  } catch(e){}
+async function loadAll(){
+  const [s,k]=await Promise.all([
+    fetch(`${API}/inventory/store`,{headers:authHeader()}).then(r=>r.json()).catch(()=>[]),
+    fetch(`${API}/inventory/kitchen`,{headers:authHeader()}).then(r=>r.json()).catch(()=>[])
+  ]);
+  storeItems=Array.isArray(s)?s:[];
+  kitchenItems=Array.isArray(k)?k:[];
+  renderStore(storeItems);
+  renderKitchen(kitchenItems);
+  populateSelects();
+  // Stats
+  const low=storeItems.filter(i=>parseFloat(i.quantity)<=parseFloat(i.reorder_level)*1.5);
+  const crit=storeItems.filter(i=>parseFloat(i.quantity)<=parseFloat(i.reorder_level));
+  document.getElementById('st-total').textContent=storeItems.length;
+  document.getElementById('st-low').textContent=low.length;
+  document.getElementById('st-critical').textContent=crit.length;
+  if(crit.length||low.length){
+    document.getElementById('low-stock-banner').classList.add('show');
+    document.getElementById('low-stock-list').textContent=[...crit,...low.filter(i=>!crit.includes(i))].slice(0,5).map(i=>`${i.name} (${i.quantity} ${i.unit})`).join(' · ');
+  }
 }
 
-async function fetchKitchen() {
-  try {
-    const res = await fetch(`${API}/inventory/kitchen`,{headers:{'Authorization':'Bearer '+token}});
-    const items = await res.json();
-    document.getElementById('kitchen-count').textContent = items.length+' items';
-    document.getElementById('kitchen-tbody').innerHTML = items.map(i => `
-      <tr>
-        <td><strong>${i.name}</strong></td>
-        <td>${i.quantity} ${i.unit}${i.quantity<=i.reorder_level?` <span class="badge badge-red" style="font-size:0.6rem">LOW</span>`:''}</td>
-        <td>${stockBar(i.quantity, i.reorder_level, 50)}</td>
-        <td>
-          <input type="number" class="qty-edit" value="${i.quantity}" min="0" onchange="updateKitchen(${i.id},this.value)" />
-        </td>
-      </tr>
-    `).join('');
-  } catch(e){}
+function renderStore(items){
+  const body=document.getElementById('store-body');
+  if(!items.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">No items in store</td></tr>';return;}
+  body.innerHTML=items.map(i=>{
+    const qty=parseFloat(i.quantity);const rl=parseFloat(i.reorder_level)||10;
+    const pct=Math.min(100,Math.round((qty/(rl*3))*100));
+    const level=qty<=rl?'critical':qty<=rl*1.5?'low':'ok';
+    return`<tr>
+      <td><strong>${i.name}</strong></td>
+      <td><span class="badge badge-earth">${i.category||'General'}</span></td>
+      <td style="font-weight:600;color:${level==='critical'?'var(--error)':level==='low'?'var(--warning)':'var(--text)'}">${qty}</td>
+      <td><div class="stock-bar"><div class="stock-fill stock-${level}" style="width:${pct}%"></div></div></td>
+      <td>${i.unit}</td>
+      <td style="color:var(--text-muted)">${i.reorder_level}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="editQty(${i.id},'${i.name.replace(/'/g,"\\'")}',${qty},'store')">Edit</button>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
-async function fetchTransactions() {
-  try {
-    const res = await fetch(`${API}/inventory/transactions`,{headers:{'Authorization':'Bearer '+token}});
-    const txs = await res.json();
-    document.getElementById('tx-list').innerHTML = txs.slice(0,10).map(t => {
-      const icons = {in:'📥',out:'📤',transfer:'🔄'};
-      const cls = {in:'tx-in',out:'tx-out',transfer:'tx-transfer'};
-      return `<div class="tx-item">
-        <div class="tx-icon ${cls[t.type]||'tx-in'}">${icons[t.type]||'📦'}</div>
-        <div style="flex:1"><strong>${t.item_name}</strong> — ${t.quantity} ${t.unit}</div>
-        <div style="color:var(--text-dim);font-size:0.75rem">${new Date(t.created_at).toLocaleDateString()}</div>
-      </div>`;
-    }).join('') || '<div style="text-align:center;color:var(--text-dim);font-size:0.85rem">No transactions yet</div>';
-  } catch(e){}
+function renderKitchen(items){
+  const body=document.getElementById('kitchen-body');
+  if(!items.length){body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">No kitchen inventory</td></tr>';return;}
+  body.innerHTML=items.map(i=>{
+    const qty=parseFloat(i.quantity);const rl=parseFloat(i.reorder_level)||5;
+    const pct=Math.min(100,Math.round((qty/(rl*3))*100));
+    const level=qty<=rl?'critical':qty<=rl*1.5?'low':'ok';
+    const statusLabel={critical:'🔴 Critical',low:'🟡 Low',ok:'🟢 OK'}[level];
+    return`<tr>
+      <td><strong>${i.name}</strong></td>
+      <td style="font-weight:600;color:${level==='critical'?'var(--error)':level==='low'?'var(--warning)':'var(--text)'}">${qty}</td>
+      <td><div class="stock-bar"><div class="stock-fill stock-${level}" style="width:${pct}%"></div></div></td>
+      <td>${i.unit}</td>
+      <td style="color:var(--text-muted)">${i.reorder_level}</td>
+      <td>${statusLabel}</td>
+    </tr>`;
+  }).join('');
 }
 
-async function transferToKitchen(id, name, maxQty) {
-  const qty = prompt(`Transfer how much of "${name}" to Kitchen? (Max: ${maxQty})`);
-  if(!qty || isNaN(qty) || qty <= 0) return;
-  try {
-    await fetch(`${API}/inventory/transfer`,{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
-      body: JSON.stringify({storeItemId:id, quantity:parseFloat(qty)})
-    });
-    showToast(`Transferred ${qty} ${name} to Kitchen`,'gold');
-    fetchStore(); fetchKitchen(); fetchTransactions();
-  } catch(e){ showToast('Transfer failed','error'); }
+async function loadLog(){
+  try{
+    const r=await fetch(`${API}/inventory/transactions`,{headers:authHeader()});
+    logItems=await r.json();
+    document.getElementById('st-transfers').textContent=logItems.filter(l=>new Date(l.created_at).toDateString()===new Date().toDateString()).length;
+    const body=document.getElementById('log-body');
+    if(!logItems.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">No transactions yet</td></tr>';return;}
+    body.innerHTML=logItems.map(l=>`<tr>
+      <td style="font-size:0.78rem;color:var(--text-muted)">${new Date(l.created_at).toLocaleString('en-KE')}</td>
+      <td><strong>${l.item_name||'—'}</strong></td>
+      <td><span class="badge ${l.type==='in'?'badge-green':l.type==='transfer'?'badge-blue':'badge-red'}">${l.type}</span></td>
+      <td>${l.quantity}</td>
+      <td>${l.destination||'—'}</td>
+      <td>${l.user_name||'—'}</td>
+      <td style="font-size:0.78rem;color:var(--text-muted)">${l.notes||'—'}</td>
+    </tr>`).join('');
+  }catch(e){}
 }
 
-async function updateKitchen(id, qty) {
-  try {
-    await fetch(`${API}/inventory/kitchen/${id}`,{
-      method:'PUT',
-      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
-      body: JSON.stringify({quantity:parseFloat(qty)})
-    });
-    showToast('Kitchen stock updated','gold');
-  } catch(e){}
+function populateSelects(){
+  const si=document.getElementById('t-store-item'),ri=document.getElementById('r-store-item');
+  si.innerHTML='<option value="">Select item</option>'+storeItems.map(i=>`<option value="${i.id}">${i.name} (${i.quantity} ${i.unit})</option>`).join('');
+  ri.innerHTML=si.innerHTML;
+  document.getElementById('t-kitchen-item').innerHTML='<option value="">Select item</option>'+kitchenItems.map(i=>`<option value="${i.id}">${i.name} (${i.quantity} ${i.unit})</option>`).join('');
 }
 
-function showAddModal() {
-  const name = prompt('Item name:');
-  if(!name) return;
-  const qty = prompt('Initial quantity:');
-  const unit = prompt('Unit (kg, litres, units):') || 'units';
-  if(!qty) return;
-  fetch(`${API}/inventory/store`,{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
-    body: JSON.stringify({name, quantity:parseFloat(qty), unit})
-  }).then(()=>{ showToast('Item added to store','gold'); fetchStore(); });
+function filterStore(){
+  const q=document.getElementById('store-search').value.toLowerCase();
+  const cat=document.getElementById('store-cat-filter').value;
+  renderStore(storeItems.filter(i=>{
+    const matchQ=i.name.toLowerCase().includes(q);
+    const matchC=!cat||i.category===cat;
+    return matchQ&&matchC;
+  }));
 }
 
-fetchStore(); fetchKitchen(); fetchTransactions();
-setInterval(fetchStore, 30000);
-setInterval(fetchKitchen, 30000);
+async function doTransfer(){
+  const si=document.getElementById('t-store-item').value;
+  const ki=document.getElementById('t-kitchen-item').value;
+  const qty=parseFloat(document.getElementById('t-qty').value);
+  const notes=document.getElementById('t-notes').value;
+  if(!si||!ki||!qty){showToast('Fill in all transfer fields','error');return;}
+  try{
+    const r=await fetch(`${API}/inventory/transfer`,{method:'POST',headers:authHeader(),body:JSON.stringify({storeItemId:si,kitchenItemId:ki,quantity:qty,notes})});
+    const d=await r.json();
+    if(r.ok){showToast('Transfer complete ✓','gold');loadAll();}
+    else showToast(d.message||'Transfer failed','error');
+  }catch(e){showToast('Network error','error');}
+}
+
+async function receiveStock(){
+  const si=document.getElementById('r-store-item').value;
+  const qty=parseFloat(document.getElementById('r-qty').value);
+  const notes=document.getElementById('r-notes').value;
+  if(!si||!qty){showToast('Fill in all fields','error');return;}
+  try{
+    const r=await fetch(`${API}/inventory/receive`,{method:'POST',headers:authHeader(),body:JSON.stringify({storeItemId:si,quantity:qty,notes})});
+    if(r.ok){showToast('Stock received ✓','gold');loadAll();}
+    else showToast('Failed','error');
+  }catch(e){showToast('Network error','error');}
+}
+
+function openAddModal(){document.getElementById('add-modal').classList.add('open');}
+
+async function addItem(){
+  const name=document.getElementById('new-name').value.trim();
+  const qty=parseFloat(document.getElementById('new-qty').value)||0;
+  const unit=document.getElementById('new-unit').value.trim()||'units';
+  const reorder=parseFloat(document.getElementById('new-reorder').value)||10;
+  const category=document.getElementById('new-cat').value;
+  if(!name){showToast('Item name required','error');return;}
+  try{
+    const r=await fetch(`${API}/inventory/store`,{method:'POST',headers:authHeader(),body:JSON.stringify({name,quantity:qty,unit,reorder_level:reorder,category})});
+    if(r.ok){showToast(`${name} added ✓`,'gold');document.getElementById('add-modal').classList.remove('open');loadAll();}
+    else showToast('Failed to add item','error');
+  }catch(e){showToast('Network error','error');}
+}
+
+function editQty(id, name, current, level){
+  const newQty=prompt(`Update quantity for ${name} (current: ${current}):`, current);
+  if(newQty===null||newQty==='') return;
+  const qty=parseFloat(newQty);
+  if(isNaN(qty)){showToast('Invalid quantity','error');return;}
+  fetch(`${API}/inventory/store/${id}`,{method:'PUT',headers:authHeader(),body:JSON.stringify({quantity:qty,name,unit:storeItems.find(i=>i.id===id)?.unit||'units',reorder_level:storeItems.find(i=>i.id===id)?.reorder_level||10,category:storeItems.find(i=>i.id===id)?.category||'General'})})
+    .then(r=>{if(r.ok){showToast('Updated ✓','gold');loadAll();}else showToast('Failed','error');});
+}
+
+if(window._socket){
+  window._socket.on('lowStock',items=>{if(items&&items.length){document.getElementById('low-stock-banner').classList.add('show');document.getElementById('low-stock-list').textContent=items.filter(i=>i.level==='store').map(i=>`${i.name} (${i.quantity} ${i.unit})`).join(' · ');}});
+}
+
+loadAll();
 </script>
 {% endblock %}

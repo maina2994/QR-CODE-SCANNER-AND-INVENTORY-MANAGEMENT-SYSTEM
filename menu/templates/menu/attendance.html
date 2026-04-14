@@ -1,104 +1,48 @@
 {% extends 'menu/base.html' %}
 {% block title %}Attendance — Saveur{% endblock %}
-{% block extra_css %}
-<style>
-body{background:var(--warm-white)!important}
-.att-page{max-width:900px;margin:0 auto;padding:2.5rem 2rem}
-.att-title{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text);margin-bottom:2rem}
-.checkin-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:2rem;box-shadow:var(--shadow);text-align:center}
-.time-display{font-family:'Cormorant Garamond',serif;font-size:3.5rem;color:var(--primary);line-height:1;margin-bottom:0.25rem}
-.date-display{font-size:0.82rem;color:var(--text-muted);margin-bottom:1.5rem}
-.checkin-status{display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.5rem;border-radius:20px;font-size:0.82rem;font-weight:600;margin-bottom:1.5rem}
-.status-in{background:rgba(45,106,79,0.1);color:var(--success);border:1px solid rgba(82,183,136,0.3)}
-.status-out{background:rgba(192,57,43,0.1);color:var(--error-light);border:1px solid rgba(192,57,43,0.2)}
-.att-table{width:100%;border-collapse:collapse;background:white;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
-.att-table th{padding:0.85rem 1.25rem;text-align:left;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);background:var(--sand-light);border-bottom:1px solid var(--border)}
-.att-table td{padding:0.85rem 1.25rem;font-size:0.875rem;border-bottom:1px solid var(--border)}
-.att-table tr:last-child td{border-bottom:none}
-.section-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;font-weight:600}
-@media(max-width:600px){.att-page{padding:1.5rem 1rem}.time-display{font-size:2.5rem}}
-</style>
-{% endblock %}
 {% block content %}
-<div class="att-page">
-  <h1 class="att-title">Attendance</h1>
-
-  <div class="checkin-card">
-    <div class="time-display" id="clock">00:00:00</div>
-    <div class="date-display" id="att-date"></div>
-    <div class="checkin-status" id="checkin-status" style="display:none"></div>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-gold btn-lg" onclick="checkIn()">✓ Check In</button>
-      <button class="btn btn-ghost btn-lg" onclick="checkOut()">✗ Check Out</button>
+<div class="page-wrap" style="max-width:700px">
+  <h1 class="page-title">⏰ Attendance</h1>
+  <p class="page-sub">Mark your attendance for today</p>
+  <div id="att-status" style="margin-bottom:1.5rem"></div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <button class="btn btn-primary btn-lg" style="flex:1" onclick="checkIn()">✅ Check In</button>
+      <button class="btn btn-outline btn-lg" style="flex:1" onclick="checkOut()">⏏ Check Out</button>
     </div>
+    <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.75rem;text-align:center" id="att-time"></div>
   </div>
-
-  <div class="section-title">My Attendance This Month</div>
-  <table class="att-table">
-    <thead><tr><th>Date</th><th>Check In</th><th>Check Out</th><th>Hours</th><th>Status</th></tr></thead>
-    <tbody id="att-tbody"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-dim)">Loading...</td></tr></tbody>
-  </table>
+  <div class="card">
+    <h3 style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1rem">My Attendance Record</h3>
+    <div id="att-list"><div class="spinner"></div></div>
+  </div>
 </div>
 {% endblock %}
 {% block extra_js %}
 <script>
-const token = localStorage.getItem('token');
-if(!token) window.location.href = '/login/';
-
-function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent = now.toLocaleTimeString('en-KE');
-  document.getElementById('att-date').textContent = now.toLocaleDateString('en-KE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+const token=localStorage.getItem('token');
+if(!token){window.location.href='/login/';}
+setInterval(()=>{document.getElementById('att-time').textContent=new Date().toLocaleString('en-KE',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});},1000);
+async function checkIn(){
+  try{const r=await fetch(`${API}/attendance/checkin`,{method:'POST',headers:authHeader()});const d=await r.json();showToast(d.message,'gold');loadAtt();}
+  catch(e){showToast('Check-in failed','error');}
 }
-setInterval(updateClock,1000); updateClock();
-
-async function checkIn() {
-  try {
-    const res = await fetch(`${API}/attendance/checkin`,{method:'POST',headers:{'Authorization':'Bearer '+token}});
-    const d = await res.json();
-    showStatus('Checked In at '+new Date().toLocaleTimeString(),'in');
-    showToast('Check-in recorded!','gold');
-    loadHistory();
-  } catch(e){ showToast('Could not record check-in','error'); }
+async function checkOut(){
+  try{const r=await fetch(`${API}/attendance/checkout`,{method:'POST',headers:authHeader()});const d=await r.json();showToast(d.message,'gold');loadAtt();}
+  catch(e){showToast('Check-out failed','error');}
 }
-
-async function checkOut() {
-  try {
-    const res = await fetch(`${API}/attendance/checkout`,{method:'POST',headers:{'Authorization':'Bearer '+token}});
-    showStatus('Checked Out at '+new Date().toLocaleTimeString(),'out');
-    showToast('Check-out recorded!','gold');
-    loadHistory();
-  } catch(e){ showToast('Could not record check-out','error'); }
+async function loadAtt(){
+  try{
+    const r=await fetch(`${API}/attendance/my`,{headers:authHeader()});
+    const rows=await r.json();
+    if(!rows.length){document.getElementById('att-list').innerHTML='<div style="color:var(--text-muted);font-size:0.85rem">No records yet</div>';return;}
+    const today=rows[0];
+    const cin=today.check_in?new Date(today.check_in).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'}):'—';
+    const cout=today.check_out?new Date(today.check_out).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'}):'—';
+    document.getElementById('att-status').innerHTML=`<div class="alert alert-success">Today: Checked in ${cin}${today.check_out?' · Checked out '+cout:' · Still on shift'}</div>`;
+    document.getElementById('att-list').innerHTML=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr>${['Date','In','Out','Hours','Status'].map(h=>`<th style="padding:0.5rem;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);border-bottom:1px solid var(--border)">${h}</th>`).join('')}</tr></thead><tbody>${rows.map(a=>{const hrs=a.check_in&&a.check_out?((new Date(a.check_out)-new Date(a.check_in))/3600000).toFixed(1)+'h':'—';return`<tr><td style="padding:0.5rem;border-bottom:1px solid var(--border)">${a.date}</td><td style="padding:0.5rem;border-bottom:1px solid var(--border)">${a.check_in?new Date(a.check_in).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'}):'—'}</td><td style="padding:0.5rem;border-bottom:1px solid var(--border)">${a.check_out?new Date(a.check_out).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'}):'—'}</td><td style="padding:0.5rem;border-bottom:1px solid var(--border)">${hrs}</td><td style="padding:0.5rem;border-bottom:1px solid var(--border)"><span class="badge badge-green">${a.status}</span></td></tr>`;}).join('')}</tbody></table></div>`;
+  }catch(e){}
 }
-
-function showStatus(msg, type) {
-  const el = document.getElementById('checkin-status');
-  el.className = 'checkin-status status-'+type;
-  el.innerHTML = (type==='in'?'✓ ':'✗ ')+msg;
-  el.style.display='inline-flex';
-}
-
-async function loadHistory() {
-  try {
-    const res = await fetch(`${API}/attendance/my`,{headers:{'Authorization':'Bearer '+token}});
-    const records = await res.json();
-    document.getElementById('att-tbody').innerHTML = records.map(r => {
-      const cin = r.check_in ? new Date(r.check_in).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'}) : '—';
-      const cout = r.check_out ? new Date(r.check_out).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'}) : '—';
-      let hours = '—';
-      if(r.check_in && r.check_out) {
-        const h = (new Date(r.check_out) - new Date(r.check_in)) / 3600000;
-        hours = h.toFixed(1)+'h';
-      }
-      return `<tr>
-        <td>${new Date(r.date).toLocaleDateString('en-KE',{weekday:'short',month:'short',day:'numeric'})}</td>
-        <td>${cin}</td><td>${cout}</td><td>${hours}</td>
-        <td><span class="badge ${r.status==='present'?'badge-green':'badge-red'}">${r.status}</span></td>
-      </tr>`;
-    }).join('') || '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-dim)">No records found</td></tr>';
-  } catch(e){}
-}
-
-loadHistory();
+loadAtt();
 </script>
 {% endblock %}

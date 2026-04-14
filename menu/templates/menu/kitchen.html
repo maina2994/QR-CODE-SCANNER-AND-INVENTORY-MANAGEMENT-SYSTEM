@@ -2,185 +2,239 @@
 {% block title %}Kitchen Dashboard — Saveur{% endblock %}
 {% block extra_css %}
 <style>
-body{background:var(--dark)!important}
-.kitchen{max-width:1400px;margin:0 auto;padding:1.5rem}
-.kitchen-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
-.kitchen-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);font-weight:400}
-.kitchen-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
-.kstat{background:var(--dark2);border:1px solid rgba(201,168,76,0.15);border-radius:var(--radius-lg);padding:1.1rem;text-align:center}
-.kstat-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--sand);line-height:1}
-.kstat-label{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);margin-top:0.3rem}
-.orders-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-.order-ticket{background:var(--dark2);border:1px solid rgba(201,168,76,0.15);border-radius:var(--radius-lg);overflow:hidden;transition:all 0.3s}
-.ticket-header{padding:0.9rem 1.1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.1)}
-.ticket-id{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--sand)}
-.ticket-table{font-size:0.75rem;color:var(--text-dim)}
-.ticket-time{font-size:0.72rem;color:var(--text-dim)}
-.ticket-body{padding:1rem 1.1rem}
-.ticket-items{margin-bottom:1rem}
-.ticket-item{display:flex;align-items:flex-start;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid rgba(201,168,76,0.08)}
-.ticket-item:last-child{border-bottom:none}
-.ticket-qty{background:var(--primary);color:white;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0}
-.ticket-meal{font-size:0.88rem;color:var(--sand);font-weight:500}
-.ticket-special{font-size:0.72rem;color:var(--gold-dark);font-style:italic;margin-top:0.2rem}
-.ticket-actions{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
-.tick-btn{padding:0.55rem;border:none;border-radius:var(--radius);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:0.06em;font-family:'Inter',sans-serif}
-.tick-btn-start{background:rgba(27,108,168,0.2);color:#60a5fa;border:1px solid rgba(96,165,250,0.3)}
-.tick-btn-start:hover{background:rgba(27,108,168,0.4)}
-.tick-btn-done{background:rgba(45,106,79,0.2);color:var(--success-light);border:1px solid rgba(82,183,136,0.3)}
-.tick-btn-done:hover{background:rgba(45,106,79,0.4)}
-.status-bar{height:3px;margin-bottom:0}
-.status-pending{background:var(--gold-dark)}
-.status-preparing{background:#60a5fa;animation:pulse-bar 1s infinite}
-.status-ready{background:var(--success-light)}
-@keyframes pulse-bar{0%,100%{opacity:1}50%{opacity:0.5}}
-.new-badge{animation:new-in 0.4s ease}
-@keyframes new-in{from{transform:scale(1.03);border-color:var(--gold)}to{transform:scale(1);}}
-
-/* INVENTORY ALERTS */
-.alerts-panel{background:var(--dark2);border:1px solid rgba(192,57,43,0.3);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem}
-.alerts-title{font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--terracotta-light);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
-.alert-dot{width:8px;height:8px;border-radius:50%;background:var(--terracotta);animation:pulse-dot 1s infinite}
-@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.3}}
-.alert-item{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid rgba(201,168,76,0.08);font-size:0.82rem}
-.alert-item:last-child{border-bottom:none}
-.alert-name{color:var(--sand)}
-.alert-qty{color:var(--terracotta-light);font-weight:600}
-.no-orders{text-align:center;padding:3rem;color:var(--text-dim);grid-column:1/-1}
-.kitchen-section-title{font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--success-light);animation:pulse-dot 1.5s infinite}
-
-@media(max-width:768px){
-  .kitchen-stats{grid-template-columns:repeat(2,1fr)}
-  .orders-board{grid-template-columns:1fr}
-  .kitchen{padding:1rem}
+.k-layout{max-width:1300px;margin:0 auto;padding:1.5rem 1.25rem}
+.k-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.k-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--text)}
+.k-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1.5rem}
+.k-stat{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-align:center}
+.k-stat-val{font-size:1.6rem;font-weight:700;color:var(--primary)}
+.k-stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-top:0.2rem}
+/* ALERT BANNER */
+.low-stock-banner{background:#FFF3CD;border:1px solid #FFC107;border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:1rem;display:none;align-items:flex-start;gap:0.75rem}
+.low-stock-banner.show{display:flex}
+/* ORDERS GRID */
+.orders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:2rem}
+.order-ticket{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);transition:all 0.2s}
+.order-ticket.urgent{border-left:4px solid var(--terracotta);animation:urgentPulse 2s ease-in-out infinite}
+@keyframes urgentPulse{0%,100%{box-shadow:var(--shadow)}50%{box-shadow:0 0 0 3px rgba(193,68,14,0.15),var(--shadow)}}
+.ticket-header{padding:0.85rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.ticket-table{font-weight:700;font-size:1rem;color:var(--text)}
+.ticket-time{font-size:0.75rem;color:var(--text-muted)}
+.ticket-items{padding:0.75rem 1rem}
+.ticket-item{display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0;border-bottom:1px solid var(--border);font-size:0.85rem}
+.ticket-item:last-child{border:none}
+.ti-qty{background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0}
+.ti-cat{font-size:0.68rem;color:var(--text-dim);margin-left:auto;padding:0.15rem 0.4rem;background:var(--sand-light);border-radius:4px}
+.ticket-actions{padding:0.75rem 1rem;display:flex;gap:0.5rem;background:var(--sand-light)}
+/* INVENTORY TABLE */
+.inv-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.inv-table th{padding:0.65rem 0.85rem;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);border-bottom:2px solid var(--border);background:var(--sand-light)}
+.inv-table td{padding:0.65rem 0.85rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.inv-table tr:hover td{background:var(--sand-light)}
+.stock-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden}
+.stock-fill{height:100%;border-radius:3px;transition:width 0.3s}
+.stock-ok{background:var(--success-light)}
+.stock-low{background:var(--warning)}
+.stock-critical{background:var(--error-light)}
+.inv-tabs{display:flex;gap:0.5rem;margin-bottom:1rem}
+.inv-tab{padding:0.45rem 1rem;border:1.5px solid var(--border);border-radius:20px;font-size:0.78rem;cursor:pointer;background:#fff;transition:all 0.15s;font-family:'Inter',sans-serif}
+.inv-tab.active{border-color:var(--primary);background:rgba(139,69,19,0.06);color:var(--primary);font-weight:600}
+@media(max-width:700px){
+  .k-stats{grid-template-columns:repeat(2,1fr)}
+  .orders-grid{grid-template-columns:1fr}
 }
 </style>
 {% endblock %}
+
 {% block content %}
-<div class="kitchen">
-  <div class="kitchen-header">
+<div class="k-layout">
+  <div class="k-header">
     <div>
-      <div class="kitchen-title">Kitchen Dashboard</div>
-      <div style="font-size:0.75rem;color:var(--text-dim)" id="ktime"></div>
+      <div class="k-title">👨‍🍳 Kitchen Dashboard</div>
+      <div style="font-size:0.75rem;color:var(--text-muted)" id="k-clock"></div>
     </div>
-    <div style="display:flex;gap:0.75rem;align-items:center">
-      <span class="badge badge-green" id="conn-status">Live</span>
-      <button class="btn btn-ghost btn-sm" onclick="logout()" style="color:var(--sand)">Logout</button>
+    <div style="display:flex;gap:0.6rem;align-items:center">
+      <span class="badge badge-green" id="k-online-dot">● Live</span>
+      <button class="btn btn-outline btn-sm" onclick="loadAll()">🔄 Refresh</button>
+      <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
     </div>
   </div>
 
-  <div class="kitchen-stats">
-    <div class="kstat"><div class="kstat-num" id="k-pending">0</div><div class="kstat-label">Pending</div></div>
-    <div class="kstat"><div class="kstat-num" id="k-preparing">0</div><div class="kstat-label">Preparing</div></div>
-    <div class="kstat"><div class="kstat-num" id="k-ready">0</div><div class="kstat-label">Ready</div></div>
-    <div class="kstat"><div class="kstat-num" id="k-done">0</div><div class="kstat-label">Done Today</div></div>
+  <!-- Low stock alert -->
+  <div class="low-stock-banner" id="low-stock-banner">
+    <span style="font-size:1.2rem">⚠️</span>
+    <div>
+      <strong style="font-size:0.85rem">Low Stock Alert</strong>
+      <div id="low-stock-items" style="font-size:0.8rem;margin-top:0.2rem"></div>
+    </div>
+    <button onclick="this.parentElement.classList.remove('show')" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-muted)">×</button>
   </div>
 
-  <div class="alerts-panel" id="alerts-panel" style="display:none">
-    <div class="alerts-title"><div class="alert-dot"></div>Low Kitchen Stock Alerts</div>
-    <div id="alerts-list"></div>
+  <!-- Stats -->
+  <div class="k-stats">
+    <div class="k-stat"><div class="k-stat-val" id="stat-pending">0</div><div class="k-stat-label">Pending</div></div>
+    <div class="k-stat"><div class="k-stat-val" id="stat-preparing">0</div><div class="k-stat-label">Preparing</div></div>
+    <div class="k-stat"><div class="k-stat-val" id="stat-ready">0</div><div class="k-stat-label">Ready</div></div>
+    <div class="k-stat"><div class="k-stat-val" id="stat-done">0</div><div class="k-stat-label">Done Today</div></div>
   </div>
 
-  <div class="kitchen-section-title"><div class="live-dot"></div>Active Orders</div>
-  <div class="orders-board" id="orders-board">
-    <div class="no-orders">Loading orders...</div>
+  <!-- Active Orders -->
+  <h3 style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.75rem">Active Orders</h3>
+  <div class="orders-grid" id="orders-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Kitchen Inventory -->
+  <div class="card" style="margin-top:1rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem">
+      <h3 style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Kitchen Inventory</h3>
+      <div class="inv-tabs">
+        <button class="inv-tab active" onclick="filterInv('all',this)">All</button>
+        <button class="inv-tab" onclick="filterInv('low',this)">⚠️ Low Stock</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="inv-table" id="inv-table">
+        <thead><tr><th>Item</th><th>In Kitchen</th><th>Stock Level</th><th>Unit</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="inv-body"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-const token = localStorage.getItem('token');
-if(!token) window.location.href = '/login/';
-let orders = [];
+const token=localStorage.getItem('token');
+const role=localStorage.getItem('role');
+if(!token){window.location.href='/login/';}
+if(!['kitchen','admin'].includes(role)){window.location.href='/login/';}
 
-function logout() { localStorage.removeItem('token'); window.location.href = '/login/'; }
-function updateTime() { document.getElementById('ktime').textContent = new Date().toLocaleString('en-KE',{weekday:'long',hour:'2-digit',minute:'2-digit'}); }
-setInterval(updateTime,1000); updateTime();
+let allInv=[], allOrders=[];
 
-async function fetchOrders() {
-  try {
-    const res = await fetch(`${API}/orders`, {headers:{'Authorization':'Bearer '+token}});
-    if(res.status===401){logout();return;}
-    orders = await res.json();
-    renderOrders(); updateStats();
-  } catch(e){}
+// Clock
+setInterval(()=>{
+  document.getElementById('k-clock').textContent=new Date().toLocaleString('en-KE',{weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+},1000);
+
+async function loadAll(){
+  await Promise.all([loadOrders(), loadInventory()]);
 }
 
-async function fetchKitchenInventory() {
-  try {
-    const res = await fetch(`${API}/inventory/kitchen`, {headers:{'Authorization':'Bearer '+token}});
-    const items = await res.json();
-    const low = items.filter(i => i.quantity <= i.reorder_level);
-    const panel = document.getElementById('alerts-panel');
-    if(low.length) {
-      panel.style.display='block';
-      document.getElementById('alerts-list').innerHTML = low.map(i =>
-        `<div class="alert-item"><span class="alert-name">${i.name}</span><span class="alert-qty">${i.quantity} ${i.unit} left</span></div>`
-      ).join('');
-    } else { panel.style.display='none'; }
-  } catch(e){}
+async function loadOrders(){
+  try{
+    const r=await fetch(`${API}/orders`,{headers:authHeader()});
+    allOrders=await r.json();
+    const active=allOrders.filter(o=>!['completed','served'].includes(o.status));
+    renderOrders(active);
+    document.getElementById('stat-pending').textContent=allOrders.filter(o=>o.status==='pending').length;
+    document.getElementById('stat-preparing').textContent=allOrders.filter(o=>o.status==='preparing').length;
+    document.getElementById('stat-ready').textContent=allOrders.filter(o=>o.status==='ready').length;
+    document.getElementById('stat-done').textContent=allOrders.filter(o=>['served','completed'].includes(o.status)).length;
+  }catch(e){console.error(e);}
 }
 
-function renderOrders() {
-  const active = orders.filter(o => o.status !== 'completed' && o.status !== 'served');
-  const board = document.getElementById('orders-board');
-  if(!active.length) { board.innerHTML='<div class="no-orders">🍽️ No active orders</div>'; return; }
-  board.innerHTML = active.map(o => {
-    const items = o.items || [];
-    const elapsed = Math.floor((Date.now() - new Date(o.created_at)) / 60000);
-    return `
-    <div class="order-ticket new-badge" id="ot-${o.id}">
-      <div class="status-bar status-${o.status}"></div>
+async function loadInventory(){
+  try{
+    const r=await fetch(`${API}/inventory/kitchen`,{headers:authHeader()});
+    allInv=await r.json();
+    renderInventory(allInv);
+    const low=allInv.filter(i=>parseFloat(i.quantity)<=parseFloat(i.reorder_level)*1.5);
+    if(low.length){
+      document.getElementById('low-stock-banner').classList.add('show');
+      document.getElementById('low-stock-items').textContent=low.map(i=>`${i.name} (${i.quantity} ${i.unit} left)`).join(' · ');
+    }
+  }catch(e){}
+}
+
+function renderOrders(orders){
+  const grid=document.getElementById('orders-grid');
+  if(!orders.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)">🎉 No active orders right now</div>';return;}
+  grid.innerHTML=orders.map(o=>{
+    const age=Math.floor((Date.now()-new Date(o.created_at))/60000);
+    const urgent=age>20&&o.status!=='ready';
+    const items=Array.isArray(o.items)?o.items:[];
+    return`<div class="order-ticket ${urgent?'urgent':''}" id="ticket-${o.id}">
       <div class="ticket-header">
-        <div><div class="ticket-id">Order #${o.id}</div><div class="ticket-table">Table ${o.table_number||o.table_id}</div></div>
-        <div style="text-align:right"><span class="badge ${sb(o.status)}">${o.status}</span><div class="ticket-time">${elapsed}m ago</div></div>
+        <div>
+          <div class="ticket-table">Table ${o.table_number||'—'} · #${o.id}</div>
+          ${o.waiter_name?`<div style="font-size:0.72rem;color:var(--text-muted)">Waiter: ${o.waiter_name}</div>`:''}
+        </div>
+        <div style="text-align:right">
+          <span class="badge ${statusBadge(o.status)}">${o.status}</span>
+          <div class="ticket-time">${age}m ago</div>
+        </div>
       </div>
-      <div class="ticket-body">
-        <div class="ticket-items">
-          ${items.map(i=>`
-            <div class="ticket-item">
-              <div class="ticket-qty">${i.quantity}</div>
-              <div><div class="ticket-meal">${i.name}</div>${i.special_request?`<div class="ticket-special">⚠️ ${i.special_request}</div>`:''}</div>
-            </div>
-          `).join('')}
-          ${!items.length?'<div style="color:var(--text-dim);font-size:0.8rem">Loading items...</div>':''}
-        </div>
-        <div class="ticket-actions">
-          ${o.status==='pending'?`<button class="tick-btn tick-btn-start" onclick="updateStatus(${o.id},'preparing')">Start Cooking</button>`:'<div></div>'}
-          ${o.status==='preparing'?`<button class="tick-btn tick-btn-done" onclick="updateStatus(${o.id},'ready')" style="grid-column:1/-1">Mark Ready ✓</button>`:''}
-          ${o.status==='pending'?`<button class="tick-btn" style="background:rgba(212,160,23,0.15);color:var(--warning);border:1px solid rgba(212,160,23,0.3)" onclick="updateStatus(${o.id},'ready')">Skip → Ready</button>`:''}
-        </div>
+      <div class="ticket-items">
+        ${items.length?items.map(i=>`
+          <div class="ticket-item">
+            <span class="ti-qty">${i.quantity}</span>
+            <span style="font-weight:500">${i.name}</span>
+            ${i.category?`<span class="ti-cat">${i.category}</span>`:''}
+          </div>
+        `).join(''):'<div style="color:var(--text-muted);font-size:0.82rem;padding:0.5rem 0">Loading items…</div>'}
+      </div>
+      <div class="ticket-actions">
+        ${o.status==='pending'?`<button class="btn btn-primary btn-sm" onclick="updateStatus(${o.id},'preparing')">▶ Start Cooking</button>`:''}
+        ${o.status==='preparing'?`<button class="btn btn-gold btn-sm" onclick="updateStatus(${o.id},'ready')">✓ Mark Ready</button>`:''}
+        ${o.status==='ready'?`<span class="badge badge-green" style="padding:0.4rem 0.75rem">Waiting for waiter</span>`:''}
       </div>
     </div>`;
   }).join('');
 }
 
-function sb(s){return{pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',served:'badge-gold',completed:'badge-earth'}[s]||'badge-yellow';}
-
-function updateStats() {
-  document.getElementById('k-pending').textContent=orders.filter(o=>o.status==='pending').length;
-  document.getElementById('k-preparing').textContent=orders.filter(o=>o.status==='preparing').length;
-  document.getElementById('k-ready').textContent=orders.filter(o=>o.status==='ready').length;
-  document.getElementById('k-done').textContent=orders.filter(o=>o.status==='completed').length;
+async function updateStatus(id, status){
+  try{
+    await fetch(`${API}/orders/${id}/status`,{method:'PUT',headers:authHeader(),body:JSON.stringify({status})});
+    showToast(`Order #${id} → ${status}`,'gold');
+    loadOrders();
+  }catch(e){showToast('Update failed','error');}
 }
 
-async function updateStatus(id, status) {
-  try {
-    await fetch(`${API}/orders/${id}/status`,{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({status})});
-    fetchOrders();
-  } catch(e){}
+function renderInventory(items){
+  const body=document.getElementById('inv-body');
+  if(!items.length){body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">No inventory data</td></tr>';return;}
+  body.innerHTML=items.map(i=>{
+    const qty=parseFloat(i.quantity);
+    const rl=parseFloat(i.reorder_level)||5;
+    const pct=Math.min(100,Math.round((qty/(rl*3))*100));
+    const level=qty<=rl?'critical':qty<=rl*1.5?'low':'ok';
+    const statusLabel={critical:'🔴 Critical',low:'🟡 Low',ok:'🟢 OK'}[level];
+    return`<tr>
+      <td><strong>${i.name}</strong>${i.store_name?`<div style="font-size:0.72rem;color:var(--text-dim)">From: ${i.store_name}</div>`:''}
+      </td>
+      <td style="font-weight:600;color:${level==='critical'?'var(--error)':level==='low'?'var(--warning)':'var(--text)'}">${qty}</td>
+      <td style="min-width:100px"><div class="stock-bar"><div class="stock-fill stock-${level}" style="width:${pct}%"></div></div></td>
+      <td>${i.unit}</td>
+      <td>${statusLabel}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="requestTransfer(${i.id},'${i.name.replace(/'/g,"\\'")}')">Request Restock</button>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
-const socket = io(API,{transports:['websocket','polling']});
-socket.on('connect',()=>{ document.getElementById('conn-status').textContent='Live'; document.getElementById('conn-status').className='badge badge-green'; });
-socket.on('disconnect',()=>{ document.getElementById('conn-status').textContent='Offline'; document.getElementById('conn-status').className='badge badge-red'; });
-socket.on('newOrder',()=>{ showToast('New order received!','gold'); fetchOrders(); });
-socket.on('orderStatusUpdate',()=>fetchOrders());
+function filterInv(type, btn){
+  document.querySelectorAll('.inv-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered=type==='low'?allInv.filter(i=>parseFloat(i.quantity)<=parseFloat(i.reorder_level)*1.5):allInv;
+  renderInventory(filtered);
+}
 
-fetchOrders(); fetchKitchenInventory();
-setInterval(fetchOrders,20000);
-setInterval(fetchKitchenInventory,60000);
+function requestTransfer(id, name){
+  showToast(`Restock request sent for ${name}`,'gold');
+}
+
+function statusBadge(s){return{pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',served:'badge-gold',completed:'badge-earth'}[s]||'badge-gray';}
+
+// Socket live updates
+if(window._socket){
+  window._socket.on('newOrder', d=>{ showToast(`New order! Table ${d.tableId||'?'}`)
+; loadOrders(); });
+  window._socket.on('lowStock', items=>{ if(items&&items.length){ document.getElementById('low-stock-banner').classList.add('show'); document.getElementById('low-stock-items').textContent=items.map(i=>`${i.name} (${i.quantity} ${i.unit})`).join(' · '); }});
+}
+
+loadAll();
+setInterval(loadOrders, 30000);
 </script>
 {% endblock %}

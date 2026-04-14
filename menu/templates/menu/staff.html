@@ -1,195 +1,63 @@
 {% extends 'menu/base.html' %}
 {% block title %}Staff Dashboard — Saveur{% endblock %}
-{% block extra_css %}
-<style>
-.dashboard{max-width:1300px;margin:0 auto;padding:2.5rem}
-.dash-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2.5rem}
-.dash-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:0.25rem}
-.dash-date{font-size:0.75rem;color:var(--text-muted);letter-spacing:0.1em}
-.live-indicator{display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;letter-spacing:0.1em;color:var(--success-light)}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--success-light);animation:pulse-live 1.5s infinite}
-@keyframes pulse-live{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem}
-.stat{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;position:relative;overflow:hidden;transition:border-color 0.3s}
-.stat:hover{border-color:var(--border-hover)}
-.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
-.stat.gold::after{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.stat.green::after{background:linear-gradient(90deg,transparent,var(--success-light),transparent)}
-.stat.blue::after{background:linear-gradient(90deg,transparent,#60a5fa,transparent)}
-.stat.purple::after{background:linear-gradient(90deg,transparent,#a78bfa,transparent)}
-.stat-label{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem}
-.stat-value{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:400;line-height:1;color:var(--text)}
-.dash-grid{display:grid;grid-template-columns:1fr 360px;gap:1.5rem}
-.section-label{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.75rem}
-.order-card{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:0.75rem;transition:all 0.3s;position:relative;overflow:hidden}
-.order-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--border)}
-.order-card.pending::before{background:var(--gold)}
-.order-card.preparing::before{background:#60a5fa}
-.order-card.ready::before{background:var(--success-light)}
-.order-card.new-anim{animation:slide-in 0.4s ease}
-@keyframes slide-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.order-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
-.order-id{font-family:'Cormorant Garamond',serif;font-size:1.1rem}
-.order-table{font-size:0.75rem;color:var(--text-muted);margin-top:0.1rem;letter-spacing:0.05em}
-.order-bottom{display:flex;align-items:center;justify-content:space-between}
-.order-total{color:var(--gold);font-size:0.9rem;font-weight:500}
-.status-sel{background:var(--dark3);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:0.35rem 0.7rem;font-size:0.75rem;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color 0.2s}
-.status-sel:focus{outline:none;border-color:var(--border-hover)}
-.inv-item{background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem;margin-bottom:0.6rem}
-.inv-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem}
-.inv-name{font-size:0.875rem;font-weight:500}
-.inv-qty{font-size:0.75rem;color:var(--text-muted)}
-.inv-bar{height:4px;border-radius:2px;background:var(--dark3);overflow:hidden}
-.inv-fill{height:100%;border-radius:2px;transition:width 0.5s}
-.notif{position:fixed;top:84px;right:1.5rem;background:var(--dark3);border:1px solid var(--border-strong);border-radius:var(--radius-lg);padding:1.1rem 1.5rem;max-width:320px;transform:translateX(380px);transition:transform 0.4s;z-index:500;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
-.notif::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.notif.show{transform:translateX(0)}
-.notif-title{font-size:0.8rem;color:var(--gold);font-weight:600;letter-spacing:0.05em;margin-bottom:0.3rem}
-.notif-body{font-size:0.78rem;color:var(--text-muted)}
-.no-orders{text-align:center;padding:3rem 1rem;color:var(--text-dim);font-size:0.875rem}
-.no-orders-icon{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text-dim);margin-bottom:0.5rem;display:block}
-</style>
-{% endblock %}
 {% block content %}
-<div class="dashboard">
-  <div class="dash-header">
-    <div>
-      <h1 class="dash-title">Staff Dashboard</h1>
-      <div class="dash-date" id="dash-date"></div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.75rem">
-      <div class="live-indicator"><div class="live-dot"></div><span id="conn-status">Connecting...</span></div>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+<div class="page-wrap" style="max-width:900px">
+  <h1 class="page-title">Staff Dashboard</h1>
+  <p class="page-sub">Welcome back, <span id="staff-name-h">Staff</span></p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;margin-bottom:2rem">
+    <a href="/waiter/" class="card" style="text-decoration:none;text-align:center;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:2rem;margin-bottom:0.5rem">🤵</div>
+      <div style="font-weight:600">Waiter Dashboard</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem">Manage your tables</div>
+    </a>
+    <a href="/kitchen/" class="card" style="text-decoration:none;text-align:center;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:2rem;margin-bottom:0.5rem">👨‍🍳</div>
+      <div style="font-weight:600">Kitchen Dashboard</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem">Manage orders & stock</div>
+    </a>
+    <a href="/store/" class="card" style="text-decoration:none;text-align:center;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:2rem;margin-bottom:0.5rem">📦</div>
+      <div style="font-weight:600">Store Inventory</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem">Stock & transfers</div>
+    </a>
+    <a href="/admin-dashboard/" class="card" style="text-decoration:none;text-align:center;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:2rem;margin-bottom:0.5rem">📊</div>
+      <div style="font-weight:600">Admin Dashboard</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem">Reports & analytics</div>
+    </a>
+    <a href="/attendance/" class="card" style="text-decoration:none;text-align:center;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:2rem;margin-bottom:0.5rem">⏰</div>
+      <div style="font-weight:600">Attendance</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem">Check in / out</div>
+    </a>
+    <a href="/qr-generate/" class="card" style="text-decoration:none;text-align:center;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:2rem;margin-bottom:0.5rem">📱</div>
+      <div style="font-weight:600">QR Codes</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem">Generate table QRs</div>
+    </a>
+  </div>
+  <div class="card">
+    <h3 style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1rem">Quick Actions</h3>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="checkIn()">⏰ Check In Today</button>
+      <button class="btn btn-outline btn-sm" onclick="checkOut()">⏏ Check Out</button>
+      <a href="/qr-generate/" class="btn btn-gold btn-sm">📱 Generate QR</a>
     </div>
   </div>
-
-  <div class="stats">
-    <div class="stat gold"><div class="stat-label">Pending</div><div class="stat-value" id="s-pending">0</div></div>
-    <div class="stat blue"><div class="stat-label">Preparing</div><div class="stat-value" id="s-preparing">0</div></div>
-    <div class="stat green"><div class="stat-label">Ready</div><div class="stat-value" id="s-ready">0</div></div>
-    <div class="stat purple"><div class="stat-label">Completed Today</div><div class="stat-value" id="s-completed">0</div></div>
-  </div>
-
-  <div class="dash-grid">
-    <div>
-      <div class="section-label"><div class="live-dot"></div>Active Orders</div>
-      <div id="orders-list"><div class="no-orders"><span class="no-orders-icon">◇</span>No active orders</div></div>
-    </div>
-    <div>
-      <div class="section-label">Inventory</div>
-      <div id="inv-list"></div>
-    </div>
-  </div>
-</div>
-
-<div class="notif" id="notif">
-  <div class="notif-title" id="notif-title">New Order</div>
-  <div class="notif-body" id="notif-body"></div>
 </div>
 {% endblock %}
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-const token = localStorage.getItem('token');
-if(!token) window.location.href = '/login/';
-let orders = [];
-
-function logout(){ localStorage.removeItem('token'); window.location.href='/login/'; }
-
-function updateTime(){
-  const now = new Date();
-  document.getElementById('dash-date').textContent = now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + ' — ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-}
-setInterval(updateTime,1000); updateTime();
-
-async function fetchOrders(){
-  try{
-    const res = await fetch(`${API}/orders`,{headers:{'Authorization':'Bearer '+token}});
-    if(res.status===401||res.status===403){logout();return;}
-    orders = await res.json();
-    renderOrders(); updateStats();
-  }catch(e){}
-}
-
-async function fetchInv(){
-  try{
-    const res = await fetch(`${API}/inventory`,{headers:{'Authorization':'Bearer '+token}});
-    const data = await res.json();
-    renderInv(data);
-  }catch(e){}
-}
-
-function renderOrders(){
-  const active = orders.filter(o=>o.status!=='completed');
-  const el = document.getElementById('orders-list');
-  if(!active.length){el.innerHTML='<div class="no-orders"><span class="no-orders-icon">◇</span>No active orders</div>';return;}
-  el.innerHTML = active.map(o=>`
-    <div class="order-card ${o.status} new-anim" id="oc-${o.id}">
-      <div class="order-top">
-        <div>
-          <div class="order-id">Order #${o.id}</div>
-          <div class="order-table">Table ${o.table_number||o.table_id}</div>
-        </div>
-        <span class="badge ${sb(o.status)}">${o.status}</span>
-      </div>
-      <div class="order-bottom">
-        <div class="order-total">$${parseFloat(o.total_amount).toFixed(2)} <span style="color:var(--text-dim);font-size:0.75em">/ KES ${Math.round(o.total_amount*130).toLocaleString()}</span></div>
-        <select class="status-sel" onchange="updateStatus(${o.id},this.value)">
-          <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
-          <option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option>
-          <option value="ready" ${o.status==='ready'?'selected':''}>Ready</option>
-          <option value="completed" ${o.status==='completed'?'selected':''}>Completed</option>
-        </select>
-      </div>
-    </div>
-  `).join('');
-}
-
-function sb(s){return{pending:'badge-yellow',preparing:'badge-blue',ready:'badge-green',completed:'badge-gold'}[s]||'badge-gold';}
-
-function updateStats(){
-  document.getElementById('s-pending').textContent=orders.filter(o=>o.status==='pending').length;
-  document.getElementById('s-preparing').textContent=orders.filter(o=>o.status==='preparing').length;
-  document.getElementById('s-ready').textContent=orders.filter(o=>o.status==='ready').length;
-  document.getElementById('s-completed').textContent=orders.filter(o=>o.status==='completed').length;
-}
-
-function renderInv(items){
-  document.getElementById('inv-list').innerHTML=items.map(i=>{
-    const pct=Math.min(100,(i.quantity_in_stock/200)*100);
-    const c=pct<20?'#f87171':pct<50?'#fbbf24':i.quantity_in_stock>0?'var(--success-light)':'#f87171';
-    return `<div class="inv-item">
-      <div class="inv-row"><span class="inv-name">${i.name}</span><span class="inv-qty">${i.quantity_in_stock} ${i.unit}</span></div>
-      <div class="inv-bar"><div class="inv-fill" style="width:${pct}%;background:${c}"></div></div>
-    </div>`;
-  }).join('');
-}
-
-async function updateStatus(id,status){
-  try{
-    await fetch(`${API}/orders/${id}/status`,{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({status})});
-    fetchOrders();
-  }catch(e){}
-}
-
-function showNotif(title,body){
-  document.getElementById('notif-title').textContent=title;
-  document.getElementById('notif-body').textContent=body;
-  const n=document.getElementById('notif');
-  n.classList.add('show');
-  setTimeout(()=>n.classList.remove('show'),5000);
-}
-
-const socket=io(API,{transports:['websocket','polling']});
-socket.on('connect',()=>{document.getElementById('conn-status').textContent='Live';});
-socket.on('disconnect',()=>{document.getElementById('conn-status').textContent='Reconnecting...';});
-socket.on('newOrder',d=>{showNotif('New Order — Table '+d.tableId,'$'+parseFloat(d.total).toFixed(2)+' / KES '+Math.round(d.total*130).toLocaleString());fetchOrders();});
-socket.on('orderStatusUpdate',()=>fetchOrders());
-
-fetchOrders(); fetchInv();
-setInterval(fetchOrders,20000);
-setInterval(fetchInv,60000);
+const token=localStorage.getItem('token');
+if(!token){window.location.href='/login/';}
+const name=localStorage.getItem('staffName')||'Staff';
+const role=localStorage.getItem('role')||'staff';
+document.getElementById('staff-name-h').textContent=name;
+// Role-based redirect
+if(role==='waiter'&&window.location.pathname==='/staff/') window.location.href='/waiter/';
+if(role==='kitchen'&&window.location.pathname==='/staff/') window.location.href='/kitchen/';
+if(role==='store'&&window.location.pathname==='/staff/') window.location.href='/store/';
+async function checkIn(){try{const r=await fetch(`${API}/attendance/checkin`,{method:'POST',headers:authHeader()});const d=await r.json();showToast(d.message,'gold');}catch(e){showToast('Check-in failed','error');}}
+async function checkOut(){try{const r=await fetch(`${API}/attendance/checkout`,{method:'POST',headers:authHeader()});const d=await r.json();showToast(d.message,'gold');}catch(e){showToast('Check-out failed','error');}}
 </script>
 {% endblock %}
-
-
